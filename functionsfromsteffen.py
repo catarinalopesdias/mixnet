@@ -99,7 +99,7 @@ def calc_gauss_function_np( mu, sigma, dim):
 
         return z
 
-def apply_random_brain_mask(data):
+def apply_random_brain_ (data):
         """Apply a random brain mask to the data (numpy implementation).
 
         Parameters

@@ -196,8 +196,8 @@ def view_slices_3dNew(image_3d, slice_nbr_x,slice_nbr_y,slice_nbr_z, vmin, vmax,
   print('input shape', image_3d.shape)
 
   gridspec = {'width_ratios': [1, 1, 1, 0.1]}
-  fig, ax = plt.subplots(1, 4, figsize=(15, 4), gridspec_kw=gridspec) 
-  plt.suptitle(title, fontsize=8)
+  fig, ax = plt.subplots(1, 4, figsize=(15, 8), gridspec_kw=gridspec) 
+  plt.suptitle(title, fontsize=16)
 
   print('axial, fixed z shape', np.take(image_3d, slice_nbr_z, 2).shape)
 

@@ -9,7 +9,7 @@ replicaytes teh add z_gradient
 import os
 import tensorflow as tf
 import numpy as np
-from visualize_volumes import view_slices_3d
+from visualize_volumes import view_slices_3d, view_slices_3dNew
 from create_datasetfunctions import simulate_susceptibility_sources, generate_3d_dipole_kernel, forward_convolution
 from generate_background_field_as_function_christian import generate_backgroundfield
 import random
@@ -26,7 +26,7 @@ shape_of_sus_cuboid = [size,size, size] # of the susceptibilitz sources
 print("create dipole")
 dipole_kernel = generate_3d_dipole_kernel(shape_of_sus_cuboid, voxel_size=1, b_vec=[0, 0, 1])
 print("view dipole")
-view_slices_3d(dipole_kernel, slice_nbr=50, vmin=-0.5, vmax=0.5, title="dipole kernel")
+view_slices_3dNew(dipole_kernel, 50,50,50, vmin=-0.5, vmax=0.5, title="dipole kernel")
 
 
 ###############################################################################
@@ -36,11 +36,11 @@ view_slices_3d(dipole_kernel, slice_nbr=50, vmin=-0.5, vmax=0.5, title="dipole k
 # 4D-cuboids (training samples, size, size, size)
 sim_gt_full =    np.zeros((num_train,size,size,size))
 sim_fwgt_full =    np.zeros((num_train,size,size,size)) 
-sim_bg_full = np.zeros((num_train,size,size,size)) 
-sim_fwbg_full = np.zeros((num_train, size,size,size)) 
+#sim_bg_full = np.zeros((num_train,size,size,size)) 
+#sim_fwbg_full = np.zeros((num_train, size,size,size)) 
 
 # create background field (now it is a cte)
-background_fied = generate_backgroundfield() #3D 128 128 128 # this is a constant
+#background_fied = generate_backgroundfield() #3D 128 128 128 # this is a constant
 
 
 ##############################################################################
@@ -58,8 +58,8 @@ for epoch_i in range(num_train):
     # Phase:forward convolution with the dipole kernel 
     sim_fwgt_full[epoch_i,:,:,:]  = forward_convolution(sim_gt_full[epoch_i,:,:,:])
     
-    sim_bg_full[epoch_i,:,:,:] = background_fied
-    sim_fwbg_full[epoch_i,:,:,:]  = forward_convolution(sim_bg_full[epoch_i, :,:,:])
+ '   sim_bg_full[epoch_i,:,:,:] = background_fied
+ '   sim_fwbg_full[epoch_i,:,:,:]  = forward_convolution(sim_bg_full[epoch_i, :,:,:])
 
 
     # Add background field
@@ -71,20 +71,20 @@ for epoch_i in range(num_train):
 # Visualize synthetic dataset
 ###############################################################################
 #   view ground truth
-view_slices_3d(sim_gt_full[1,:,:,:], slice_nbr=50, vmin=-1, vmax=1, title="images of the susceptibility (ground truth)" )
+view_slices_3d(sim_gt_full[1,:,:,:], 50,50,50, vmin=-1, vmax=1, title="images of the susceptibility (ground truth)" )
 #   view convolution
 print("view phase -conv mit dipole")
-view_slices_3d(sim_fwgt_full[1,:,:,:], slice_nbr=50, vmin=-1, vmax=1, title= "conv of gt susc sources with dipole kernel")
+view_slices_3d(sim_fwgt_full[1,:,:,:], 50, 50,50, vmin=-1, vmax=1, title= "conv of gt susc sources with dipole kernel")
 #   view phase + bavk 
 
 print("view noise")
-view_slices_3d(sim_bg_full[1,:,:,:], slice_nbr=50, vmin=-1, vmax=1, title= "Background GT")
+view_slices_3dNew(sim_bg_full[1,:,:,:], 50,50,50, vmin=-1, vmax=1, title= "Background GT")
 print("view noise")
-view_slices_3d(sim_fwbg_full[1,:,:,:], slice_nbr=50, vmin=-1, vmax=1, title= "Background Phase")
+view_slices_3dNew(sim_fwbg_full[1,:,:,:], 50,50,50, vmin=-1, vmax=1, title= "Background Phase")
 
 
 print("view phase + background field")
-view_slices_3d(sim_total_full[1,:,:,:], slice_nbr=50, vmin=-1, vmax=1, title= "total: phase +background phase")
+view_slices_3dNew(sim_total_full[1,:,:,:], 50,50,50, vmin=-1, vmax=1, title= "total: phase +background phase")
 ###############################################################################
 
 
@@ -100,28 +100,28 @@ view_slices_3d(sim_total_full[1,:,:,:], slice_nbr=50, vmin=-1, vmax=1, title= "t
 
 def distance_to_plane(point, normal, dim, signed_dist=False):
     
-    print('distance to plane')
-    print("----------------")
-    print('point', point)
-    print('normal', normal)
-    print('dim', dim)
+    #print('distance to plane')
+    #print("----------------")
+    #print('point', point)
+    #print('normal', normal)
+    #print('dim', dim)
     
-    print("----------------")
+    #print("----------------")
     
     ndim = len(dim)
     linspace = [np.linspace(0, dim[i] - 1, dim[i]) for i in range(ndim)] 
     
     coord = np.meshgrid(*linspace, indexing='ij')
 
-    print('linspace length', len(linspace))
-    print('linspace element 1 size', linspace[1].shape)
-    print('coord length', len(coord))
-    print('coord [1] shape', coord[1].shape)
+    #print('linspace length', len(linspace))
+    #print('linspace element 1 size', linspace[1].shape)
+    #print('coord length', len(coord))
+    #print('coord [1] shape', coord[1].shape)
     
 
     coord = np.stack(coord, axis=3)
     
-    print('coord after stacking shape', coord.shape)
+    #print('coord after stacking shape', coord.shape)
     
     # calculate distance
     # calculates the dot product between (3,w,h,d) and (3,1)
