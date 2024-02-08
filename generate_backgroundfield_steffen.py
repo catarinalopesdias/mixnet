@@ -279,10 +279,17 @@ backgroundfield = True
 if backgroundfield:
 
           bgf = np.zeros_like(mask)
+          print("add z gradient")
           bgf = add_z_gradient(bgf, slope_range)
+
+                      
+                      
+                      
+                      
+                      
           
-view_slices_3d(bgf, slice_nbr=50, vmin=-0.5, vmax=0.5, title="mask")
+view_slices_3d(bgf, slice_nbr=50, vmin=-20, vmax=20, title="mask")
           
 X = X + bgf          
 
-view_slices_3d(X, slice_nbr=50, vmin=-0.5, vmax=0.5, title="X with bg")
+view_slices_3d(X, slice_nbr=50, vmin=-20, vmax=20, title="X with bg")
