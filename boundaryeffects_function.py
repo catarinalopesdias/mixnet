@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Tue Feb 13 09:53:34 2024
+
+@author: catarinalopesdias
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Feb  7 08:47:22 2024
 
 @author: catarinalopesdias
@@ -8,13 +16,9 @@ Created on Wed Feb  7 08:47:22 2024
 """
 
 import numpy
-import os
 import tensorflow as tf
 import numpy as np
-from visualize_volumes import view_slices_3d, view_slices_3dNew
-from create_datasetfunctions import simulate_susceptibility_sources, generate_3d_dipole_kernel, forward_convolution
-from functionsfromsteffen import apply_random_brain_mask, calc_gauss_function_np, calc_gauss_function, forward_simulation
-from generate_backgroundfield_steffen import add_z_gradient
+from functionsfromsteffen import calc_gauss_function, forward_simulation
 
 
 def dilation(mask, kernel, kernel_size, shape, num_dilations):
@@ -242,130 +246,3 @@ def add_boundary_artifacts( data, mask, mean, std):
     result = tf.multiply(tf.cast(mask,tf.float64), result)
 
     return result
-
-##############################################################################
-##############################################################################
-# added boundary artifacts (background field with given mask)
-boundary_artifacts_mean = 90.0
-boundary_artifacts_std = 10.0
-
-# the slope of the added z gradient
-z_gradient_range = [3 * 2 * np.pi, 8 * 2 * np.pi]
-###############################################################################
-num_train = 2
-size = 128    #[128,128,128]
-rect_num = 30
-############################################################################################################################################################
-# Create synthetic dataset
-sim_gt_full =    np.zeros((num_train,size,size,size))
-# ground truth: Add rect_num to each cuboid to simulate susceptibility
-##############################################################################
-#print("iterate epochs,sim susc,  convolve, add background noise")
-#for epoch_i in range(num_train):
-    # Create ground thruth - add rectangles               
-#    sim_gt_full[epoch_i,:,:,:] = simulate_susceptibility_sources(simulation_dim = size, rectangles_total = rect_num, plot=False)
-
-#   view ground truth
-#view_slices_3dNew(sim_gt_full[1,:,:,:], 50,50,50, vmin=-1, vmax=1, title="images of the susceptibility (ground truth)" )
-
-
-###################################################################################
-
-data = sim_gt_full[1,:,:,:]
-X = data
-##
-#view_slices_3d(X, slice_nbr=50, vmin=-0.5, vmax=0.5, title="data X (gt)")
-####
-X_input, mask = apply_random_brain_mask(X)
-####
-#view_slices_3d(X_input, slice_nbr=50, vmin=-0.5, vmax=0.5, title="Xinput")
-#view_slices_3d(mask, slice_nbr=50, vmin=-0.5, vmax=0.5, title="mask")
-
-
-####################################
-backgroundfield = True
-apply_masking = True
-
-if backgroundfield:
-                print('backgroundfield')
-
-                bgf = np.zeros_like(mask)
-                print('add z gradient')
-                    
-                bgf = add_z_gradient(bgf,z_gradient_range)
-                view_slices_3dNew(bgf, 50,50,50, vmin=-10, vmax=10, title="background field")
-
-
-                if apply_masking:
-                    print("apply masking (and boundary artifacts) to background field")
-                            # add boundary artifacts
-                            
-                    bgf = add_boundary_artifacts(
-                                    bgf, mask, boundary_artifacts_mean,
-                                    boundary_artifacts_std)
-                        
-                    view_slices_3dNew(bgf, 50, 50,50, vmin=-10, vmax=10, title="bg field + masking (bondary artifacts)")
-
-                                
-
-                Xin_bg = tf.add(X_input, bgf) #????????????dkjfsdfsdsdklfjdsjfhhsdgfkjsdfkllfdfjfk
-                
-                view_slices_3d(Xin_bg, slice_nbr=50, vmin=-20, vmax=20, title="bg field + masking")
-
-
-X= Xin_bg
-
-##########################
-wrap_input_data = True
-
-
-
-if wrap_input_data:
-    print('wrap_data')
-    value_range = 2.0 * np.pi
-        # shift from [-pi,pi] to [0,2*pi]
-    X = tf.add(X, value_range / 2.0)
-    
-        # # calculate wrap counts
-        # self.tensor['wrap_count'] = tf.floor(
-        #     tf.divide(X, value_range))
-    
-    X = tf.math.floormod(X, value_range)
-    
-        # shift back to [-pi,pi]
-    X = tf.subtract(X, value_range / 2.0)
-    
-    view_slices_3d(X, slice_nbr=50, vmin=-20, vmax=20, title="wrapped")
-
-######################
-
-sensor_noise_mean = 0.0
-sensor_noise_std = 0.03
-
-sensor_noise = True
-if sensor_noise:
-    
-    tf_noise = tf.random.normal(
-        shape=X.get_shape(),
-        mean=sensor_noise_mean,
-        stddev=sensor_noise_std,
-        dtype=tf.float32)
-    
-    view_slices_3d(tf_noise.numpy(), slice_nbr=50, vmin=-0.5, vmax=0.5, title="noise")
-
-    X = tf.add(X, tf_noise.numpy()) 
-    view_slices_3d(X, slice_nbr=50, vmin=-5, vmax=5, title="noise+X")
-
-
-
-###############################################################################
-##############################################################################
-
-
-
-
-
-
-
-
-            

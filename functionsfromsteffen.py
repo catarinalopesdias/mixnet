@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb  6 10:50:03 2024
-
+Auxiliar functions taken from steffen code
 @author: catarinalopesdias
 """
 import numpy as np
@@ -99,7 +99,7 @@ def calc_gauss_function_np( mu, sigma, dim):
 
         return z
 
-def apply_random_brain_ (data):
+def apply_random_brain_mask(data):
         """Apply a random brain mask to the data (numpy implementation).
 
         Parameters
@@ -179,6 +179,52 @@ def distance_to_plane_np(point, normal, dim, signed_dist=False):
 
     return dist
 
+def distance_to_plane(point, normal, dim, signed_dist=False):
+    
+    #print('distance to plane')
+    #print("----------------")
+    #print('point', point)
+    #print('normal', normal)
+    #print('dim', dim)
+    
+    #print("----------------")
+    
+    ndim = len(dim)
+    linspace = [np.linspace(0, dim[i] - 1, dim[i]) for i in range(ndim)] 
+    
+    coord = np.meshgrid(*linspace, indexing='ij')
+
+    #print('linspace length', len(linspace))
+    #print('linspace element 1 size', linspace[1].shape)
+    #print('coord length', len(coord))
+    #print('coord [1] shape', coord[1].shape)
+    
+
+    coord = np.stack(coord, axis=3)
+    
+    #print('coord after stacking shape', coord.shape)
+    
+    # calculate distance
+    # calculates the dot product between (3,w,h,d) and (3,1)
+    pot = point.reshape(3,)
+    coord_minus_point = np.subtract(coord, pot)
+
+    
+    if signed_dist:
+        dist = np.dot(coord_minus_point, normal)
+    else:
+        dist = np.abs( np.dot(coord_minus_point, normal))
+        
+    dist = np.squeeze(dist)
+        
+    dist = np.divide(dist, np.linalg.norm(normal))
+
+    
+    return dist
+
+##############################################################################
+
+
 def calc_dipole_kernel(dim):
         """Calculates the dipole kernel of dimension 'dim'
         (1/3 - k_z^2/k^2)
@@ -211,6 +257,9 @@ def calc_dipole_kernel(dim):
         kernel = 1.0 / 3.0 - tf.square(coord[2]) / magnitude
 
         return kernel
+
+
+
 
 def fftshift(tensor):
     """Calculates fftshift for a given tf tensor.
