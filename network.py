@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Dec 11 12:23:10 2023
-
+This is one U net network
 @author: catarinalopesdias
 """
 import os
@@ -208,3 +208,4 @@ def build_CNN(input_tensor):
 
     #r#eturn output_tensor
     return tf.keras.Model(inputs=input_tensor, outputs=output_tensor)
+    #return tf.keras.Model(inputs=input_tensor, outputs=output_tensor), output_tensor
