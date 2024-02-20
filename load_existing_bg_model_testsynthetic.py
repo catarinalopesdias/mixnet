@@ -55,8 +55,8 @@ model.compile(loss = lossU, optimizer = 'adam')
 # load unseen data 
 
 #new data
-phasebg  = np.load('syntheticdata/phase_bg50.npy')
-phase  = np.load('syntheticdata/phase50.npy')
+phasebg  = np.load('syntheticdata/50phase_bg.npy')
+phase  = np.load('syntheticdata/50phase.npy')
 num_instance = 50
           
 #view_slices_3dNew(loaded_array[index,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="X ongoing-fw,masj,bg,sn,wrapped")
@@ -74,7 +74,8 @@ for epoch_i in range(3): #num_instance
 
     print(epoch_i)
     title =   "trained network with testing data 50 epochs: " + str(epoch_i)
-    predicted, reference,error = visualize_all4(phasebg[epoch_i,:,:,:], phase[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True )
+    pathi = "models/backgroundremoval/results/testset_epoch" + str(epoch_i)
+    predicted, reference,error = visualize_all4(phasebg[epoch_i,:,:,:], phase[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
 #########################
 
 #import matplotlib.pyplot as plt
