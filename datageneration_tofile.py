@@ -194,7 +194,7 @@ view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[index,:,:,:], 50, 50,50, vmin=-10,
 view_slices_3dNew(Xongoing[index,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="X ongoing-fw,masj,bg,sn,wrapped")
 
 
-titleGT = "syntheticdata/GT" + str(num_train_instances)+"GT.npy"
+titleGT = "syntheticdata/" + str(num_train_instances)+"GT.npy"
 np.save(titleGT,sim_gt)
 
 titlephasebg = "syntheticdata/" + str(num_train_instances)+"phase_bg.npy"

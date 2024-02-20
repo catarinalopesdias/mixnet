@@ -240,7 +240,7 @@ def view_slices_3dNew(image_3d, slice_nbr_x,slice_nbr_y,slice_nbr_z, vmin, vmax,
   #plt.show()
  
  
-def visualize_all4(resized_input, reference , predicted, title, save ):
+def visualize_all4(resized_input, reference , predicted, title, save, path):
   
   #shape input
   input_data_shape = list(resized_input.shape)
@@ -403,7 +403,7 @@ def visualize_all4(resized_input, reference , predicted, title, save ):
   grid.cbar_axes[0].colorbar(jj)
 
   if save:    
-      filename = "images/" + title + ".png"
+      filename = path +  ".png"
       plt.savefig(filename)
   plt.show()
   
