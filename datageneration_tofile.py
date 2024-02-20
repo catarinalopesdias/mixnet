@@ -17,7 +17,7 @@ from boundaryeffects_function import add_boundary_artifacts
 
 import tensorflow as tf
 
-num_train_instances = 100
+num_train_instances = 50
 size = 128    #[128,128,128]
 rect_num = 200
 
@@ -194,10 +194,13 @@ view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[index,:,:,:], 50, 50,50, vmin=-10,
 view_slices_3dNew(Xongoing[index,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="X ongoing-fw,masj,bg,sn,wrapped")
 
 
-titlephasebg = "syntheticdata/phase_bg" + str(num_train_instances)+".npy"
+titleGT = "syntheticdata/GT" + str(num_train_instances)+"GT.npy"
+np.save(titleGT,sim_gt)
+
+titlephasebg = "syntheticdata/" + str(num_train_instances)+"phase_bg.npy"
 
 np.save(titlephasebg, Xongoing)
-titlephase = "syntheticdata/phase" + str(num_train_instances)+".npy"
+titlephase = "syntheticdata/" + str(num_train_instances)+"phase.npy"
 
 np.save(titlephase, Xinput)
 
