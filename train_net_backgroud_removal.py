@@ -66,11 +66,29 @@ model = build_CNN(input_tensor)
 ###############################################
 ###############################################
 print("Model with gradient accumulation")
-gaaccumsteps = 8;
+gaaccumsteps = 12;
 model = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, outputs=model.output)
 
 # we changed to mean absolute error
-lossU = "mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
+lossU = "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
+#opt = keras.optimizers.Adam(learning_rate=0.0001, beta_1=0.9 ,beta_2 =0.999, epsilon=1e-8, gradient_accumulation_steps=gaaccumsteps )
+
+ # from model manager
+#          optimizer = tf.train.AdamOptimizer(
+  #              learning_rate=self.para['learning_rate'],
+  #              beta1=0.9,
+  #              beta2=0.999,
+  #              epsilon=1e-8)
+
+
+
+#default from Adam
+#  learning_rate=0.001,
+#    beta_1=0.9,
+#    beta_2=0.999,
+#    epsilon=1e-07,
+
+
 model.compile(optimizer='adam', loss= lossU) #mean_absolute_error
 model.summary()
 
@@ -112,9 +130,9 @@ else:
 ##############################################################################################
 
 
-dataset_iterations = 200
-save_period = 50
-batch_size = 2
+dataset_iterations = 300
+save_period = 100
+batch_size = 1
 
 ###############
 
@@ -169,10 +187,12 @@ with open('loss_historyGA.pickle', 'wb') as f:
 if not os.path.exists("models/backgroundremoval"): 
     os.makedirs("models/backgroundremoval") 
     
-model_name = "models/backgroundremoval/modelBR_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".h5"
-model.save(model_name)
+#model_name = "models/backgroundremoval/modelBR_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".h5"
+model_name1 = "models/backgroundremoval/modelBR_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".keras"
 
+#model.save(model_name)
 
+model.save(model_name1)
 #tf.keras.models.save_model(model, model_name)    
     
     

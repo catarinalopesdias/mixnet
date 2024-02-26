@@ -33,13 +33,15 @@ from tensorflow import keras
 # model data
 
 
-num_train_instances = 100
-dataset_iterations = 100
-batch_size = 2
-gaaccumsteps = 8;
-lossU = "mean_absolute_error" #"mse"# "mean_absolute_error" #"mse"    #mse
+num_train_instances = 100 
+dataset_iterations = 300
+finalcheckpoint = 240
+batch_size = 1
+gaaccumsteps = 12;
+lossU = "mse" # "mean_absolute_error" #"mse"# "mean_absolute_error" #"mse"    #mse
 
-path = "checkpoints/bgremovalmodel/cp-0"+ str(dataset_iterations) +"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
+
+path = "checkpoints/bgremovalmodel/cp-0"+ str(finalcheckpoint) +"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
 #path = "checkpoints/GAcp-0"+ str(epochs_train) + str(num_train)+ "trainsamples_" + str(epochs_train) +"epochs_" + "batchsize"+ str(batch_size)+ "_"+ str(gaaccumsteps) +"gaaccum" + "loss"+str(lossU)+".ckpt"
 #path = "checkpoints/GAcp-00"+str(num_epochs)+".ckpt/"
 model = tf.keras.models.load_model(path)
@@ -73,8 +75,8 @@ for epoch_i in range(3): #num_instance
     y_pred = model.predict(X_test)
 
     print(epoch_i)
-    title =   "trained network with testing data 50 epochs: " + str(epoch_i)
-    pathi = "models/backgroundremoval/results/testset_epoch" + str(epoch_i)
+    title =   "trained network with testing data 50 epochs: " + str(epoch_i)+ " " + lossU
+    pathi = "models/backgroundremoval/results/" + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+ "_testset_epoch" + str(epoch_i)
     predicted, reference,error = visualize_all4(phasebg[epoch_i,:,:,:], phase[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
 #########################
 
