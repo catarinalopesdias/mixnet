@@ -19,7 +19,7 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-#from networks.network import build_CNN
+from networks.network_phillip import build_CNN
 #from networks.network_BOLLMAN import build_CNN_BOLLMAN
 from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
 from visualize_volumes import view_slices_3dNew
@@ -37,7 +37,7 @@ from visualize_volumes import view_slices_3dNew
 loaded = np.load('datasynthetic/150samples.npz')
 
 phase = loaded['phase1']
-phase_bg = loaded['phase_bg1']
+gt = loaded['sim_gt1']
 del loaded
 #######################
 
@@ -60,7 +60,7 @@ num_slice = 3
 
 
 view_slices_3dNew(phase[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="phase") 
-view_slices_3dNew(phase_bg[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="phase+bg")
+view_slices_3dNew(gt[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="gt")
 del num_slice
 
 num_train_instances = phase.shape[0]
@@ -80,8 +80,8 @@ input_tensor = Input(shape = input_shape, name="input")
 print("compile model")
 
 #model = Model(input_tensor, ushape2) #get from orig deepQSM algorithm
-#model = build_CNN(input_tensor)
-model = build_CNN_BOLLMAN(input_tensor)
+model = build_CNN(input_tensor)
+#model = build_CNN_BOLLMAN(input_tensor)
 
 #model.compile(optimizer='adam', loss='mean_absolute_error')
 #model.summary()
@@ -98,7 +98,7 @@ lossU = "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
 
 # from model manager
 optimizerMINE = Adam(
-              learning_rate=0.0003,
+              #learning_rate=0.0003,
                 beta_1=0.9,
                 beta_2=0.999,
                epsilon=1e-8
@@ -120,7 +120,7 @@ model.summary()
 print("untrained")
 # what does the untrained model predict
 test_epoch_nbr = 3
-X_test = phase_bg[np.newaxis, test_epoch_nbr,:,:,:, np.newaxis]
+X_test = phase[np.newaxis, test_epoch_nbr,:,:,:, np.newaxis]
 print(X_test.shape)
 
 y_pred = model.predict(X_test)
@@ -147,13 +147,13 @@ else:
 
 ##############################################################################################
 
-dataset_iterations = 100
+dataset_iterations = 5000
 save_period = 150
 batch_size = 1
 num_filter = 16
 ###############
-
-checkpoint_path = "checkpoints/bgremovalmodel/newadam" + str(num_filter)+"cp-{epoch:04d}"+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
+# {epoch:04d}
+checkpoint_path = "checkpoints/dipoleinversion/newadam_" + str(num_filter)+"filter"+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -180,8 +180,8 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 
 
 
-train_images =tf.expand_dims(phase_bg, 4)
-train_labels = tf.expand_dims(phase, 4)
+train_images =tf.expand_dims(phase, 4)
+train_labels = tf.expand_dims(gt, 4)
 
 print("fit model")
 history = model.fit(train_images, train_labels,  epochs=dataset_iterations, batch_size=batch_size, shuffle=True,#nitial_epoch = 289,
@@ -201,12 +201,10 @@ with open('loss_historyGA.pickle', 'wb') as f:
 #if not os.path.exists("models/backgroundremoval"): 
 #    os.makedirs("models/backgroundremoval") 
     
-if not os.path.exists("models/backgroundremovalBOLLMAN"): 
-    os.makedirs("models/backgroundremovalBOLLMAN")     
+if not os.path.exists("models/dipoleinversion"): 
+    os.makedirs("models/dipoleinversion")     
     
-#model_name = "models/backgroundremoval/modelBR_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".h5"
-#model_name1 = "models/backgroundremoval/modelBR_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".keras"
-model_name1 = "models/backgroundremovalBOLLMAN/modelBR_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".keras"
+model_name1 = "models/dipoleinversion/model_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".keras"
 
 
 #model.save(model_name)
@@ -222,26 +220,24 @@ model.save(model_name1)
 #################################
 #plot loss
 
-if not os.path.exists("models/backgroundremoval/loss"): 
-    os.makedirs("models/backgroundremoval/loss") 
+lossfile_extensionpng =".png"
+lossfile_extensiontxt =".txt"
 
-if not os.path.exists("models/backgroundremovalBOLLMAN/loss"): 
-    os.makedirs("models/backgroundremovalBOLLMAN/loss") 
+if not os.path.exists("models/dipoleinversion/loss"): 
+    os.makedirs("models/dipoleinversion/loss") 
     
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
 plt.title("Loss")
 plt.xlabel("Dataset iterations")
-lossnamefile = "models/backgroundremovalBOLLMAN/loss/modelBR_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ lossU
-lossfile_extension =".png"
-plt.savefig(lossnamefile + lossfile_extension )
+lossnamefile = "models/dipoleinversion/loss/modelBR_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ lossU
+plt.savefig(lossnamefile + lossfile_extensionpng )
 
 ###############
 # plot loss as txt
-lossfile_extension =".txt"
 
-file = open(lossnamefile+lossfile_extension,'w')
+file = open(lossnamefile+lossfile_extensiontxt,'w')
 for item in loss_historyGA:
 
 	file.write(str(item)+"\n")

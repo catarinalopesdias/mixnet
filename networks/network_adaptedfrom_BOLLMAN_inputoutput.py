@@ -56,7 +56,7 @@ def upsample(filters, kernel_size, apply_dropout=False, apply_batchnorm=True):
   return result
 
 
-def build_CNN_BOLLMAN(input_tensor):
+def build_CNN_BOLLMANinputoutput(input_tensor):
 
   filter_base = 16
   kernel_size = 3
@@ -85,10 +85,7 @@ def build_CNN_BOLLMAN(input_tensor):
                                          activation='tanh')
 
   concat = tf.keras.layers.Concatenate()
-
-
   x = input_tensor
-
   # Downsampling through the model
   skips = []
   for down in down_stack:
@@ -104,6 +101,6 @@ def build_CNN_BOLLMAN(input_tensor):
 
   x = last(x)
 
-  return tf.keras.Model(input_tensor, x)
+  return x
 
 

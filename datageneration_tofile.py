@@ -19,7 +19,7 @@ from boundaryeffects_function import add_boundary_artifacts
 
 import tensorflow as tf
 
-num_train_instances = 200
+num_train_instances = 5
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -61,6 +61,8 @@ bgf_mask = np.zeros_like(mask)
 sensornoise = np.zeros_like(mask)
 
 Xinput = np.ones_like(sim_gt)
+gtmask = np.ones_like(sim_gt)
+
 Xongoing = np.ones_like(sim_gt)
 
 #################################################################
@@ -92,6 +94,10 @@ for epoch_i in range(num_train_instances):
                                               :] = apply_random_brain_mask(sim_fwgt[epoch_i, :, :, :])
 
         Xinput[epoch_i, :, :, :] = sim_fwgt_mask[epoch_i, :, :, :]
+        
+        gtmask[epoch_i, :, :, :] = tf.multiply(
+            sim_gt[epoch_i, :, :, :], mask[epoch_i, :, :, :])
+        
 
 ######################
     if backgroundfield:
@@ -177,8 +183,8 @@ for epoch_i in range(num_train_instances):
 ##############################################################################
 # visualize
 ##############################################################################
-index = 3
-view_slices_3dNew(sim_gt[index, :, :, :], 50, 50, 50,
+index = 1
+view_slices_3dNew(gtmask[index, :, :, :], 50, 50, 50,
                   vmin=-1.5, vmax=1.5, title="gt")
 view_slices_3dNew(sim_fwgt[index, :, :, :], 50, 50,
                   50, vmin=-1.5, vmax=1.5, title="fw")
@@ -245,8 +251,13 @@ final1 = "datasynthetic/" + str(num_train_instances)+"phase_bg" + ".h5"
 
 #np.save(titlephase, Xinput)
 #np.save(titlephase, Xinput)
+
+#final = "/mnt/neuro/physics/catarina/" + titlephase
+
+
+#/mnt/neuro/nas2/Catarina
 title = "datasynthetic/" + str(num_train_instances) + "samples"
 
-np.savez_compressed(title, sim_gt1 = sim_gt, phase_bg1 = Xongoing, phase1 = Xinput )
+np.savez_compressed(title, sim_gt1 = gtmask, phase_bg1 = Xongoing, phase1 = Xinput )
 ###
 #loaded = np.load('')

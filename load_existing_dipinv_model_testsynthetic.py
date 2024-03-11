@@ -17,8 +17,10 @@ import os
 import tensorflow as tf
 #import matplotlib.pyplot as plt
 import numpy as np
-from datahandling import read_and_decode_tf
-from pl import visualize_all4
+#from datahandling import read_and_code_tf
+from plotting.visualize_volumes import visualize_all4
+#from datahandlinging import visualize_volumes
+#import read_and_code_tf
 
 
 ###############################################################################
@@ -29,31 +31,22 @@ from pl import visualize_all4
 #num_epochs = 60
 #batch_size = 1
 
-# model datalossss
+# model data
+
+
 num_train_instances = 150
 dataset_iterations = 5000
-finalcheckpoint = 2996
+finalcheckpoint = 500
 batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
 
 
 lossU = "mse" # "mean_absolute_error" #"mse"# "mean_absolute_error" #"mse"    #mse
-
-#newadam16cp-2996_trainsamples150_datasetiter3000_batchsize1_gaaccum10_loss_mse.ckpt
-#newadam16cp-1981_trainsamples150_datasetiter2000_batchsize1_gaaccum10_loss_mse.ckpt
-#newadam16cp-1307_trainsamples150_datasetiter2000_batchsize1_gaaccum10_loss_mse.ckpt
-#n#ewadam16cp-1977_trainsamples130_datasetiter2000_batchsize1_gaaccum10_loss_mse.ckpt
-#newadam64cp-0997_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#32cp-0416_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#32cp-0469_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#cp-0326_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#cp-0300_trainsamples100_datasetiter300_batchsize1_gaaccum10_loss_mse.ckpt.index
-#path = "checkpoints/bgremovalmodel/cp-0"+ str(finalcheckpoint) +"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt.index"
 #model_newadam_16filters_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp
-#model_newadam_16filters_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillip#
-path = "checkpoints/bgremovalmodel/newadam"+str(num_filter)+"cp-"+ str(finalcheckpoint) +"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
-
+#newadam_16filter_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp.ckpt
+path = "checkpoints/dipoleinversion/newadam_"+str(num_filter)+"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+"_phillipp.ckpt"
+path = "checkpoints/dipoleinversion/newadam_16filter_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp.ckpt"
 #path = "checkpoints/GAcp-0"+ str(epochs_train) + str(num_train)+ "trainsamples_" + str(epochs_train) +"epochs_" + "batchsize"+ str(batch_size)+ "_"+ str(gaaccumsteps) +"gaaccum" + "loss"+str(lossU)+".ckpt"
 #path = "checkpoints/GAcp-00"+str(num_epochs)+".ckpt/"
 
@@ -77,7 +70,7 @@ newdata=False
 
 # compressed data
 if newdata:
-    loaded = np.load('datasynthetic/10samples.npz')
+    loaded = np.load('datasynthetic/5samples.npz')
     text = "testdata"
 else: #traindata
     loaded = np.load('datasynthetic/150samples.npz')
@@ -85,7 +78,7 @@ else: #traindata
 
 
 phase = loaded['phase1']
-phasebg = loaded['phase_bg1']
+gt = loaded['sim_gt1']
 del loaded
 #new data
 #phasebg  = np.load('datasynthetic/50phase_bg.npy')
@@ -100,14 +93,14 @@ num_instance = 50
 
 
 for epoch_i in range(3): #num_instance
-    X_test = phasebg[np.newaxis, epoch_i,:,:,:, np.newaxis]
+    X_test = phase[np.newaxis, epoch_i,:,:,:, np.newaxis]
 
     y_pred = model.predict(X_test)
 
     print(epoch_i)
     title =   "trained network with testing data 50 epochs: " + str(epoch_i)+ " " + lossU
-    pathi = "models/backgroundremovalBOLLMAN/results/train"+str(num_filter) + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+ "_testset_epoch" + str(epoch_i) + text
-    predicted, reference,error = visualize_all4(phasebg[epoch_i,:,:,:], phase[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
+    pathi = "models/dipoleinversion/results/train"+str(num_filter) + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+ "_testset_epoch" + str(epoch_i) + text
+    predicted, reference,error = visualize_all4(phase[epoch_i,:,:,:], gt[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
 #########################
 
 #import matplotlib.pyplot as plt

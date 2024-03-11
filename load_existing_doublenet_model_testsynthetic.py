@@ -18,7 +18,7 @@ import tensorflow as tf
 #import matplotlib.pyplot as plt
 import numpy as np
 from datahandling import read_and_decode_tf
-from pl import visualize_all4
+from visualize_volumes import visualize_all4
 
 
 ###############################################################################
@@ -29,30 +29,28 @@ from pl import visualize_all4
 #num_epochs = 60
 #batch_size = 1
 
-# model datalossss
+# model data
+
+
 num_train_instances = 150
 dataset_iterations = 5000
-finalcheckpoint = 2996
+#finalcheckpoint = 2996
 batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
 
 
-lossU = "mse" # "mean_absolute_error" #"mse"# "mean_absolute_error" #"mse"    #mse
+lossU = "msemse" # "mean_absolute_error" #"mse"# "mean_absolute_error" #"mse"    #mse
 
-#newadam16cp-2996_trainsamples150_datasetiter3000_batchsize1_gaaccum10_loss_mse.ckpt
-#newadam16cp-1981_trainsamples150_datasetiter2000_batchsize1_gaaccum10_loss_mse.ckpt
-#newadam16cp-1307_trainsamples150_datasetiter2000_batchsize1_gaaccum10_loss_mse.ckpt
-#n#ewadam16cp-1977_trainsamples130_datasetiter2000_batchsize1_gaaccum10_loss_mse.ckpt
-#newadam64cp-0997_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#32cp-0416_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#32cp-0469_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#cp-0326_trainsamples100_datasetiter999_batchsize1_gaaccum10_loss_mse.ckpt
-#cp-0300_trainsamples100_datasetiter300_batchsize1_gaaccum10_loss_mse.ckpt.index
-#path = "checkpoints/bgremovalmodel/cp-0"+ str(finalcheckpoint) +"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt.index"
-#model_newadam_16filters_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp
-#model_newadam_16filters_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillip#
-path = "checkpoints/bgremovalmodel/newadam"+str(num_filter)+"cp-"+ str(finalcheckpoint) +"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
+
+
+#/home/catarinalopesdias/proj_mixnet/checkpoints/doublenet/newadam16_trainsamples150_datasetiter500_batchsize1_gaaccum10_loss_msemse.ckpt
+
+path = "checkpoints/doublenet/newadam16_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_msemse_stop3700_0003andstop.ckpt"
+
+#"checkpoints/doublenet/newadam"+str(num_filter)+"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
+
+#path = "checkpoints/doublenet/newadam"+str(num_filter)+"cp-"+ str(finalcheckpoint) +"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
 
 #path = "checkpoints/GAcp-0"+ str(epochs_train) + str(num_train)+ "trainsamples_" + str(epochs_train) +"epochs_" + "batchsize"+ str(batch_size)+ "_"+ str(gaaccumsteps) +"gaaccum" + "loss"+str(lossU)+".ckpt"
 #path = "checkpoints/GAcp-00"+str(num_epochs)+".ckpt/"
@@ -77,7 +75,7 @@ newdata=False
 
 # compressed data
 if newdata:
-    loaded = np.load('datasynthetic/10samples.npz')
+    loaded = np.load('datasynthetic/150samples_1.npz')
     text = "testdata"
 else: #traindata
     loaded = np.load('datasynthetic/150samples.npz')
@@ -86,6 +84,8 @@ else: #traindata
 
 phase = loaded['phase1']
 phasebg = loaded['phase_bg1']
+phase = loaded['phase1']
+gt = loaded['sim_gt1']
 del loaded
 #new data
 #phasebg  = np.load('datasynthetic/50phase_bg.npy')
@@ -96,7 +96,8 @@ num_instance = 50
           
 
 
-
+if not os.path.exists("models/doublenet/results"): 
+    os.makedirs("models/doublenet/results") 
 
 
 for epoch_i in range(3): #num_instance
@@ -105,9 +106,15 @@ for epoch_i in range(3): #num_instance
     y_pred = model.predict(X_test)
 
     print(epoch_i)
-    title =   "trained network with testing data 50 epochs: " + str(epoch_i)+ " " + lossU
-    pathi = "models/backgroundremovalBOLLMAN/results/train"+str(num_filter) + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+ "_testset_epoch" + str(epoch_i) + text
-    predicted, reference,error = visualize_all4(phasebg[epoch_i,:,:,:], phase[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
+    title =   "FIRST network: " + str(epoch_i)+ " " + lossU
+    pathi = "models/doublenet/results/FIRSTNET_train"+str(num_filter) + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU +  text + "_epoch" + str(epoch_i)
+    predicted, reference,error = visualize_all4(phasebg[epoch_i,:,:,:], phase[epoch_i,:,:,:], y_pred[0][0,:,:,:,0] ,title = title , save = True, path = pathi )
+    title =   "Second network: " + str(epoch_i)+ " " + lossU
+
+    pathi = "models/doublenet/results/SECONDNET_train"+str(num_filter) + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU +  text + "_epoch" + str(epoch_i) 
+    predicted, reference,error = visualize_all4(phasebg[epoch_i,:,:,:], gt[epoch_i,:,:,:], y_pred[1][0,:,:,:,0] ,title = title , save = True, path = pathi )
+    
+    
 #########################
 
 #import matplotlib.pyplot as plt
