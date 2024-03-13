@@ -155,7 +155,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                  verbose=1)
 
 earlystop = tf.keras.callbacks.EarlyStopping(
-    monitor="loss",#
+    monitor="val_loss",#
     min_delta=0,
     patience=100,
     verbose=1,
@@ -186,7 +186,7 @@ del train_labels_m1, train_labels_m2 #train_images_m2
 
 history = model.fit(train_images_m1,train_labels,  epochs=dataset_iterations, batch_size=batch_size, shuffle=True,
           callbacks = [cp_callback,earlystop],
-          #validation_split=0.1
+          validation_split=0.1
           )  # pass callback to training for saving the model80
 
 loss_historyGA = history.history['loss']
@@ -240,14 +240,14 @@ file.close()
 #######################################
 # First loss
 
-loss_historyF = history.history['conv3d_transpose_129_loss']
+loss_historyF = history.history['endbollman_loss']
 
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyF)
 #plt.ylim([0, 0.03])
-plt.title("Loss first model")
+plt.title("Loss first model-U1")
 plt.xlabel("Epochs ")
-lossnamefileF = "models/doublenet/loss/model_BollmannPhillip_newadam_1_" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ losses[0] +losses[1]+text_stop+"_"+text_lr
+lossnamefileF = "models/doublenet/loss/model_BollmannPhillip_newadam_U1_" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ losses[0] +losses[1]+text_stop+"_"+text_lr
 
 plt.savefig(lossnamefileF + lossfile_extensionpng )
 
@@ -261,14 +261,14 @@ file.close()
 
 # Second loss ######################################
 
-loss_historyS = history.history['add_63_loss']
+loss_historyS = history.history['endphillip_loss']
 
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyS)
 #plt.ylim([0, 0.03])
-plt.title("Loss Second model")
+plt.title("Loss Second model U2")
 plt.xlabel("Epochs ")
-lossnamefileS = "models/doublenet/loss/model_BollmannPhillip_newadam_2_" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ losses[0] +losses[1]+text_stop+"_"+text_lr
+lossnamefileS = "models/doublenet/loss/model_BollmannPhillip_newadam_U2_" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ losses[0] +losses[1]+text_stop+"_"+text_lr
 
 plt.savefig(lossnamefileS + lossfile_extensionpng )
 
