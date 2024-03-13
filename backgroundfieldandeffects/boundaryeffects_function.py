@@ -18,7 +18,7 @@ Created on Wed Feb  7 08:47:22 2024
 import numpy
 import tensorflow as tf
 import numpy as np
-from functionsfromsteffen import calc_gauss_function, forward_simulation
+from backgroundfieldandeffects.functionsfromsteffen import calc_gauss_function, forward_simulation
 
 
 def dilation(mask, kernel, kernel_size, shape, num_dilations):

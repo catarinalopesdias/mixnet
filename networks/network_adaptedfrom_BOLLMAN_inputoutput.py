@@ -82,7 +82,7 @@ def build_CNN_BOLLMANinputoutput(input_tensor):
                                          strides=2,
                                          padding='same',
                                          #kernel_initializer=initializer,
-                                         activation='tanh')
+                                         activation='tanh', name='endbollman')
 
   concat = tf.keras.layers.Concatenate()
   x = input_tensor

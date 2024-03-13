@@ -16,7 +16,7 @@ replicates the add_z_gradient function
 """
 import numpy as np
 from numpy import linalg as LA    
-from functionsfromsteffen import calc_gauss_function_np, apply_random_brain_mask, distance_to_plane_np, distance_to_plane
+from backgroundfieldandeffects.functionsfromsteffen import calc_gauss_function_np, apply_random_brain_mask, distance_to_plane_np, distance_to_plane
 
 ##############################
 ##############################################

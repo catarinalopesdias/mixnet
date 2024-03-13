@@ -52,6 +52,27 @@ print("Model with gradient accumulation")
 gaaccumsteps = 10;
 ###############################
 
+params = {'dim': (128,128,128),
+          'batch_size': 1,
+          'n_classes': 1,
+          'n_channels': 1,
+          'shuffle': True}
+
+##################
+
+labels = tools.read_dict('../datasets/dataset_single.csv',
+                                 value_type=constants.ValueType.INT)
+
+
+partition = # IDs
+labels = # Labels
+
+# Generators
+training_generator   = DataGenerator(partition['train'], labels, **params)
+validation_generator = DataGenerator(partition['validation'], labels, **params)
+
+
+#################################
 
 #learningrate
 lr =0.003
@@ -100,23 +121,9 @@ model = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, ou
 #odel = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, outputs={'ushape1': model.outputs[0], 'ushape2': model.outputs[1]} )
 
 
-
-
-
 model.summary
-
-
 model.compile(optimizer=optimizerMINE, loss = losses)
 ##################
-
-
-
-###############################################################################
-#   Visualize outcomes of untrained models
-#  Untrained models 
-############################################################################### 
-
-
 
 ###############################################################################
 ###############################################################################
@@ -131,7 +138,7 @@ if gpus:
 else:
     print("No GPU devices found.")
     
-    del gpu, gpus
+    del gpus
 ###############################################################################
 
 dataset_iterations = 5000
@@ -184,10 +191,40 @@ print("fit model")
 train_labels= [train_labels_m1, train_labels_m2] #[train_labels_m1]#
 del train_labels_m1, train_labels_m2 #train_images_m2
 
-history = model.fit(train_images_m1,train_labels,  epochs=dataset_iterations, batch_size=batch_size, shuffle=True,
-          callbacks = [cp_callback,earlystop],
-          #validation_split=0.1
-          )  # pass callback to training for saving the model80
+##########################################
+
+#create dictonary
+phasebg_dic =[]
+gt_dic = []
+
+nr_total = 150
+
+for i in range(150):
+    phasebg_dic.append('phasebg-' + str(i) + '.npy')
+    gt_dic.append('gt-' + str(i)+'.npy')
+   
+
+#######################
+
+partition = {'train': phasebg_dic[0: int(0.9*nr_total)] , 'validation':  phasebg_dic[int(-0.1*nr_total):nr_total]}
+
+#labels = {'id-1': 0, 'id-2': 1, 'id-3': 2, 'id-4': 1}
+#########################################################
+
+
+
+
+
+history = model.fit_generator(generator=training_generator,
+                    validation_data=validation_generator,
+                    use_multiprocessing=True,
+                    workers=6)
+
+
+#history = model.fit(train_images_m1,train_labels,  epochs=dataset_iterations, batch_size=batch_size, shuffle=True,
+#          callbacks = [cp_callback,earlystop],
+#          #validation_split=0.1
+#          )  # pass callback to training for saving the model80
 
 loss_historyGA = history.history['loss']
 

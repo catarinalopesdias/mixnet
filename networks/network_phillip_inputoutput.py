@@ -13,7 +13,7 @@ from keras.layers import Input ,Conv3D, Conv3DTranspose, LeakyReLU, UpSampling3D
 from keras.models import Model
 from keras.initializers import GlorotNormal
 
-def build_CNN_phillip(input_tensor):
+def build_CNN_phillip_inputoutput(input_tensor):
 
 
 #########################################################################################################################
@@ -203,9 +203,9 @@ def build_CNN_phillip(input_tensor):
     output_layer = Conv3D(filters=1 ,kernel_size=[3,3,3], padding='same')(X)
 
     #residual connection between input and output
-    residual_conn = Add()([input_tensor, output_layer])
+    residual_conn = Add(name='endphillip')([input_tensor, output_layer])
     output_tensor=residual_conn
 
     #r#eturn output_tensor
-    return tf.keras.Model(inputs=input_tensor, outputs=output_tensor)
+    return output_tensor#tf.keras.Model(inputs=input_tensor, outputs=output_tensor)
     #return tf.keras.Model(inputs=input_tensor, outputs=output_tensor), output_tensor

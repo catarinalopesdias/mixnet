@@ -10,20 +10,21 @@ and then transforms to phase, and then adds background and artifacts. it saves p
 
 import h5py
 import numpy as np
-from visualize_volumes import view_slices_3dNew
+from plotting.visualize_volumes import view_slices_3dNew
 from create_datasetfunctions import simulate_susceptibility_sources, forward_convolution
 # ,  calc_gauss_function_np#, apply_random_brain_mask, distance_to_plane_np, distance_to_plane
-from functionsfromsteffen import apply_random_brain_mask
-from generate_backgroundfield_steffen_function import add_z_gradient
-from boundaryeffects_function import add_boundary_artifacts
+from backgroundfieldandeffects.functionsfromsteffen import apply_random_brain_mask
+import backgroundfieldandeffects.functionsfromsteffen 
+from backgroundfieldandeffects.generate_backgroundfield_steffen_function import add_z_gradient
+from backgroundfieldandeffects.boundaryeffects_function import add_boundary_artifacts
 
 import tensorflow as tf
 
-num_train_instances = 5
+num_train_instances = 115
 size = 128  # [128,128,128]
 rect_num = 200
 
-# Parameters background
+# Parameters backgroundHHSS
 gradient_slope_range = [3 * 2 * np.pi, 8 * 2 * np.pi]
 backgroundfield = True
 apply_masking = True
