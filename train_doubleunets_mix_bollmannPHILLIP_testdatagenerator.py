@@ -31,45 +31,72 @@ from newGA import GradientAccumulateModel
 #from network_NEW import build_CNN_NEW
 from create_datasetfunctions import simulate_susceptibility_sources, generate_3d_dipole_kernel, forward_convolution
 from plotting.visualize_volumes import view_slices_3dNew
+from  my_classes.DataGenerator import DataGenerator
 
 #############################################################
 ##         Import data#################
 
-loaded = np.load('datasynthetic/115samples.npz')
+#loaded = np.load('datasynthetic/115samples.npz')
 #loaded.files
-phase = loaded['phase1']
-phase_bg = loaded['phase_bg1']
-gt = loaded['sim_gt1']
-del loaded
+#phase = loaded['phase1']
+#phase_bg = loaded['phase_bg1']
+#gt = loaded['sim_gt1']
+#del loaded
 ########################################
 
-num_train_instances = phase.shape[0]
+#num_train_instances = phase.shape[0]
+num_train_instances = 4
 ##############################
-loss_model1 = "mse"#mse "mean_absolute_error"
-loss_model2 = "mse"#mse "mean_absolute_error"
+loss_model1 = "mse"    #mse "mean_absolute_error"
+loss_model2 = "mse"    #mse "mean_absolute_error"
 
-print("Model with gradient accumulation")
-gaaccumsteps = 10;
+
 ###############################
 
 params = {'dim': (128,128,128),
           'batch_size': 1,
-          'n_classes': 1,
           'n_channels': 1,
           'shuffle': True}
 
+###################################
+#create dictonary
+###################################
+#phasebg_dic =[]
+#gt_dic = []
+samples_dic = []
+
+
+for i in range(num_train_instances):
+    #phasebg_dic.append( str(i) + 'samples' + '.npy')
+    #gt_dic.append('gt-' + str(i)+'.npy')
+    samples_dic.append( str(i) + 'samples' )
+   
+
+#######################
+partition_factor = 0.5
+#partition = {'train': phasebg_dic[0: int(partition_factor * num_train_instances)] , 
+#             'validation':  phasebg_dic[int(-partition_factor * num_train_instances): num_train_instances]}
+
+partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)] , 
+             'validation':  samples_dic[int(-partition_factor * num_train_instances): num_train_instances]}
+
+#labels = {'id-1': 0, 'id-2': 1, 'id-3': 2, 'id-4': 1}
+#########################################################
+
+
 ##################
 
-labels = tools.read_dict('../datasets/dataset_single.csv',
-                                 value_type=constants.ValueType.INT)
+#labels = tools.read_dict('../datasets/dataset_single.csv',
+#                                 value_type=constants.ValueType.INT)
 
 
-partition = # IDs
-labels = # Labels
+
 
 # Generators
-training_generator   = DataGenerator(partition['train'], labels, **params)
-validation_generator = DataGenerator(partition['validation'], labels, **params)
+training_generator   = DataGenerator(partition['train'])
+validation_generator = DataGenerator(partition['validation'])
+######################################################################################
+######################################################################################
 
 
 #################################
@@ -95,9 +122,7 @@ input_tensor = Input(shape = input_shape, name="input")
 
 
 
-#from networks.network_phillip import build_CNN
-
-#using model class
+#using module class
 #model1 = build_CNN_BOLLMAN(input_tensor)
 #model2 = build_CNN_BOLLMAN(model1.output)
 #full_model  = Model(inputs=new_model.input, outputs=output)
@@ -117,6 +142,8 @@ text_stop = "stopping"
 
 losses = [loss_model1, loss_model2]
 
+print("Model with gradient accumulation")
+gaaccumsteps = 10;
 model = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, outputs=model.outputs )
 #odel = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, outputs={'ushape1': model.outputs[0], 'ushape2': model.outputs[1]} )
 
@@ -176,7 +203,7 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 ##############################
 ##############################
 
-
+"""
 train_images_m1 =tf.expand_dims(phase_bg, 4)
 train_labels_m1 = tf.expand_dims(phase, 4)
 
@@ -190,26 +217,11 @@ print("fit model")
 #
 train_labels= [train_labels_m1, train_labels_m2] #[train_labels_m1]#
 del train_labels_m1, train_labels_m2 #train_images_m2
+"""
 
 ##########################################
 
-#create dictonary
-phasebg_dic =[]
-gt_dic = []
 
-nr_total = 150
-
-for i in range(150):
-    phasebg_dic.append('phasebg-' + str(i) + '.npy')
-    gt_dic.append('gt-' + str(i)+'.npy')
-   
-
-#######################
-
-partition = {'train': phasebg_dic[0: int(0.9*nr_total)] , 'validation':  phasebg_dic[int(-0.1*nr_total):nr_total]}
-
-#labels = {'id-1': 0, 'id-2': 1, 'id-3': 2, 'id-4': 1}
-#########################################################
 
 
 
@@ -231,7 +243,7 @@ loss_historyGA = history.history['loss']
 
 with open('loss_historyGA.pickle', 'wb') as f:
     pickle.dump([loss_historyGA, dataset_iterations], f)
-
+"""
 ###################
 
 #save model
@@ -317,5 +329,5 @@ for item in loss_historyS:
 	file.write(str(item)+"\n")
 file.close()
 
-
+"""
 
