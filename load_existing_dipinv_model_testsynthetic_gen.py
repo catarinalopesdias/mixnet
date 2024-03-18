@@ -40,9 +40,12 @@ finalcheckpoint = 500
 batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
+text_stop = "stopping"
+lr =0.003
+text_lr = str(lr).split(".")[1]
 
 
-lossU = "mse" # "mean_absolute_error" #"mse"# "mean_absolute_error" #"mse"    #mse
+lossU = "mse" # "mean_absolute_error" #"mse"
 #model_newadam_16filters_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp
 #newadam_16filter_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp.ckpt
 path = "checkpoints/dipoleinversion/newadam_"+str(num_filter)+"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+"_phillipp.ckpt"
@@ -50,7 +53,15 @@ path = "checkpoints/dipoleinversion/newadam_16filter_trainsamples150_datasetiter
 #path = "checkpoints/GAcp-0"+ str(epochs_train) + str(num_train)+ "trainsamples_" + str(epochs_train) +"epochs_" + "batchsize"+ str(batch_size)+ "_"+ str(gaaccumsteps) +"gaaccum" + "loss"+str(lossU)+".ckpt"
 #path = "checkpoints/GAcp-00"+str(num_epochs)+".ckpt/"
 
-#path = "models/backgroundremovalBOLLMAN/modelBR_trainsamples100_datasetiter300_batchsize1_gaaccum10_loss_mse.keras"
+
+path = "checkpoints/dipoleinversion/Phillip_newadam" + \
+        str(num_filter)+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+            "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses[0] +losses[1]+ \
+                text_stop+"_"+text_lr+"_valloss.ckpt"
+
+
+
+
 model = tf.keras.models.load_model(path)
 #model = tf.keras.saving.load_model(path)
 
@@ -67,6 +78,8 @@ model.compile(loss = lossU, optimizer = 'adam')
 #   Import data
 ################################################
 newdata=False
+path_common_init = "models/dipoleinversion/prediction_images/model_DipInv_Phillip_newadam"
+
 
 for epoch_i in range(3): #num_instance
    file =str(epoch_i)+"samples"
@@ -74,10 +87,11 @@ for epoch_i in range(3): #num_instance
    if newdata:
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
-        text = "testdata"
+        text_typedata = "testdata"
+        file_full = "datasynthetic/npz/testing/" + file + ".npz"
+
    else: #traindata
         text = "traindata"
-    
         file_full = "datasynthetic/npz/" + file + ".npz"
 
    loaded = np.load(file_full)
@@ -88,9 +102,17 @@ for epoch_i in range(3): #num_instance
 
    y_pred = model.predict(X_test)
 
+   path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + \
+                  "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_" + lossU+ +text_stop+"_"+text_lr +  text_typedata + "_epoch" + str(epoch_i) + "valloss"
+                  
+                  
    print(epoch_i)
-   title =   "trained network with testing data 50 epochs: " + str(epoch_i)+ " " + lossU
-   pathi = "models/dipoleinversion/results/train"+str(num_filter) + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+ "_testset_epoch" + str(epoch_i) + text
+   title =   "trained network : epoch " + str(epoch_i)+ " " + lossU
+
+
+   pathi =  path_common_init  + path_common_final
+
+ 
    predicted, reference,error = visualize_all4(phase[:,:,:], gt[:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
 #########################
 

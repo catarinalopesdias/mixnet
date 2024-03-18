@@ -295,8 +295,8 @@ def visualize_all4(resized_input, reference , predicted, title, save, path):
   
   
   #Get max min of reference
-  ref_min =-1.3 #tf.reduce_min(reference).numpy()
-  ref_max =1.3 # tf.reduce_max(reference).numpy()
+  ref_min =-2#1.3 #tf.reduce_min(reference).numpy()
+  ref_max =2#1.3 # tf.reduce_max(reference).numpy()
   print("Reference max value", ref_max, "Reference min value", ref_min)
 
   ####################################################################

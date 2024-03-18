@@ -20,7 +20,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 500 
+num_train_instances = 10 
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -40,6 +40,8 @@ sensor_noise_std = 0.03
 
 sensor_noise = True
 wrap_input_data = True
+
+testingdata = True
 ##############################################################################
 # create dipole kernel (cuboid size )
 ##############################################################################
@@ -178,66 +180,14 @@ for epoch_i in range(num_train_instances):
         #Xongoing = tf.multiply(mask[epoch_i, :,:,:], Xongoing[epoch_i, :,:,:])
 
         #     Y = tf.multiply(tf.to_float(mask), Y)
-    file_name = "datasynthetic/npz/" + str(epoch_i) + "samples"
+    if testingdata:
+        file_name = "datasynthetic/npz/testing/" + str(epoch_i) + "samples"
+    else:
+            file_name = "datasynthetic/npz/" + str(epoch_i) + "samples"
          
     arr  = np.stack((gtmask,Xinput,Xongoing), axis=0)
             
             #np.save(file_name,arr)
     np.savez_compressed(file_name, arr)
-##############################################################################
-# visualize
-##############################################################################
 
-index = 1
-"""view_slices_3dNew(gtmask[index, :, :, :], 50, 50, 50,
-                  vmin=-1.5, vmax=1.5, title="gt")
-view_slices_3dNew(sim_fwgt[index, :, :, :], 50, 50,
-                  50, vmin=-1.5, vmax=1.5, title="fw")
-
-
-view_slices_3dNew(Xinput[index, :, :, :], 50, 50, 50,
-                  vmin=-1.5, vmax=1.5, title="Xinput (fw+mask)")
-view_slices_3dNew(sim_fwgt_mask[index, :, :, :], 50,
-                  50, 50, vmin=-0.5, vmax=0.5, title="fw+brain mask")
-view_slices_3dNew(mask[index, :, :, :], 50, 50, 50,
-                  vmin=-0.5, vmax=0.5, title="brain mask")
-
-
-view_slices_3dNew(bgf[index, :, :, :], 50, 50, 50,
-                  vmin=-10, vmax=10, title="background field")
-view_slices_3dNew(bgf_mask[index, :, :, :], 50, 50, 50, vmin=-10,
-                  vmax=10, title="bg field + masking (bondary artifacts)")
-view_slices_3dNew(sim_fwgt_mask_bg[index, :, :, :], 50,
-                  50, 50, vmin=-10, vmax=10, title="fw + mask +background")
-view_slices_3dNew(sim_fwgt_mask_bg[index, :, :, :], 50, 50, 50, vmin=-
-                  0.5, vmax=0.5, title="fw + mask +background+boundarz artifacs")
-
-
-view_slices_3dNew(sensornoise[index, :, :, :], 50,
-                  50, 50, vmin=-0.5, vmax=0.5, title="sn")
-
-view_slices_3dNew(sim_fwgt_mask_bg_sn[index, :, :, :], 50, 50, 50,
-                  vmin=-10, vmax=10, title="fw+bg + mask (bondary artifacts)+sn")
-
-
-view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[index, :, :, :], 50, 50, 50,
-                  vmin=-10, vmax=10, title="bg field + masking (bondary artifacts)+wrapped")
-
-
-view_slices_3dNew(Xongoing[index, :, :, :], 50, 50, 50,
-                  vmin=-10, vmax=10, title="X ongoing-fw,masj,bg,sn,wrapped")
-############################
-"""
-
-
-
-#titlephasebg = "datasynthetic/" + str(num_train_instances)+"phase_bg.npy"
-#final = "/mnt/neuro/physics/catarina/" + titlephasebg
-
-#
-
-#for i in range(num_train_instances):
-
-
-        
 
