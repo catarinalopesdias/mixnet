@@ -40,9 +40,9 @@ class DataGenerator(keras.utils.Sequence):
       list_IDs_temp = [self.list_IDs[k] for k in indexes]
     
       # Generate data
-      X, [Y, Z] = self.__data_generation(list_IDs_temp)
+      X, Y = self.__data_generation(list_IDs_temp)
     
-      return X, [Y,Z]
+      return X, Y
     
     
     def on_epoch_end(self):
@@ -56,7 +56,7 @@ class DataGenerator(keras.utils.Sequence):
       # Initialization
       X = np.empty((self.batch_size, *self.dim, self.n_channels))
       Y = np.empty((self.batch_size, *self.dim, self.n_channels))
-      Z = np.empty((self.batch_size, *self.dim, self.n_channels))
+      #Z = np.empty((self.batch_size, *self.dim, self.n_channels))
 
       #print(list_IDs_temp)
       # Generate data
@@ -67,21 +67,21 @@ class DataGenerator(keras.utils.Sequence):
 
  
           loaded = np.load('datasynthetic/npz/' + ID + '.npz')
+          #print(loaded )
           loaded =loaded['arr_0']
-
-
+          #print(loaded )
           #print("loaded shape", loaded.shape  )
 
           loaded = np.expand_dims(loaded, 4)
           #print("loaded shape after extension", loaded.shape  )
-          X[i,] = loaded[2,:] #phase and bg
+          #X[i,] = loaded[2,:] #phase and bg
           #print("Xi shape", X[i,].shape  )
 
            # Store class
            #y[i] = self.labels[ID]
-          Y[i,:] = loaded[1,:] #phase
-          Z[i,:] = loaded[0,:] #gt
-      return X, [Y,Z]
+          X[i,:] = loaded[1,:] #phase
+          Y[i,:] = loaded[0,:] #gt
+      return X, Y#[Y,Z]
      #return X, [Y,Z]
           #X[i,] = np.load('datasynthetic/np/' + ID + '.npy')# [2,:] #phase and background
           #print("Xishape", X[i,]  )

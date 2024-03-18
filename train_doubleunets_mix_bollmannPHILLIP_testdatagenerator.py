@@ -45,7 +45,7 @@ from  my_classes.DataGenerator import DataGenerator
 ########################################
 
 #num_train_instances = phase.shape[0]
-num_train_instances = 4
+num_train_instances = 500
 ##############################
 loss_model1 = "mse"    #mse "mean_absolute_error"
 loss_model2 = "mse"    #mse "mean_absolute_error"
@@ -73,24 +73,12 @@ for i in range(num_train_instances):
    
 
 #######################
-partition_factor = 0.5
+partition_factor = 0.8
 #partition = {'train': phasebg_dic[0: int(partition_factor * num_train_instances)] , 
 #             'validation':  phasebg_dic[int(-partition_factor * num_train_instances): num_train_instances]}
 
 partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)] , 
              'validation':  samples_dic[int(-partition_factor * num_train_instances): num_train_instances]}
-
-#labels = {'id-1': 0, 'id-2': 1, 'id-3': 2, 'id-4': 1}
-#########################################################
-
-
-##################
-
-#labels = tools.read_dict('../datasets/dataset_single.csv',
-#                                 value_type=constants.ValueType.INT)
-
-
-
 
 # Generators
 training_generator   = DataGenerator(partition['train'])
@@ -185,11 +173,11 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                  #save_freq=save_period,
                                                  save_freq="epoch",
                                                  save_best_only=True,
-                                                 monitor = "loss",
+                                                 monitor = "val_loss",
                                                  verbose=1)
 
 earlystop = tf.keras.callbacks.EarlyStopping(
-    monitor="loss",#
+    monitor="val_loss",#
     min_delta=0,
     patience=100,
     verbose=1,
@@ -200,36 +188,13 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 )
 
 ##############################
-##############################
-##############################
-
-"""
-train_images_m1 =tf.expand_dims(phase_bg, 4)
-train_labels_m1 = tf.expand_dims(phase, 4)
-
-#train_images_m2 =
-#train_images_m2 = tf.expand_dims(phase, 4)
-train_labels_m2 = tf.expand_dims(gt, 4)
-
-
-print("fit model")
-
-#
-train_labels= [train_labels_m1, train_labels_m2] #[train_labels_m1]#
-del train_labels_m1, train_labels_m2 #train_images_m2
-"""
-
-##########################################
-
-
-
-
-
 
 
 history = model.fit_generator(generator=training_generator,
                     validation_data=validation_generator,
+                    epochs=dataset_iterations,
                     use_multiprocessing=True,
+                    callbacks = [cp_callback,earlystop],
                     workers=6)
 
 

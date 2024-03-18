@@ -27,16 +27,25 @@ from tensorflow import keras
 ###############################################################################
 
 # model data
-num_epochs = 50
-batch_size = 1
+#num_epochs = 60
+#batch_size = 1
+
+# model data
 
 
+num_train_instances = 100
+dataset_iterations = 100
+batch_size = 2
+gaaccumsteps = 8;
+lossU = "mean_absolute_error" #"mse"# "mean_absolute_error" #"mse"    #mse
 
-path = "checkpoints/GAcp-00"+str(num_epochs)+".ckpt/"
+path = "checkpoints/bgremovalmodel/cp-{epoch:04d}"+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
+#path = "checkpoints/GAcp-0"+ str(epochs_train) + str(num_train)+ "trainsamples_" + str(epochs_train) +"epochs_" + "batchsize"+ str(batch_size)+ "_"+ str(gaaccumsteps) +"gaaccum" + "loss"+str(lossU)+".ckpt"
+#path = "checkpoints/GAcp-00"+str(num_epochs)+".ckpt/"
 model = tf.keras.models.load_model(path)
 
 
-model.compile(loss = 'mean_squared_error', optimizer = 'adam')
+model.compile(loss = lossU, optimizer = 'adam')
 
 
 
@@ -68,7 +77,6 @@ for epoch_i in range(num_epochs):
 
 
 print("trained")
-# what does the untrained model predict
 
 for epoch_i in range(num_epochs):
     X_test = test_sim_fw_full[np.newaxis, epoch_i,:,:,:, np.newaxis]
@@ -77,19 +85,20 @@ for epoch_i in range(num_epochs):
 
     print(epoch_i)
     title =   "trained network with testing data 46 epochs " + str(epoch_i)
-    a, b,e = visualize_all(test_sim_fw_full[epoch_i,:,:,:], test_sim_gt_full[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True )
+    predicted, reference,error = visualize_all(test_sim_fw_full[epoch_i,:,:,:], test_sim_gt_full[epoch_i,:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True )
+#########################
 
+#import matplotlib.pyplot as plt
 
-import matplotlib.pyplot as plt
-
-nn = np.array( b)
-bb = nn[0,1:50,50:100]
+#ref_np = np.array( reference)
+#ref_piece = ref_np[0,1:50,50:100]
 
 #
-bla =test_sim_gt_full[1,5,:,:]
-#bla = y_pred[0,5,:,:,0]
-plt.matshow(bla)
-plt.colorbar()
-plt.clim(-1, 1);
+#bla =reference[1]
+#bla =predicted[1]
 
-plt.show()
+#plt.matshow(bla)
+#plt.colorbar()
+#plt.clim(-1, 1);
+
+#plt.show()

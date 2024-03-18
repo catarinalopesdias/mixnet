@@ -24,6 +24,44 @@ from networks.network_phillip import build_CNN_phillip
 #from networks.network_BOLLMAN import build_CNN_BOLLMAN
 #from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
 from plotting.visualize_volumes import view_slices_3dNew
+from  my_classes.DataGeneratordipinv import DataGenerator
+
+
+
+num_train_instances = 500#phase.shape[0]
+samples_dic = []
+
+
+for i in range(num_train_instances):
+    #phasebg_dic.append( str(i) + 'samples' + '.npy')
+    #gt_dic.append('gt-' + str(i)+'.npy')
+    samples_dic.append( str(i) + 'samples' )
+   
+
+#######################
+partition_factor = 0.8
+#partition = {'train': phasebg_dic[0: int(partition_factor * num_train_instances)] , 
+#             'validation':  phasebg_dic[-int((1-partition_factor( * num_train_instances): num_train_instances]}
+
+partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)] , 
+             'validation':  samples_dic[ -int(( 1-partition_factor) * num_train_instances): num_train_instances]}
+
+#labels = {'id-1': 0, 'id-2': 1, 'id-3': 2, 'id-4': 1}
+#########################################################
+
+
+##################
+
+#labels = tools.read_dict('../datasets/dataset_single.csv',
+#                                 value_type=constants.ValueType.INT)
+
+
+
+
+# Generators
+training_generator   = DataGenerator(partition['train'])
+validation_generator = DataGenerator(partition['validation'])
+
 
 ################################################
 #   Import data
@@ -35,11 +73,11 @@ from plotting.visualize_volumes import view_slices_3dNew
 #phase = np.load('syntheticdata/phase100.npy')
 ######
 # compressed data
-loaded = np.load('datasynthetic/115samples.npz')
+#loaded = np.load('datasynthetic/115samples.npz')
 
-phase = loaded['phase1']
-gt = loaded['sim_gt1']
-del loaded
+#phase = loaded['phase1']
+#gt = loaded['sim_gt1']
+#del loaded
 #######################
 
 
@@ -57,14 +95,13 @@ del loaded
 # del phase_bg1, phase1
 
 ######################################
-num_slice = 3
+#num_slice = 3
 
 
-view_slices_3dNew(phase[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="phase") 
-view_slices_3dNew(gt[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="gt")
-del num_slice
+#view_slices_3dNew(phase[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="phase") 
+#view_slices_3dNew(gt[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="gt")
+#del num_slice
 
-num_train_instances = phase.shape[0]
 
 ##############################
 
@@ -98,13 +135,13 @@ lossU = "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
 #opt = keras.optimizers.Adam(learning_rate=0.0001, beta_1=0.9 ,beta_2 =0.999, epsilon=1e-8, gradient_accumulation_steps=gaaccumsteps )
 
 #learningrate
-#lr =0.003
-text_lr = "default" #str(lr).split(".")[1]
+lr =0.001
+text_lr = str(lr).split(".")[1] #"default" #
 
-# from model manager
+# from model managerloss
 
 optimizerMINE = Adam(
-              #learning_rate=0.0003,
+              learning_rate=lr, #0.0003,
                 beta_1=0.9,
                 beta_2=0.999,
                epsilon=1e-8
@@ -122,22 +159,6 @@ model.summary()
 #################################################################################
 
 ###############################################################################
-###############################################################################
-print("untrained")
-# what does the untrained model predict
-test_epoch_nbr = 3
-X_test = phase[np.newaxis, test_epoch_nbr,:,:,:, np.newaxis]
-print(X_test.shape)
-
-y_pred = model.predict(X_test)
-
-print(y_pred.shape)
-
-
-#view_slices_3dNew(phase_bg[test_epoch_nbr, :, :, :], 50,50,50, vmin=-1, vmax=1, title=' Phase and background')
-#view_slices_3dNew(phase[test_epoch_nbr, :, :, :],50,50,50 , vmin=-1, vmax=1, title='Phase')
-#view_slices_3dNew(y_pred[0, :, :, :, 0], 50,50,50, vmin=-1, vmax=1, title='Predicted phase')
-del y_pred, test_epoch_nbr
 
 
 ################################################################################
@@ -160,7 +181,7 @@ num_filter = 16
 # {epoch:04d}
 checkpoint_path = "checkpoints/dipoleinversion/newadam_" + str(num_filter)+"filter"+ \
                   "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
-                  "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
+                  "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+"datagen.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -178,7 +199,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
 earlystop = tf.keras.callbacks.EarlyStopping(
     monitor="val_loss",
     min_delta=0,
-    patience=100,
+    patience=50,
     verbose=1,
     mode="auto",
     baseline=None,
@@ -188,15 +209,23 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 
 
 
-train_images =tf.expand_dims(phase, 4)
-train_labels = tf.expand_dims(gt, 4)
 
 print("fit model")
-history = model.fit(train_images, train_labels,  epochs=dataset_iterations, \
-                    validation_split=0.1,\
-                    batch_size=batch_size, shuffle=True,\
-                    callbacks = [cp_callback,earlystop])  # pass callback to training for saving the model80
-                    #nitial_epoch = 289
+#istory = model.fit(train_images, train_labels,  epochs=dataset_iterations, \
+#                    validation_split=0.1,\
+#                    batch_size=batch_size, shuffle=True,\
+#                    callbacks = [cp_callback,earlystop])  # pass callback to training for saving the model80
+#                    #nitial_epoch = 289
+                    
+                    
+history = model.fit_generator(generator=training_generator,
+                    validation_data=validation_generator,
+                    epochs=dataset_iterations,
+                    use_multiprocessing=True,
+                    #batch_size=1, 
+                    callbacks = [cp_callback,earlystop], # pass callback to training for saving the model80
+                    workers=6)
+
                     
 loss_historyGA = history.history['loss']
 
@@ -217,7 +246,7 @@ if not os.path.exists("models/dipoleinversion"):
     
 model_name1 = "models/dipoleinversion/model_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
                 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
-                    "_loss_"+ lossU + text_lr +".keras"
+                    "_loss_"+ lossU + text_lr +"datagen.keras"
 
 
 
@@ -241,7 +270,7 @@ plt.title("Loss")
 plt.xlabel("Dataset iterations")
 lossnamefile = "models/dipoleinversion/loss/modelBR_newadam" + str(num_filter)+"trainsamples" \
     + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
-        "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ lossU + text_lr
+        "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ lossU + text_lr +"datagen"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 
 ###############

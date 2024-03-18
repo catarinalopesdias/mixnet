@@ -151,7 +151,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                  #save_freq=save_period,
                                                  save_freq="epoch",
                                                  save_best_only=True,
-                                                 monitor = "loss",
+                                                 monitor = "val_loss",
                                                  verbose=1)
 
 earlystop = tf.keras.callbacks.EarlyStopping(

@@ -20,7 +20,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 4
+num_train_instances = 500 
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -50,8 +50,8 @@ shape_of_sus_cuboid = [size, size, size]  # of the susceptibilitz sources
 ###############################################################################
 # Inizialize 3 steps: gt, phase, background+phase
 # 4D-cuboids (training samples, size, size, size)
-sim_gt = np.zeros((num_train_instances, size, size, size))
-sim_fwgt = np.zeros((num_train_instances, size, size, size))
+sim_gt = np.zeros(( size, size, size))
+sim_fwgt = np.zeros(( size, size, size))
 mask = np.ones_like(sim_gt)
 sim_fwgt_mask = np.zeros_like(sim_gt)
 bgf = np.zeros_like(mask)
@@ -77,49 +77,48 @@ for epoch_i in range(num_train_instances):
     print("epoch ", str(epoch_i))
 
     # Create ground thruth - add rectangles
-    sim_gt[epoch_i, :, :, :] = simulate_susceptibility_sources(
+    sim_gt[ :, :, :] = simulate_susceptibility_sources(
         simulation_dim=size, rectangles_total=rect_num, plot=False)
     # Phase:forward convolution with the dipole kernel
-    sim_fwgt[epoch_i, :, :, :] = forward_convolution(sim_gt[epoch_i, :, :, :])
+    sim_fwgt[ :, :, :] = forward_convolution(sim_gt[ :, :, :])
 
  ########################################################################################################
  ########################################################################################################
  ########################################################################################################
 
-    Xinput[epoch_i, :, :, :] = sim_fwgt[epoch_i, :, :, :]
-    Xongoing[epoch_i, :, :, :] = sim_fwgt[epoch_i, :, :, :]
+    Xinput[ :, :, :] = sim_fwgt[ :, :, :]
+    Xongoing[ :, :, :] = sim_fwgt[ :, :, :]
 
     if apply_masking:
 
-        sim_fwgt_mask[epoch_i, :, :, :], mask[epoch_i, :, :,
-                                              :] = apply_random_brain_mask(sim_fwgt[epoch_i, :, :, :])
+        sim_fwgt_mask[ :, :, :], mask[ :, :,
+                                              :] = apply_random_brain_mask(sim_fwgt[ :, :, :])
 
-        Xinput[epoch_i, :, :, :] = sim_fwgt_mask[epoch_i, :, :, :]
+        Xinput[ :, :, :] = sim_fwgt_mask[ :, :, :]
         
-        gtmask[epoch_i, :, :, :] = tf.multiply(
-            sim_gt[epoch_i, :, :, :], mask[epoch_i, :, :, :])
+        gtmask[ :, :, :] = tf.multiply(
+            sim_gt[ :, :, :], mask[ :, :, :])
         
 
 ######################
     if backgroundfield:
 
         #print("add z gradient")
-        bgf[epoch_i, :, :, :] = add_z_gradient(
-            bgf[epoch_i, :, :, :], gradient_slope_range)
+        bgf[ :, :, :] = add_z_gradient(
+            bgf[ :, :, :], gradient_slope_range)
 
         if apply_masking:
 
-            bgf_mask[epoch_i, :, :, :] = add_boundary_artifacts(
-                bgf[epoch_i, :, :, :], mask[epoch_i,
-                                            :, :, :], boundary_artifacts_mean,
+            bgf_mask[ :, :, :] = add_boundary_artifacts(
+                bgf[ :, :, :], mask[ :, :, :], boundary_artifacts_mean,
                 boundary_artifacts_std)
 
         # ????????????dkjfsdfsdsdklfjdsjfhhsdgfkjsdfkllfdfjfk
-        sim_fwgt_mask_bg[epoch_i, :, :, :] = tf.add(
-            sim_fwgt_mask[epoch_i, :, :, :], bgf_mask[epoch_i, :, :, :])
+        sim_fwgt_mask_bg[ :, :, :] = tf.add(
+            sim_fwgt_mask[ :, :, :], bgf_mask[ :, :, :])
 
-        Xongoing[epoch_i, :, :, :] = tf.add(
-            Xongoing[epoch_i, :, :, :], bgf_mask[epoch_i, :, :, :])
+        Xongoing[ :, :, :] = tf.add(
+            Xongoing[ :, :, :], bgf_mask[ :, :, :])
 
 ######################
     if sensor_noise:
@@ -130,39 +129,39 @@ for epoch_i in range(num_train_instances):
             stddev=sensor_noise_std,
             dtype=tf.float32)
 
-        sim_fwgt_mask_bg_sn[epoch_i, :, :, :] = tf.add(
-            sim_fwgt_mask_bg[epoch_i, :, :, :], tf_noise.numpy())
+        sim_fwgt_mask_bg_sn[ :, :, :] = tf.add(
+            sim_fwgt_mask_bg[ :, :, :], tf_noise.numpy())
 
-        Xongoing[epoch_i, :, :, :] = tf.add(
-            Xongoing[epoch_i, :, :, :], tf_noise.numpy())
+        Xongoing[ :, :, :] = tf.add(
+            Xongoing[ :, :, :], tf_noise.numpy())
 
-        sensornoise[epoch_i, :, :, :] = tf_noise.numpy()
+        sensornoise[ :, :, :] = tf_noise.numpy()
   ######################
     if wrap_input_data:
         # print('wrap_data')
         value_range = 2.0 * np.pi
         # shift from [-pi,pi] to [0,2*pi]
-        sim_fwgt_mask_bg_sn_wrapped[epoch_i, :, :, :] = tf.add(
-            sim_fwgt_mask_bg_sn[epoch_i, :, :, :], value_range / 2.0)
+        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = tf.add(
+            sim_fwgt_mask_bg_sn[ :, :, :], value_range / 2.0)
 
-        Xongoing[epoch_i, :, :, :] = tf.add(
-            Xongoing[epoch_i, :, :, :], value_range / 2.0)
+        Xongoing[ :, :, :] = tf.add(
+            Xongoing[ :, :, :], value_range / 2.0)
 
         # # calculate wrap counts
         # self.tensor['wrap_count'] = tf.floor(
         #     tf.divide(X, value_range))
 
-        sim_fwgt_mask_bg_sn_wrapped[epoch_i, :, :, :] = tf.math.floormod(
-            sim_fwgt_mask_bg_sn_wrapped[epoch_i, :, :, :], value_range)
-        Xongoing[epoch_i, :, :, :] = tf.math.floormod(
-            Xongoing[epoch_i, :, :, :], value_range)
+        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = tf.math.floormod(
+            sim_fwgt_mask_bg_sn_wrapped[ :, :, :], value_range)
+        Xongoing[ :, :, :] = tf.math.floormod(
+            Xongoing[ :, :, :], value_range)
 
         # shift back to [-pi,pi]
-        sim_fwgt_mask_bg_sn_wrapped[epoch_i, :, :, :] = tf.subtract(
-            sim_fwgt_mask_bg_sn_wrapped[epoch_i, :, :, :], value_range / 2.0)
+        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = tf.subtract(
+            sim_fwgt_mask_bg_sn_wrapped[ :, :, :], value_range / 2.0)
 
-        Xongoing[epoch_i, :, :, :] = tf.subtract(
-            Xongoing[epoch_i, :, :, :], value_range / 2.0)
+        Xongoing[ :, :, :] = tf.subtract(
+            Xongoing[ :, :, :], value_range / 2.0)
 
  ######################
     if apply_masking:
@@ -170,22 +169,27 @@ for epoch_i in range(num_train_instances):
         #sim_gt_mask_bg_sn_wrapped = tf.multiply(tf.to_float(mask), sim_gt_mask_bg_sn_wrapped)
 
         #sim_gt_mask_bg_sn_wrapped = tf.multiply(tf.cast(mask. tf.float32), sim_gt_mask_bg_sn_wrapped)
-        sim_fwgt_mask_bg_sn_wrapped[epoch_i, :, :, :] = np.multiply(
-            mask[epoch_i, :, :, :], sim_fwgt_mask_bg_sn_wrapped[epoch_i, :, :, :])
+        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = np.multiply(
+            mask[ :, :, :], sim_fwgt_mask_bg_sn_wrapped[ :, :, :])
 
-        Xongoing[epoch_i, :, :, :] = np.multiply(
-            mask[epoch_i, :, :, :], Xongoing[epoch_i, :, :, :])
+        Xongoing[ :, :, :] = np.multiply(
+            mask[ :, :, :], Xongoing[ :, :, :])
 
         #Xongoing = tf.multiply(mask[epoch_i, :,:,:], Xongoing[epoch_i, :,:,:])
 
         #     Y = tf.multiply(tf.to_float(mask), Y)
-
-
+    file_name = "datasynthetic/npz/" + str(epoch_i) + "samples"
+         
+    arr  = np.stack((gtmask,Xinput,Xongoing), axis=0)
+            
+            #np.save(file_name,arr)
+    np.savez_compressed(file_name, arr)
 ##############################################################################
 # visualize
 ##############################################################################
+
 index = 1
-view_slices_3dNew(gtmask[index, :, :, :], 50, 50, 50,
+"""view_slices_3dNew(gtmask[index, :, :, :], 50, 50, 50,
                   vmin=-1.5, vmax=1.5, title="gt")
 view_slices_3dNew(sim_fwgt[index, :, :, :], 50, 50,
                   50, vmin=-1.5, vmax=1.5, title="fw")
@@ -223,27 +227,17 @@ view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[index, :, :, :], 50, 50, 50,
 view_slices_3dNew(Xongoing[index, :, :, :], 50, 50, 50,
                   vmin=-10, vmax=10, title="X ongoing-fw,masj,bg,sn,wrapped")
 ############################
+"""
 
 
-############################
-# gt
-#titleGT = "datasynthetic/" + str(num_train_instances)+"GT.npy"
-
-#np.save(titleGT, sim_gt)
-##################################
-# PHASE BG
 
 #titlephasebg = "datasynthetic/" + str(num_train_instances)+"phase_bg.npy"
 #final = "/mnt/neuro/physics/catarina/" + titlephasebg
 
+#
 
+#for i in range(num_train_instances):
 
-for i in range(num_train_instances):
-    file_name = "datasynthetic/np/" + str(i) + "samples"
-    
-    arr  = np.stack((gtmask[i,],Xinput[i,],Xongoing[i,]), axis=0)
-    
-    np.save(file_name,arr)
 
         
 
