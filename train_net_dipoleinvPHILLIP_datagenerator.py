@@ -120,10 +120,11 @@ dataset_iterations = 5000
 batch_size = 1
 num_filter = 16
 ###############
-# {epoch:04d}
+# {epoch:04d}     #"cp-{epoch:04d}"+
 
-checkpoint_path = "checkpoints/dipoleinversion/DipInv_Phillip_newadam" \
-    + str(num_filter)+"cp-{epoch:04d}"+ "_trainsamples" + str(num_train_instances) + \
+
+checkpoint_path = "checkpoints/dipoleinversion/DipInv_Phillip_newadam"+ str(num_filter)+ \
+    "_trainsamples" + str(num_train_instances) + \
         "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
         "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+"_datagen.ckpt"
 
