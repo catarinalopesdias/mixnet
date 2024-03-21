@@ -23,32 +23,50 @@ from networks.network_phillip import build_CNN_phillip
 #from networks.network_phillip_inputoutput import build_CNN_phillip_inputoutput
 #from networks.network_BOLLMAN import build_CNN_BOLLMAN
 #from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
-from  my_classes.DataGeneratordipinv import DataGenerator
+from plotting.visualize_volumes import view_slices_3dNew
 
+################################################
+#   Import data
+################################################
+#view input
+#view output
 
+#phase_bg = np.load('syntheticdata/phase_bg100.npy')
+#phase = np.load('syntheticdata/phase100.npy')
+######
+# compressed data
+loaded = np.load('datasynthetic/115samples.npz')
 
-num_train_instances = 500 
-samples_dic = []
-
-
-for i in range(num_train_instances):
-
-    samples_dic.append( str(i) + 'samples' )
-   
-
+phase = loaded['phase1']
+gt = loaded['sim_gt1']
+del loaded
 #######################
-partition_factor = 0.8
-
-partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)] , 
-             'validation':  samples_dic[ -int(( 1-partition_factor) * num_train_instances): num_train_instances]}
 
 
-# Generators
-training_generator   = DataGenerator(partition['train'])
-validation_generator = DataGenerator(partition['validation'])
+######
+# compressed data
+# loaded1= np.load('datasynthetic/150samples_1.npz')
+
+#phase1 = loaded1['phase1']
+#phase_bg1 = loaded1['phase_bg1']
+#del loaded1
+
+#phase = np.concatenate((phase, phase1))
+#phase_bg = np.concatenate((phase_bg, phase_bg1))
+
+# del phase_bg1, phase1
+
+######################################
+num_slice = 3
 
 
+view_slices_3dNew(phase[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="phase") 
+view_slices_3dNew(gt[num_slice,:,:,:], 50, 50,50, vmin=-10, vmax=10, title="gt")
+del num_slice
 
+num_train_instances = phase.shape[0]
+
+##############################
 
 
 #############################################################
@@ -65,27 +83,28 @@ print("compile model")
 #model = Model(input_tensor, ushape2) #get from orig deepQSM algorithm
 model = build_CNN_phillip(input_tensor)
 #model = build_CNN_BOLLMAN(input_tensor)
-name = "Phillipp"
+
+#model.compile(optimizer='adam', loss='mean_absolute_error')
+#model.summary()
 
 ###############################################
 ###############################################
 print("Model with gradient accumulation")
 gaaccumsteps = 10;
-#learningrate
-lr =0.001
-text_lr = str(lr).split(".")[1] #"default" #
-
 model = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, outputs=model.output)
 
 # we changed to mean absolute error
 lossU = "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
 #opt = keras.optimizers.Adam(learning_rate=0.0001, beta_1=0.9 ,beta_2 =0.999, epsilon=1e-8, gradient_accumulation_steps=gaaccumsteps )
 
+#learningrate
+#lr =0.003
+text_lr = "default" #str(lr).split(".")[1]
 
-# from model managerloss
+# from model manager
 
 optimizerMINE = Adam(
-              learning_rate=lr, #0.0003,
+              #learning_rate=0.0003,
                 beta_1=0.9,
                 beta_2=0.999,
                epsilon=1e-8
@@ -101,7 +120,24 @@ model.compile(optimizer=optimizerMINE, loss= lossU) #mean_absolute_error
 model.summary()
 
 #################################################################################
+
 ###############################################################################
+###############################################################################
+print("untrained")
+# what does the untrained model predict
+test_epoch_nbr = 3
+X_test = phase[np.newaxis, test_epoch_nbr,:,:,:, np.newaxis]
+print(X_test.shape)
+
+y_pred = model.predict(X_test)
+
+print(y_pred.shape)
+
+
+#view_slices_3dNew(phase_bg[test_epoch_nbr, :, :, :], 50,50,50, vmin=-1, vmax=1, title=' Phase and background')
+#view_slices_3dNew(phase[test_epoch_nbr, :, :, :],50,50,50 , vmin=-1, vmax=1, title='Phase')
+#view_slices_3dNew(y_pred[0, :, :, :, 0], 50,50,50, vmin=-1, vmax=1, title='Predicted phase')
+del y_pred, test_epoch_nbr
 
 
 ################################################################################
@@ -120,15 +156,11 @@ else:
 dataset_iterations = 5000
 batch_size = 1
 num_filter = 16
-lossmon = "val_loss"
 ###############
-# {epoch:04d}     #"cp-{epoch:04d}"+
-
-
-checkpoint_path = "checkpoints/dipoleinversion/DipInv_" + name + "_newadam"+ str(num_filter)+ \
-    "_trainsamples" + str(num_train_instances) + \
-        "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
-        "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU + "_" + text_lr +"_"+ lossmon+"_datagen.ckpt"
+# {epoch:04d}
+checkpoint_path = "checkpoints/dipoleinversion/newadam_" + str(num_filter)+"filter"+ \
+                  "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+                  "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+".ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -138,15 +170,15 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                  #save_freq=save_period,
                                                  save_freq="epoch",
                                                  save_best_only=True,
-                                                 monitor = lossmon,
+                                                 monitor = "val_loss",
                                                  verbose=1)
 
 
 
 earlystop = tf.keras.callbacks.EarlyStopping(
-    monitor=lossmon,
+    monitor="val_loss",
     min_delta=0,
-    patience=50,
+    patience=100,
     verbose=1,
     mode="auto",
     baseline=None,
@@ -156,19 +188,15 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 
 
 
+train_images =tf.expand_dims(phase, 4)
+train_labels = tf.expand_dims(gt, 4)
 
 print("fit model")
-                                  
-history = model.fit_generator(generator=training_generator,
-                    validation_data=validation_generator,
-                    epochs=dataset_iterations,
-                    use_multiprocessing=True,
-                    #batch_size=1, 
-                    callbacks = [cp_callback,earlystop], # pass callback to training for saving the model80
-                    workers=6)
-
-
-
+history = model.fit(train_images, train_labels,  epochs=dataset_iterations, \
+                    validation_split=0.1,\
+                    batch_size=batch_size, shuffle=True,\
+                    callbacks = [cp_callback,earlystop])  # pass callback to training for saving the model80
+                    #nitial_epoch = 289
                     
 loss_historyGA = history.history['loss']
 
@@ -176,17 +204,20 @@ loss_historyGA = history.history['loss']
 with open('loss_historyGA.pickle', 'wb') as f:
     pickle.dump([loss_historyGA, dataset_iterations], f)
     
+
+##
 ###################
 
+#save model
+#if not os.path.exists("models/backgroundremoval"): 
+#    os.makedirs("models/backgroundremoval") 
     
 if not os.path.exists("models/dipoleinversion"): 
     os.makedirs("models/dipoleinversion")     
     
-
-    
-model_name1 = "models/dipoleinversion/model_DipInv_" + name + "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
+model_name1 = "models/dipoleinversion/model_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
                 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
-                    "_loss_" + lossU + "_" + text_lr + "_"+ lossmon + "_datagen.keras"
+                    "_loss_"+ lossU + text_lr +".keras"
 
 
 
@@ -208,10 +239,9 @@ plt.plot(loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
 plt.title("Loss")
 plt.xlabel("Dataset iterations")
-lossnamefile = "models/dipoleinversion/loss/model_DipInv_" + name + "_newadam" + str(num_filter)+"trainsamples" \
+lossnamefile = "models/dipoleinversion/loss/modelBR_newadam" + str(num_filter)+"trainsamples" \
     + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
-        "_gaaccum"+ str(gaaccumsteps) + "_loss_" + lossU + "_" + text_lr + \
-        "_" + lossmon+"_"+"_datagen"
+        "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ lossU + text_lr
 plt.savefig(lossnamefile + lossfile_extensionpng )
 
 ###############

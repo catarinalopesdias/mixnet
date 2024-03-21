@@ -27,14 +27,11 @@ from plotting.visualize_volumes import visualize_all4
 # Load existing model
 ###############################################################################
 
-# model data
-#num_epochs = 60
-#batch_size = 1
 
 # model data
 
 
-num_train_instances = 150
+num_train_instances = 500
 dataset_iterations = 5000
 finalcheckpoint = 500
 batch_size = 1
@@ -45,20 +42,14 @@ lr =0.003
 text_lr = str(lr).split(".")[1]
 
 
-lossU = "mse" # "mean_absolute_error" #"mse"
-#model_newadam_16filters_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp
-#newadam_16filter_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp.ckpt
-path = "checkpoints/dipoleinversion/newadam_"+str(num_filter)+"_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+"_phillipp.ckpt"
-path = "checkpoints/dipoleinversion/newadam_16filter_trainsamples150_datasetiter5000_batchsize1_gaaccum10_loss_mse_phillipp.ckpt"
-#path = "checkpoints/GAcp-0"+ str(epochs_train) + str(num_train)+ "trainsamples_" + str(epochs_train) +"epochs_" + "batchsize"+ str(batch_size)+ "_"+ str(gaaccumsteps) +"gaaccum" + "loss"+str(lossU)+".ckpt"
-#path = "checkpoints/GAcp-00"+str(num_epochs)+".ckpt/"
+losses = "mse" # "mean_absolute_error" #"mse"
 
-
-path = "checkpoints/dipoleinversion/Phillip_newadam" + \
+#DipInv_Bollmann_newadam16_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_003_val_loss_datagen.ckpt
+name = "Bollmann" # Phillip
+path = "checkpoints/dipoleinversion/DipInv_" + name + "_newadam" + \
         str(num_filter)+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
-            "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses[0] +losses[1]+ \
-                text_stop+"_"+text_lr+"_valloss.ckpt"
-
+            "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
+              + "_" + "valloss"+ "_datagen" + ".ckpt"
 
 
 
@@ -66,7 +57,7 @@ model = tf.keras.models.load_model(path)
 #model = tf.keras.saving.load_model(path)
 
 
-model.compile(loss = lossU, optimizer = 'adam')
+model.compile(loss = losses, optimizer = 'adam')
 
 
 
@@ -77,8 +68,12 @@ model.compile(loss = lossU, optimizer = 'adam')
 ################################################
 #   Import data
 ################################################
-newdata=False
-path_common_init = "models/dipoleinversion/prediction_images/model_DipInv_Phillip_newadam"
+newdata=True
+
+
+
+
+path_common_init = "models/dipoleinversion/prediction_images/DipInv_"+name+"_newadam"
 
 
 for epoch_i in range(3): #num_instance
@@ -91,7 +86,7 @@ for epoch_i in range(3): #num_instance
         file_full = "datasynthetic/npz/testing/" + file + ".npz"
 
    else: #traindata
-        text = "traindata"
+        text_typedata = "traindata"
         file_full = "datasynthetic/npz/" + file + ".npz"
 
    loaded = np.load(file_full)
@@ -102,17 +97,38 @@ for epoch_i in range(3): #num_instance
 
    y_pred = model.predict(X_test)
 
-   path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + \
-                  "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_" + lossU+ +text_stop+"_"+text_lr +  text_typedata + "_epoch" + str(epoch_i) + "valloss"
+
+
+
+
+   path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+                  "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
+                      "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) 
                   
                   
    print(epoch_i)
-   title =   "trained network : epoch " + str(epoch_i)+ " " + lossU
+   title =   text_typedata + "_epoch " + str(epoch_i)+ " " + losses
 
 
    pathi =  path_common_init  + path_common_final
 
- 
-   predicted, reference,error = visualize_all4(phase[:,:,:], gt[:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
+
+
+   #predicted, reference,error = visualize_all4(phase[:,:,:], gt[:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
+   
 #########################
 
+dim = int(gt.shape[0]/2)
+bla1=gt[dim,:,:]
+bla2= y_pred[0,dim,:,:,0]
+
+diff = bla2-bla1
+import matplotlib.pyplot as plt
+import scipy.ndimage
+plt.imshow(diff, cmap='RdBu',  vmin=-0.2, vmax=0.2)
+
+
+plt.imshow(bla1, cmap='RdBu',  vmin=-1.5, vmax=1.5)
+plt.imshow(bla2, cmap='RdBu',  vmin=-1.5, vmax=1.5)
+plt.imshow(bla1-bla2, cmap='RdBu',  vmin=-1.5, vmax=1.5)
+plt.colorbar()

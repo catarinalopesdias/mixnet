@@ -19,15 +19,16 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-from networks.network_phillip import build_CNN_phillip
+#from networks.network_phillip import build_CNN_phillip
 #from networks.network_phillip_inputoutput import build_CNN_phillip_inputoutput
 #from networks.network_BOLLMAN import build_CNN_BOLLMAN
-#from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
+from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
 from  my_classes.DataGeneratordipinv import DataGenerator
 
 
 
 num_train_instances = 500 
+
 samples_dic = []
 
 
@@ -63,16 +64,16 @@ input_tensor = Input(shape = input_shape, name="input")
 print("compile model")
 
 #model = Model(input_tensor, ushape2) #get from orig deepQSM algorithm
-model = build_CNN_phillip(input_tensor)
-#model = build_CNN_BOLLMAN(input_tensor)
-name = "Phillipp"
+#model = build_CNN_phillip(input_tensor)
+model = build_CNN_BOLLMAN(input_tensor)
+name = "Bollmann"
 
 ###############################################
 ###############################################
 print("Model with gradient accumulation")
 gaaccumsteps = 10;
 #learningrate
-lr =0.001
+lr =0.003
 text_lr = str(lr).split(".")[1] #"default" #
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, outputs=model.output)
