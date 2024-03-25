@@ -11,7 +11,7 @@ and then transforms to phase, and then adds background and artifacts. it saves p
 import h5py
 import numpy as np
 from plotting.visualize_volumes import view_slices_3dNew
-from create_datasetfunctions import simulate_susceptibility_sources, forward_convolution
+from create_datasetfunctions_susc_unif02 import simulate_susceptibility_sources_uni, forward_convolution
 # ,  calc_gauss_function_np#, apply_random_brain_mask, distance_to_plane_np, distance_to_plane
 from backgroundfieldandeffects.functionsfromsteffen import apply_random_brain_mask
 import backgroundfieldandeffects.functionsfromsteffen 
@@ -20,7 +20,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 10 
+num_train_instances = 500 
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -41,7 +41,7 @@ sensor_noise_std = 0.03
 sensor_noise = True
 wrap_input_data = True
 
-testingdata = True
+testingdata = False
 ##############################################################################
 # create dipole kernel (cuboid size )
 ##############################################################################
@@ -79,7 +79,7 @@ for epoch_i in range(num_train_instances):
     print("epoch ", str(epoch_i))
 
     # Create ground thruth - add rectangles
-    sim_gt[ :, :, :] = simulate_susceptibility_sources(
+    sim_gt[ :, :, :] = simulate_susceptibility_sources_uni( #simulate_susceptibility_sources_uni
         simulation_dim=size, rectangles_total=rect_num, plot=False)
     # Phase:forward convolution with the dipole kernel
     sim_fwgt[ :, :, :] = forward_convolution(sim_gt[ :, :, :])
@@ -181,9 +181,9 @@ for epoch_i in range(num_train_instances):
 
         #     Y = tf.multiply(tf.to_float(mask), Y)
     if testingdata:
-        file_name = "datasynthetic/npz/testing/" + str(epoch_i) + "samples"
+        file_name = "datasynthetic/uniform02/npz/testing/" + str(epoch_i) + "samples"
     else:
-            file_name = "datasynthetic/npz/" + str(epoch_i) + "samples"
+            file_name = "datasynthetic/uniform02/npz/" + str(epoch_i) + "samples"
          
     arr  = np.stack((gtmask,Xinput,Xongoing), axis=0)
             

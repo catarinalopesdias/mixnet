@@ -33,23 +33,22 @@ from plotting.visualize_volumes import visualize_all4
 
 num_train_instances = 500
 dataset_iterations = 5000
-finalcheckpoint = 500
 batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
-text_stop = "stopping"
-lr =0.003
+#text_stop = "stopping"
+lr =0.0005
 text_lr = str(lr).split(".")[1]
 
 
 losses = "mse" # "mean_absolute_error" #"mse"
 
 #DipInv_Bollmann_newadam16_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_003_val_loss_datagen.ckpt
-name = "Bollmann" # Phillip
+name = "Phillipp" # Phillip
 path = "checkpoints/dipoleinversion/DipInv_" + name + "_newadam" + \
         str(num_filter)+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
             "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
-              + "_" + "valloss"+ "_datagen" + ".ckpt"
+              + "_" + "val_loss"+ "_datagen" + ".ckpt"
 
 
 
@@ -114,10 +113,10 @@ for epoch_i in range(3): #num_instance
 
 
 
-   #predicted, reference,error = visualize_all4(phase[:,:,:], gt[:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
+   predicted, reference,error = visualize_all4(phase[:,:,:], gt[:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
    
 #########################
-
+"""
 dim = int(gt.shape[0]/2)
 bla1=gt[dim,:,:]
 bla2= y_pred[0,dim,:,:,0]
@@ -130,5 +129,16 @@ plt.imshow(diff, cmap='RdBu',  vmin=-0.2, vmax=0.2)
 
 plt.imshow(bla1, cmap='RdBu',  vmin=-1.5, vmax=1.5)
 plt.imshow(bla2, cmap='RdBu',  vmin=-1.5, vmax=1.5)
+diff = bla1-bla2
 plt.imshow(bla1-bla2, cmap='RdBu',  vmin=-1.5, vmax=1.5)
 plt.colorbar()
+import sklearn
+from sklearn.neighbors import KernelDensity
+
+kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(diff)
+ kde.score_samples(diff)
+ sns.kdeplot(data=diff, x="total_bill")
+ 
+matplotlib.pyplot.hist( scipy.stats.gaussian_kde(diff, bw_method=None, weights=None))
+import matplotlib
+matplotlib.pyplot.hist(np.ndarray.flatten(diff), bins=128)"""

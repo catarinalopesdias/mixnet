@@ -72,7 +72,7 @@ name = "Phillipp"
 print("Model with gradient accumulation")
 gaaccumsteps = 10;
 #learningrate
-lr =0.001
+lr =0.0005
 text_lr = str(lr).split(".")[1] #"default" #
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps, inputs=model.input, outputs=model.output)
