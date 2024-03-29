@@ -19,11 +19,12 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-from networks.network_phillip import build_CNN_phillip
-#from networks.network_phillip_inputoutput import build_CNN_phillip_inputoutput
+#from networks.network import build_CNN
 #from networks.network_BOLLMAN import build_CNN_BOLLMAN
-#from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
-from  my_classes.DataGeneratordipinv_susc02 import DataGeneratorUniform
+from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
+#from visualize_volumes import view_slices_3dNew
+from  my_classes.DataGeneratordipinv_susc02_bgrem import DataGeneratorUniform
+
 
 
 
@@ -46,9 +47,8 @@ partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)
 # Generators
 #text regarding susc
 text_susc="unif02"
-training_generator   = DataGeneratorUniform(partition['train'])
-validation_generator = DataGeneratorUniform(partition['validation'])
-
+training_generatorUni   = DataGeneratorUniform(partition['train'])
+validation_generatorUni = DataGeneratorUniform(partition['validation'])
 
 
 
@@ -65,9 +65,9 @@ input_tensor = Input(shape = input_shape, name="input")
 print("compile model")
 
 #model = Model(input_tensor, ushape2) #get from orig deepQSM algorithm
-model = build_CNN_phillip(input_tensor)
-#model = build_CNN_BOLLMAN(input_tensor)
-name = "Phillipp"
+#model = build_CNN(input_tensor)
+model = build_CNN_BOLLMAN(input_tensor)
+name = "Bollmann"
 
 ###############################################
 ###############################################
@@ -120,7 +120,7 @@ lossmon = "val_loss"
 ###############
 # {epoch:04d}     #"cp-{epoch:04d}"+
 
-checkpoint_path = "checkpoints/dipoleinversion/DipInv_" + name + "_newadam"+ str(num_filter)+ \
+checkpoint_path = "checkpoints/bgremovalmodel/Bg_" + name + "_newadam"+ str(num_filter)+ \
     "_trainsamples" + str(num_train_instances) + \
         "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
         "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU + "_" + text_lr +"_"+ lossmon+"_" + text_susc + "_datagen.ckpt"
@@ -154,8 +154,8 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 
 print("fit model")
                                   
-history = model.fit_generator(generator=training_generator,
-                    validation_data=validation_generator,
+history = model.fit_generator(generator=training_generatorUni,
+                    validation_data=validation_generatorUni,
                     epochs=dataset_iterations,
                     use_multiprocessing=True,
                     #batch_size=1, 
@@ -173,11 +173,11 @@ loss_historyGA = history.history['loss']
 ###################
 
     
-if not os.path.exists("models/dipoleinversion"):
-    os.makedirs("models/dipoleinversion")
+if not os.path.exists("models/backgroundremovalBOLLMAN"):
+    os.makedirs("models/backgroundremovalBOLLMAN")
 
     
-model_name1 = "models/dipoleinversion/model_DipInv_" + name + \
+model_name1 = "models/backgroundremovalBOLLMAN/model_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + text_lr + "_"+ lossmon + "_"+text_susc+"_datagen.keras"
@@ -194,15 +194,15 @@ model.save(model_name1)
 lossfile_extensionpng =".png"
 lossfile_extensiontxt =".txt"
 
-if not os.path.exists("models/dipoleinversion/loss"):
-    os.makedirs("models/dipoleinversion/loss")
+if not os.path.exists("models/backgroundremovalBOLLMAN/loss"): 
+    os.makedirs("models/backgroundremovalBOLLMAN/loss") 
 
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
 plt.title("Loss")
 plt.xlabel("Dataset iterations")
-lossnamefile = "models/dipoleinversion/loss/model_DipInv_" + name + \
+lossnamefile = "models/backgroundremovalBOLLMAN/loss/modelBR_"+ name + \
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + "_loss_" + lossU + "_" + text_lr + \

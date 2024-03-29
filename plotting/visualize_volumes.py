@@ -421,3 +421,170 @@ def visualize_all4(resized_input, reference , predicted, title, save, path):
 
 
 
+############################################################################
+
+def visualize_all4grey(resized_input, reference , predicted, title, save, path, colormax, colormin, errormax, errormin):
+  
+  #shape input
+  input_data_shape = list(resized_input.shape)
+  print("Input shape:", input_data_shape)
+  
+  #shape reference
+  reference_shape = list(reference.shape)
+  print("reference shape:", reference_shape)
+  
+  #shape predicted
+  predicted_shape = list(predicted.shape)
+  print("predicted shape:", predicted_shape)
+  
+  
+  error = predicted - reference
+  
+  #error shape
+  error_shape = list(error.shape)
+  print("error shape:", error_shape)
+  
+  #cut 3 slices from input 
+  input_slice_x = resized_input[input_data_shape[0]//2, :, :]
+  input_slice_y = resized_input[:, input_data_shape[1]//2, :]
+  input_slice_z = resized_input[:, :, input_data_shape[2]//2]
+  
+  #cut 3 slices from reference 
+  reference_slice_x = reference[reference_shape[0]//2, :, :]
+  reference_slice_y = reference[:, reference_shape[1]//2, :]
+  reference_slice_z = reference[:, :, reference_shape[2]//2]
+  
+  #cut 3 slices from predicted
+  predicted_slice_x = predicted[predicted_shape[0]//2, :, :]
+  predicted_slice_y = predicted[:, predicted_shape[1]//2, :]
+  predicted_slice_z = predicted[:, :, predicted_shape[2]//2]
+  
+  
+  # 3 slices of error
+  
+  error_slice_x = predicted_slice_x - reference_slice_x
+  error_slice_y = predicted_slice_y - reference_slice_y
+  error_slice_z = predicted_slice_z - reference_slice_z
+  
+  
+  #Get max min of reference
+  ref_min =colormin#1.3 #tf.reduce_min(reference).numpy()
+  ref_max =colormax#1.3 # tf.reduce_max(reference).numpy()
+  print("Reference max value", colormax, "Reference min value", colormin)
+
+  ####################################################################
+  fig = plt.figure(figsize=(10, 10), dpi=100, edgecolor="black" )
+  fig.suptitle(title, fontsize=12)
+
+  ###########################################################
+  grid = ImageGrid(fig, 411,
+     nrows_ncols = (1,3),
+     axes_pad = 0.5,
+     cbar_location = "right",
+     cbar_mode="single",
+     cbar_size="5%",
+     cbar_pad=1,
+     share_all=True
+     )
+   #### error
+  
+ 
+  
+  
+  grid[0].imshow(input_slice_x, cmap='gray',aspect='equal', vmin=ref_min, vmax=ref_max)
+  grid[0].set_title("Input data X-dim")
+  grid[0].get_xaxis().set_ticks([])
+  grid[0].get_yaxis().set_ticks([])
+    
+  grid[1].imshow(input_slice_y, cmap='gray',aspect='equal', vmin=ref_min, vmax=ref_max)
+  grid[1].set_title("Input data Y-dim")
+
+
+  jj = grid[2].imshow(input_slice_z, cmap='gray',aspect='equal', vmin=ref_min, vmax=ref_max)
+  grid[2].set_title("Input data Z-dim ")
+  grid.cbar_axes[0].colorbar(jj)
+
+  ########################################################################
+  grid = ImageGrid(fig, 412,
+     nrows_ncols = (1,3),
+     axes_pad = 0.5,
+     cbar_location = "right",
+     cbar_mode="single",
+     cbar_size="5%",
+     cbar_pad=1,
+     share_all=True
+     )
+
+
+  grid[0].imshow(reference_slice_x, cmap='gray', vmin = ref_min, vmax = ref_max)
+  #grid[0].axis('off')
+  grid[0].set_title("Reference data X-dim")
+  grid[0].get_xaxis().set_ticks([])
+  grid[0].get_yaxis().set_ticks([])
+   
+  grid[1].imshow(reference_slice_y, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  grid[1].set_title("Reference data Y-dim")
+     
+  kk = grid[2].imshow(reference_slice_z, cmap='gray', vmin=ref_min, vmax=ref_max)
+  grid[2].set_title("Reference data Z-dim")
+   
+  grid.cbar_axes[0].colorbar(kk)
+
+  #### predicted
+  #################################################################### 
+  grid = ImageGrid(fig, 413,
+      nrows_ncols = (1,3),
+      axes_pad = 0.5,
+      cbar_location = "right",
+      cbar_mode="single",
+      cbar_size="5%",
+      cbar_pad=1,
+      share_all=True
+      )
+
+  grid[0].imshow(predicted_slice_x, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  grid[0].set_title("predicted data X-dim ")
+  grid[0].get_xaxis().set_ticks([])
+  grid[0].get_yaxis().set_ticks([])
+    
+  grid[1].imshow(predicted_slice_y, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  grid[1].set_title("predicted data Y-dim ")
+
+  ll = grid[2].imshow(predicted_slice_z, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  grid[2].set_title("predicted data Z-dim")
+  grid.cbar_axes[0].colorbar(ll)
+
+  
+###############################################################################################
+  grid = ImageGrid(fig, 414,
+     nrows_ncols = (1,3),
+     axes_pad = 0.5,
+     cbar_location = "right",
+     cbar_mode="single",
+     cbar_size="5%",
+     cbar_pad=1,
+     share_all=True
+     )
+   #### error
+  
+
+  
+  grid[0].imshow(error_slice_x, cmap='gray',aspect='equal', vmin=errormin, vmax=errormax)
+  grid[0].set_title("Error data X-dim")
+  grid[0].get_xaxis().set_ticks([])
+  grid[0].get_yaxis().set_ticks([])
+    
+  grid[1].imshow(error_slice_y, cmap='gray',aspect='equal', vmin=errormin, vmax=errormax)
+  grid[1].set_title("Error data Y-dim")
+
+
+  jj = grid[2].imshow(error_slice_z, cmap='gray',aspect='equal', vmin=errormin, vmax=errormax)
+  grid[2].set_title("Error data Z-dim ")
+  grid.cbar_axes[0].colorbar(jj)
+
+  if save:    
+      filename = path +  ".png"
+      plt.savefig(filename)
+  plt.show()
+  
+  return [predicted_slice_x, predicted_slice_y, predicted_slice_z],  [reference_slice_x, reference_slice_y, reference_slice_z], [error_slice_x, error_slice_y, error_slice_z]
