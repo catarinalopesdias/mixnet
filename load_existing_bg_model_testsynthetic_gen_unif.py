@@ -41,8 +41,8 @@ text_lr = str(lr).split(".")[1]
 
 losses = "mse" # "mean_absolute_error" #"mse"
 text_susc="unif02"
-#Bg_Bollmann_newadam16_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0005_val_loss_unif02_datagen.ckpt
-#DipInv_Bollmann_newadam16_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_003_val_loss_datagen.ckpt
+
+
 name = "Bollmann" # Phillip
 path = "checkpoints/bgremovalmodel/Bg_" + name + "_newadam" + \
         str(num_filter)+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
@@ -67,7 +67,7 @@ model.compile(loss = losses, optimizer = 'adam')
 ################################################
 #   Import data
 ################################################
-newdata=False
+newdata=True
 
 
 
@@ -122,16 +122,30 @@ for epoch_i in range(1): #num_instance
 #########################
 # 2d dif
 dim = int(phase.shape[0]/2)
-gt2d=phase[dim,:,:]
+phase2d=phase[dim,:,:]
 pred2d= y_pred[0,dim,:,:,0]
 
-diff2d = pred2d-gt2d
+diff2d = pred2d-phase2d
 
 #plot 2d diff
 import matplotlib.pyplot as plt
 import scipy.ndimage
-plt.imshow(diff2d, cmap='RdBu',  vmin=-0.2, vmax=0.2)
 
+
+plt.imshow(diff2d, cmap='RdBu',  vmin=-0.2, vmax=0.2)
+plt.colorbar()
+################
+
+
+
+plt.imshow(phasebg[dim,:,:], cmap='RdBu',  vmin=-0.2, vmax=0.2 )
+plt.colorbar()
+
+plt.imshow(phase2d, cmap='RdBu',  vmin=-0.2, vmax=0.2 )
+plt.colorbar()
+
+plt.imshow(pred2d, cmap='RdBu',  vmin=-0.005, vmax=0.004)
+plt.colorbar()
 ###############
 #3d diff
 

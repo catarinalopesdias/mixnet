@@ -40,7 +40,7 @@ class DataGeneratorUniform(keras.utils.Sequence):
       list_IDs_temp = [self.list_IDs[k] for k in indexes]
     
       # Generate data
-      X, Y = self.__data_generation(list_IDs_temp)
+      X, [Y,Z] = self.__data_generation(list_IDs_temp)
     
       return X, Y
     
@@ -56,7 +56,7 @@ class DataGeneratorUniform(keras.utils.Sequence):
       # Initialization
       X = np.empty((self.batch_size, *self.dim, self.n_channels))
       Y = np.empty((self.batch_size, *self.dim, self.n_channels))
-      #Z = np.empty((self.batch_size, *self.dim, self.n_channels))
+      Z = np.empty((self.batch_size, *self.dim, self.n_channels))
 
       #print(list_IDs_temp)
       # Generate data
@@ -76,12 +76,12 @@ class DataGeneratorUniform(keras.utils.Sequence):
            #y[i] = self.labels[ID]
           X[i,:] = loaded[2,:] #phase+bg
           Y[i,:] = loaded[1,:] #phase
-          
+          Z[i,:] = loaded[0,:] #gt
           #bla = loaded[1,:][64,:,:]
 
           #plt.imshow(bla, cmap='gray',  vmin=-0.4, vmax=0.4)   
 
-      return X, Y#[Y,Z]
+      return X, [Y,Z]
 
 
 
