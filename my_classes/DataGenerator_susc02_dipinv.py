@@ -10,7 +10,7 @@ import numpy as np
 import keras
 import tensorflow as tf
 
-class DataGenerator(keras.utils.Sequence):
+class DataGeneratorUniform(keras.utils.Sequence):
     'Generates data for Keras'
 
 
@@ -63,10 +63,10 @@ class DataGenerator(keras.utils.Sequence):
       
       for i, ID in enumerate(list_IDs_temp):
           # Store sample
-          
+          #    arr  = np.stack((gtmask[i,],Xinput[i,],Xongoing[i,]), axis=0)
 
  
-          loaded = np.load('datasynthetic/npz/' + ID + '.npz')
+          loaded = np.load('datasynthetic/uniform02/npz/' + ID + '.npz')
           #print(loaded )
           loaded =loaded['arr_0']
           #print(loaded )
@@ -79,8 +79,14 @@ class DataGenerator(keras.utils.Sequence):
 
            # Store class
            #y[i] = self.labels[ID]
+          #X[i,:] = loaded[2,:] #phase+bg
           X[i,:] = loaded[1,:] #phase
           Y[i,:] = loaded[0,:] #gt
+
+          #bla = loaded[1,:][60,:,:]
+
+          #plt.imshow(bla, cmap='gray',  vmin=-1, vmax=1)   
+
       return X, Y#[Y,Z]
      #return X, [Y,Z]
           #X[i,] = np.load('datasynthetic/np/' + ID + '.npy')# [2,:] #phase and background

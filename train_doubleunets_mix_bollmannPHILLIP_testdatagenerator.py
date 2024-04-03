@@ -226,7 +226,7 @@ file.close()
 #######################################
 # First loss
 
-loss_historyF = history.history['conv3d_transpose_129_loss']
+loss_historyF = history.history['val_endbollman_loss']
 
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyF)
@@ -255,12 +255,19 @@ file.close()
 
 # Second loss ######################################
 
-loss_historyS = history.history['add_63_loss']
+loss_historyS = history.history['val_endphillip_loss']
+
+lossnamefileS = "models/doublenet/loss/model_DB_" + name + "_2_"\
+"_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
++ "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
+"_gaaccum"+ str(gaaccumsteps) + \
+"_loss_" + losses[0] +losses[1] + "_" + \
+text_lr + "_" + lossmon+"_"+text_susc+"_datagen"
 
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyS)
 #plt.ylim([0, 0.03])
-plt.title("Loss Second model")
+plt.title("val Loss Second model")
 plt.xlabel("Epochs ")
 lossnamefileF = "models/doublenet/loss/model_DB_" + name + "_2_"\
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \

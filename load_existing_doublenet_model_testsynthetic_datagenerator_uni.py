@@ -29,7 +29,7 @@ from plotting.visualize_volumes import visualize_all4
 # parameter models
 num_train_instances = 500
 dataset_iterations = 5000
-#finalcheckpoint = 2996
+
 batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
@@ -79,9 +79,11 @@ if not os.path.exists("models/doublenet/prediction_images"):
 ################################################
 #   Import data
 ################################################
-path_common_init = "models/doublenet/prediction_images/model_BollmannPhillip_newadam"
+path_common_init = "models/doublenet/prediction_images/modelDN_"+ \
+    name + "_newadam" +str(num_filter)
 
 newdata=True
+
 
 for epoch_i in range(3): #num_instance
    file =str(epoch_i)+"samples"
@@ -90,12 +92,12 @@ for epoch_i in range(3): #num_instance
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
         text_typedata = "testdata"
-        file_full = "datasynthetic/npz/testing/" + file + ".npz"
+        file_full = "datasynthetic/uniform02/npz/testing/" + file + ".npz"
 
    else: #traindata
         text_typedata = "traindata"
     
-        file_full = "datasynthetic/npz/" + file + ".npz"
+        file_full = "datasynthetic/uniform02/npz/" + file + ".npz"
 
 ###############################################
    loaded = np.load(file_full)
@@ -108,12 +110,18 @@ for epoch_i in range(3): #num_instance
    y_pred = model.predict(X_test)
 
    print(epoch_i)
-   #title =   "trained network with testing data 50 epochs: " + str(epoch_i)+ " " + lossU
-   #pathi = "models/dipoleinversion/results/train"+str(num_filter) + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + lossU+ "_testset_epoch" + str(epoch_i) + text
-   #predicted, reference,error = visualize_all4(phase[:,:,:], gt[:,:,:], y_pred[0,:,:,:,0] ,title = title , save = True, path = pathi )
+
+
+
    
-   path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + \
-               "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ losses[0] +losses[1]+text_stop+"_"+text_lr +  text_typedata + "_epoch" + str(epoch_i) + "valloss"
+   path_common_final =  "trainsamples" + str(num_train_instances) +\
+                           "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+\
+                   "_gaaccum"+ str(gaaccumsteps) +\
+                       "_loss_"+ losses[0] +losses[1]+text_stop +\
+                   "_"+text_lr + lossmon +  text_typedata + "_epoch" + str(epoch_i) + \
+                       text_susc + "_datagen"
+
+
 
    print(epoch_i)
    title =   "U1 network - Backgroundremoval: " + str(epoch_i)+ " " + losses[0] + " " +  text_typedata
