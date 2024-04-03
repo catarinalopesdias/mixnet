@@ -16,7 +16,8 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-from  my_classes.DataGeneratordipinv_susc02 import DataGeneratorUniform
+from  my_classes.DataGenerator_susc02_dipinv import DataGeneratorUniform
+
 
 from networks.network_phillip import build_CNN_phillip
 

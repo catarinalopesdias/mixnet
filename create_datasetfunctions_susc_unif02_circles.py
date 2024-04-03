@@ -138,38 +138,53 @@ sim_gt[ :, :, :] = simulate_susceptibility_sources_uni_circles( #simulate_suscep
 
 """
 
-simulation_dim =128
-temp_sources = np.zeros((simulation_dim, simulation_dim, simulation_dim))
-from plotting.visualize_volumes import view_slices_3dNew
-#TypeError: view_slices_3dNew() missing 5 required positional arguments: 'slice_nbr_x', 'slice_nbr_y', 'slice_nbr_z', 'vmin', and 'vmax'
-
-view_slices_3dNew(temp_sources,60, 60,60, -1,1)
-
-temp_sources = np.zeros((simulation_dim, simulation_dim))
-#import matplotlib.pyplot as plt
-
-plt.imshow(temp_sources, vmin=-1, vmax=1, cmap='gray')
-
+from plotting.visualize_volumes import view_slices_3dNew, view_slices_3d
 
 import numpy as np
 import random
+
+
+simulation_dim =128
+slicecut = 60
+
+
+##############
+temp_sources3d = np.zeros((simulation_dim, simulation_dim, simulation_dim))
+
+view_slices_3dNew(temp_sources3d, slicecut, slicecut, slicecut, -1,1)
+
+##########
+temp_sources2d = np.zeros((simulation_dim, simulation_dim))
+
+plt.imshow(temp_sources2d, vmin=-1, vmax=1, cmap='gray')
+##########
+
+
+
+nr_circles = 80 
+max_radius = 12
+
+
 # https://stackoverflow.com/questions/49330080/numpy-2d-array-selecting-indices-in-a-circle
-x = np.arange(0, 128)
-y = np.arange(0, 128)
+x = np.arange(0, simulation_dim)
+y = np.arange(0, simulation_dim)
 #z = np.arange(0.128)
 arr = np.zeros((y.size, x.size))
 
-for i in range(80):
-    cxx = random.randint(0, 128)
-    cyy = random.randint(0, 128)
-    rr = random.randint(1, 12)
+for i in range(nr_circles):
+    cxx = random.randint(0, simulation_dim) # “discrete uniform” distribution
+    cyy = random.randint(0, simulation_dim)
+    rr = random.randint(1, max_radius)
 
 
 
-#####
+    #####
+    # create mask
     maskkk = (x[np.newaxis,:]-cxx)**2 + (y[:,np.newaxis]-cyy)**2 < rr**2
+    
     arr[maskkk] = np.random.uniform(low=-0.2, high=0.2)
 
+#plot add
 plt.figure(figsize=(6, 6))
 plt.pcolormesh(x, y, arr)
 plt.set_cmap('gray') #grayscale colormap 
@@ -182,27 +197,35 @@ plt.show()
 # try 3d 
 
 # https://stackoverflow.com/questions/49330080/numpy-2d-array-selecting-indices-in-a-circle
-x = np.arange(0, 128)
-y = np.arange(0, 128)
-z = np.arange(0,128)
-arr3D = np.zeros((y.size, x.size, z.size))
+x = np.arange(0, simulation_dim)
+y = np.arange(0, simulation_dim)
+z = np.arange(0, simulation_dim)
 
-arr3D = np.zeros((y.size, x.size, z.size))
+
+
+arr3D = np.zeros((x.size, y.size, z.size))
+
+
+
 for i in range(1):
-    cxx = random.randint(0, 128)
-    cyy = random.randint(0, 128)
-    czz = random.randint(0, 128)
+    cxx = random.randint(0, simulation_dim)
+    cyy = random.randint(0, simulation_dim)
+    czz = random.randint(0, simulation_dim)
 
-    rr = random.randint(1, 16)
+    rr = random.randint(1, max_radius)
 
 #####
-    maskkk3D = (z[np.newaxis, np.newaxis, :]          - czz)**2 + \
-               (x[:,         np.newaxis, np.newaxis] - cxx)**2  + \
-               (y[np.newaxis,:, np.newaxis] - cyy)**2 < rr**2
+
+               
+    maskkk3D = ((x[ :,         np.newaxis, np.newaxis]  - cxx)**2 + \
+               (y[np.newaxis, :         , np.newaxis]  - cyy)**2  + \
+               (z[np.newaxis, np.newaxis, :          ] - czz)**2 )< 20**2            
                
     arr3D[maskkk3D] = 20 #np.random.uniform(low=-0.2, high=0.2)
 
     view_slices_3dNew(arr3D,cxx,cyy,czz, -0.5,0.5)
+    #view_slices_3d(arr3D,cxx, -0.5,0.5)
+
     print("cxx",cxx)
     print("cyy",cyy)
     print("czz",czz)
@@ -210,4 +233,65 @@ for i in range(1):
 
 
 
+
 #view_slices_3dNew(arr3D,cxx, cyy,czz, -0.5,0.5)
+
+import scipy
+def aa(image_3d, slice_nbr_x,slice_nbr_y,slice_nbr_z, vmin, vmax, title=''):
+
+  #image_3d = phantom
+  #slice_nbr_x =100
+  #slice_nbr_y =100
+  #slice_nbr_z = 50
+  #vmin=-0.05
+  #vmax=0.05
+  
+  print('input shape', image_3d.shape)
+
+  gridspec = {'width_ratios': [1, 1, 1, 0.1]}
+  fig, ax = plt.subplots(1, 4, figsize=(15, 8), gridspec_kw=gridspec) 
+  plt.suptitle(title, fontsize=16)
+
+  #print('axial, fixed z shape', np.take(image_3d, slice_nbr_z, 2).shape)
+
+  ax[0].imshow(np.take(image_3d, slice_nbr_z, 2), vmin=vmin, vmax=vmax, cmap='gray')
+  ax[0].set_title('Axial: z = ' + str(slice_nbr_z) );
+  ax[0].set_xlabel('y')
+  ax[0].set_ylabel('x')
+  
+  ###########################################################
+  #coronal
+  im_y = np.take(image_3d, slice_nbr_y, 1)
+  im_y_rot = im_y #scipy.ndimage.rotate(im_y,90)
+  #print('axial, after rotation ', im_y_rot.shape)
+
+  ax[1].imshow(im_y_rot, vmin=vmin, vmax=vmax, cmap='gray')
+  ax[1].set_title('Coronal: y= '+str(slice_nbr_y));
+  ax[1].set_xlabel('x')
+  ax[1].set_ylabel('z')
+  ############################################################
+
+  # sagittal 
+  im_x = np.take(image_3d, slice_nbr_x, 0)
+  print('sagittal, fixed x', im_x.shape)
+  im_x_rot = np.swapaxes(im_x,0,1) #scipy.ndimage.rotate(im_x,90)
+  print('after rotation ',im_x_rot.shape)
+
+
+  im = ax[2].imshow(im_x_rot, vmin=vmin, vmax=vmax, cmap='gray')
+  ax[2].set_title('Sagittal: x= ' + str(slice_nbr_x));
+  ax[2].set_xlabel('y')
+  ax[2].set_ylabel('z')
+
+  #######################################################
+  # make them square
+  ax[1].set_aspect(im_x_rot.shape[1]/im_x_rot.shape[0])
+  ax[2].set_aspect(im_x_rot.shape[1]/im_x_rot.shape[0])
+  
+  cax = ax[3]
+  plt.colorbar(im, cax=cax)
+  #plt.tight_layout()
+  #plt.show()
+ 
+aa(arr3D,cxx,cyy,czz, -0.5,0.5)
+    
