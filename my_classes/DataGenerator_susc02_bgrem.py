@@ -9,6 +9,8 @@ Created on Tue Mar 12 10:58:49 2024
 import numpy as np
 import keras
 import tensorflow as tf
+import matplotlib.pyplot as plt
+
 
 class DataGeneratorUniform(keras.utils.Sequence):
     'Generates data for Keras'
@@ -76,10 +78,12 @@ class DataGeneratorUniform(keras.utils.Sequence):
            #y[i] = self.labels[ID]
           X[i,:] = loaded[2,:] #phase+bg
           Y[i,:] = loaded[1,:] #phase
+
           
           #bla = loaded[1,:][64,:,:]
-
-          #plt.imshow(bla, cmap='gray',  vmin=-0.4, vmax=0.4)   
+          #if i < 5:
+           #   plt.imshow(Y[i,:,:,64,0], cmap='gray',  vmin=-0.4, vmax=0.4) 
+            #  plt.show()  
 
       return X, Y#[Y,Z]
 

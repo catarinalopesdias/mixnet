@@ -40,7 +40,7 @@ text_lr = str(lr).split(".")[1]
 
 
 losses = "mse" # "mean_absolute_error" #"mse"
-text_susc="unif02"
+text_susc="norm01"#"unif02"
 
 
 name = "Bollmann" # Phillip
@@ -70,7 +70,7 @@ newdata=False
 
 
 
-path_common_init = "models/backgroundremovalBOLLMAN/prediction_images/unif/BgRem_"+name+"_newadam"
+path_common_init = "models/backgroundremovalBOLLMAN/prediction_images/norm01/BgRem_"+name+"_newadam"
 
 
 for epoch_i in range(1): #num_instance
@@ -80,11 +80,11 @@ for epoch_i in range(1): #num_instance
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
         text_typedata = "testdata"
-        file_full = "datasynthetic/uniform02/npz/testing/" + file + ".npz"
+        file_full = "datasynthetic/npz/testing/" + file + ".npz"
 
    else: #traindata
         text_typedata = "traindata" 
-        file_full = "datasynthetic//uniform02/npz/" + file + ".npz"
+        file_full = "datasynthetic/npz/" + file + ".npz"
 
    loaded = np.load(file_full)
    loaded =loaded['arr_0']

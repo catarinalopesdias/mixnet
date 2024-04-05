@@ -22,7 +22,7 @@ from newGA import GradientAccumulateModel
 #from networks.network import build_CNN
 #from networks.network_BOLLMAN import build_CNN_BOLLMAN
 from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
-from visualize_volumes import view_slices_3dNew
+from plotting.visualize_volumes import view_slices_3dNew
 
 ################################################
 #   Import data
@@ -147,7 +147,7 @@ else:
 
 ##############################################################################################
 
-dataset_iterations = 100
+dataset_iterations = 5000
 save_period = 150
 batch_size = 1
 num_filter = 16

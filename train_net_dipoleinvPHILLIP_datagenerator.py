@@ -17,8 +17,6 @@ import pickle
 
 from newGA import GradientAccumulateModel
 from  my_classes.DataGenerator_susc02_dipinv import DataGeneratorUniform
-
-
 from networks.network_phillip import build_CNN_phillip
 
 
@@ -40,15 +38,14 @@ partition_factor = 0.8
 
 partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)] , 
              'validation': 
-             samples_dic[ -int((1-partition_factor) * num_train_instances): num_train_instances]}
+             samples_dic[ -int(( 1-partition_factor) * num_train_instances): num_train_instances]}
 
 
 # Generators
 #text regarding susc
 text_susc="unif02"
-training_generator   = DataGeneratorUniform(partition['train'])
-validation_generator = DataGeneratorUniform(partition['validation'])
-
+training_generatorUni   = DataGeneratorUniform(partition['train'])
+validation_generatorUni = DataGeneratorUniform(partition['validation'])
 
 
 
@@ -72,7 +69,7 @@ gaaccumsteps = 10;
 lr =0.0005
 text_lr = str(lr).split(".")[1]
 
-model = GradientAccumulateModel(accum_steps=gaaccumsteps, 
+model = GradientAccumulateModel(accum_steps=gaaccumsteps,
                                 inputs=model.input, outputs=model.output)
 
 lossU = "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
@@ -117,7 +114,7 @@ checkpoint_path = "checkpoints/dipoleinversion/DipInv_" +\
     "_trainsamples" + str(num_train_instances) + \
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
-    "_loss_" + lossU + "_" +  \
+    "_loss_" + lossU + "_" + \
     text_lr +"_"+ lossmon+"_" + text_susc + "_datagen.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
@@ -149,8 +146,8 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 
 print("fit model")
 
-history = model.fit_generator(generator=training_generator,
-                    validation_data=validation_generator,
+history = model.fit_generator(generator=training_generatorUni,
+                    validation_data=validation_generatorUni,
                     epochs=dataset_iterations,
                     use_multiprocessing=True,
                     #batch_size=1, 
@@ -176,7 +173,7 @@ model_name1 = "models/dipoleinversion/model_DipInv_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_"+ lossmon + "_" + text_susc + "_datagen.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen.keras"
 
 
 model.save(model_name1)
