@@ -211,7 +211,7 @@ def view_slices_3dNew(image_3d, slice_nbr_x,slice_nbr_y,slice_nbr_z, vmin, vmax,
   ###########################################################
   im_y = np.take(image_3d, slice_nbr_y, 1)
   print('axial fixed y ', im_y.shape)
-  im_y_rot = scipy.ndimage.rotate(im_y,90)
+  im_y_rot = np.swapaxes(im_y,0,1) # scipy.ndimage.rotate(im_y,90)
   print('axial, after rotation ', im_y_rot.shape)
 
   ax[1].imshow(im_y_rot, vmin=vmin, vmax=vmax, cmap='gray')
@@ -222,7 +222,7 @@ def view_slices_3dNew(image_3d, slice_nbr_x,slice_nbr_y,slice_nbr_z, vmin, vmax,
 
   im_x = np.take(image_3d, slice_nbr_x, 0)
   print('sagittal, fixed x', im_x.shape)
-  im_x_rot = scipy.ndimage.rotate(im_x,90)
+  im_x_rot = np.swapaxes(im_x,0,1)  #scipy.ndimage.rotate(im_x,90)
   print('after rotation ',im_x_rot.shape)
 
 
