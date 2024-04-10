@@ -35,7 +35,7 @@ batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
 #text_stop = "stopping"
-lr =0.0005
+lr =0.0001
 text_lr = str(lr).split(".")[1]
 
 
@@ -44,6 +44,9 @@ text_susc="norm01"#"unif02"
 
 
 name = "Bollmann" # Phillip
+
+#Bg_Bollmann_newadam16_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0003_val_loss_norm01_datagen.ckpt
+
 path = "checkpoints/bgremovalmodel/Bg_" + name + "_newadam" + \
         str(num_filter)+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
             "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
@@ -80,11 +83,11 @@ for epoch_i in range(1): #num_instance
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
         text_typedata = "testdata"
-        file_full = "datasynthetic/npz/testing/" + file + ".npz"
+        file_full = "datasynthetic/normal01/npz/testing/" + file + ".npz"
 
    else: #traindata
         text_typedata = "traindata" 
-        file_full = "datasynthetic/npz/" + file + ".npz"
+        file_full = "datasynthetic/normal01/npz/" + file + ".npz"
 
    loaded = np.load(file_full)
    loaded =loaded['arr_0']
@@ -104,11 +107,11 @@ for epoch_i in range(1): #num_instance
 
    path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
                   "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
-                      "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) 
+                      "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) + "_normal01"
                   
                   
    print(epoch_i)
-   title =   text_typedata + "_epoch " + str(epoch_i)+ " " + losses
+   title =   text_typedata + "_epoch " + str(epoch_i)+ " " + losses 
 
 
    pathi =  path_common_init  + path_common_final
@@ -121,6 +124,7 @@ for epoch_i in range(1): #num_instance
                                                    colormax=0.4,colormin=-0.4,
                                                    errormax = 0.4,errormin=-0.4 )
    
+"""
 #########################
 # 2d dif
 dim = int(phase.shape[0]/2)
@@ -225,7 +229,8 @@ print("std", norm.fit(flatten_diff3d)[1])
 ###########################
 # svmbir (super-voxel model-based iterative reconstruction) is an easy-to-use python package for fast iterative
 def nrmse(image, reference_image):
-    """
+"""
+"""
     Compute the normalized root mean square error between image and reference_image.
 
     Args:
@@ -234,8 +239,8 @@ def nrmse(image, reference_image):
 
     Returns:
         Root mean square of (image - reference_image) divided by RMS of reference_image
-
-    """
+"""
+"""
     rmse = np.sqrt(((image - reference_image) ** 2).mean())
     denominator = np.sqrt(((reference_image) ** 2).mean())
 
@@ -303,3 +308,4 @@ def plot_hist(ax, data, title=None):
 fig, ((a, b), (c, d)) = plt.subplots(nrows=2, ncols=2)
 
 plot_hist(a, diff3d, title="Original")
+"""

@@ -198,12 +198,38 @@ def simulate_susceptibility_sources_1_unirec(volume):
   x_pos_max = min(x_pos + sizex, simulation_dim)
   y_pos_max = min(y_pos + sizey, simulation_dim)
   z_pos_max = min(z_pos + sizez, simulation_dim)
-  ,2)
+
     
-    bla= np.random.randint(10, simulation_dim-10,2)
-  [x_min, x_max] = bla.sort()
-  [y_min, y_max] =
-  [y_min, z_max] =
+ for i in range(3)
+  check= False
+   while check:
+       ar = np.sort(np.random.randint(10, simulation_dim-10,2))
+       
+       diff = ar[1]- ar[0]
+       if diff < 50:
+           check=True
+   
+  [x_min, x_max] = ar #np.sort(np.random.randint(10, simulation_dim-10,2))
+  
+   check= False
+   while check:
+       ar = np.sort(np.random.randint(10, simulation_dim-10,2))
+       
+       diff = ar[1]- ar[0]
+       if diff < 50:
+           check=True
+           
+  [y_min, y_max] = ar#np.sort(np.random.randint(10, simulation_dim-10,2))
+  
+   check= False
+   while check:
+       ar = np.sort(np.random.randint(10, simulation_dim-10,2))
+       
+       diff = ar[1]- ar[0]
+       if diff < 50:
+           check=True
+  
+  [y_min, z_max] = ar#np.sort(np.random.randint(10, simulation_dim-10,2))
 
 
       # change the sus values in the cuboids

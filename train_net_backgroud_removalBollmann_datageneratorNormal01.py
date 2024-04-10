@@ -25,7 +25,7 @@ from  my_classes.DataGenerator_norm01_bgrem import DataGeneratorNormal
 
 
 
-num_train_instances = 500
+num_train_instances = 188#500
 samples_dic = []
 
 
@@ -45,8 +45,8 @@ partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)
 # Generators
 #text regarding susc
 text_susc="norm01"
-training_generatorUni   = DataGeneratorNormal(partition['train'])
-validation_generatorUni = DataGeneratorNormal(partition['validation'])
+training_generatorNorm   = DataGeneratorNormal(partition['train'])
+validation_generatorNorm = DataGeneratorNormal(partition['validation'])
 
 
 
@@ -72,7 +72,7 @@ name = "Bollmann"
 print("Model with gradient accumulation")
 gaaccumsteps = 10;
 #learningrate
-lr =0.0001
+lr =0.0003
 text_lr = str(lr).split(".")[1]
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps,
@@ -152,8 +152,8 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 
 print("fit model")
 
-history = model.fit_generator(generator=training_generatorUni,
-                    validation_data=validation_generatorUni,
+history = model.fit_generator(generator=training_generatorNorm,
+                    validation_data=validation_generatorNorm,
                     epochs=dataset_iterations,
                     use_multiprocessing=True,
                     #batch_size=1, 
@@ -163,7 +163,7 @@ history = model.fit_generator(generator=training_generatorUni,
 
 
 
-loss_historyGA = history.history['loss']
+loss_historyGA = history.history['val_loss']
 
 
 #with open('loss_historyGA.pickle', 'wb') as f:
@@ -198,7 +198,7 @@ if not os.path.exists("models/backgroundremovalBOLLMAN/loss"):
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
-plt.title("Loss")
+plt.title(lossmon)
 plt.xlabel("Dataset iterations")
 lossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
