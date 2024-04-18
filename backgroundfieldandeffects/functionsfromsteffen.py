@@ -9,7 +9,7 @@ import numpy as np
 import tensorflow as tf
 
 
-def calc_gauss_function( mu, sigma, dim):
+def calc_gauss_function_tf( mu, sigma, dim):
     """Calculates a gaussian function (update tensorflow graph).
 
     Parameters
@@ -54,6 +54,8 @@ def calc_gauss_function( mu, sigma, dim):
     z = tf.reshape(z, dim)
 
     return z
+
+
 
 
 def calc_gauss_function_np( mu, sigma, dim):
@@ -147,6 +149,75 @@ def apply_random_brain_mask(data):
 
         return np.multiply(mask, data), mask
     
+    
+def apply_random_brain_mask_tf( data):
+        """Apply a random brain mask to the data (tensorflow graph update)
+
+        Parameters
+        ----------
+        data : tf tensor
+            Input data of size HxWxD
+
+        Returns
+        -------
+        tf tensor
+            Result of size HxWxD
+        tf tensor
+            Mask of size HxWxD
+        """
+
+        shape = data.get_shape().as_list()
+        ndim = len(shape)
+
+        # number of gaussians to be used
+        num_gaussians = 20
+
+        # sigma range in terms of percentage wrt the dim
+        sigma_range = [0.15, 0.2]
+
+        # init volume
+        mask0 = tf.zeros(shape, dtype=tf.bool)
+
+        i0 = tf.constant(0)
+
+        def _cond(i, mask):
+            return tf.less(i, num_gaussians)
+
+        def _body(i, mask):
+
+            # create random positions inside dim range (clustered in the center)
+            mu = tf.random.normal([ndim],
+                                  mean=0.5,
+                                  stddev=0.075)
+            mu = tf.multiply(mu, shape)
+            # create random sigma values
+            sigma = tf.stack([
+                sigma_range[0] * shape[i] + tf.random.uniform(
+                    []) *
+                (sigma_range[1] - sigma_range[0]) * shape[i]
+                for i in range(ndim)
+            ])
+
+            gauss_function = calc_gauss_function_tf(mu=mu,
+                                                        sigma=sigma,
+                                                        dim=shape)
+
+            # update mask
+            mask = tf.logical_or(gauss_function > 0.5, mask)
+
+            i += 1
+            return (i, mask)
+
+        i, mask = tf.while_loop(_cond,
+                                _body,
+                                loop_vars=(i0, mask0),
+                                parallel_iterations=1,
+                                name="brain_mask_loop")
+
+    #    return tf.multiply(tf.to_float(mask), data), mask    
+        #tf.cast(x, tf.float32)
+        return tf.multiply(tf.cast(mask, tf.float32), data), mask   
+    
 def distance_to_plane_np(point, normal, dim, signed_dist=False):
     """Calculates a distance volume to the plane given by a point and a normal.
 
@@ -220,6 +291,45 @@ def distance_to_plane(point, normal, dim, signed_dist=False):
     dist = np.divide(dist, np.linalg.norm(normal))
 
     
+    return dist
+
+
+def distance_to_plane_tf(point, normal, dim, signed_dist=False):
+    """Calculates a distance volume to the plane given by a point and a normal.
+
+    Parameters
+    ----------
+    point: tf tensor
+        Point on the plane (3d point)
+    normal: tf tensor
+        Normal vector of the plane (3d vector)
+    dim: list
+        dimension of the volume (x,y,z)
+    signed_dist : bool
+        Indicates if we should use a signed or unsiged distance
+
+    Returns
+    -------
+    tf tensor
+        Tensor of size dim with distances to the plane
+    """
+    ndim = len(dim)
+
+    linspace = [tf.lin_space(0.0, dim[i] - 1.0, dim[i]) for i in range(ndim)]
+    coord = tf.meshgrid(*linspace, indexing='ij')
+    coord = [coord[i] - point[i] for i in range(ndim)]
+    coord = tf.stack(coord)
+
+    # calculates the dot product between (3,w,h,d) and (3,1)
+    dist = tf.tensordot(coord, normal, axes=[[0], [0]])
+    dist = tf.reshape(dist, dist.get_shape()[:-1])
+
+    # calculate distance
+    if not signed_dist:
+        dist = tf.abs(dist)
+
+    dist = tf.divide(dist, tf.linalg.norm(normal))
+
     return dist
 
 ##############################################################################

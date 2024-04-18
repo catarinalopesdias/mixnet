@@ -34,7 +34,8 @@ from plotting.visualize_volumes import view_slices_3dNew
 #phase = np.load('syntheticdata/phase100.npy')
 ######
 # compressed data
-loaded = np.load('datasynthetic/150samples.npz')
+#loaded = np.load('datasynthetic/150samples.npz')
+loaded = np.load('datasynthetic/150backgroundfields_1gt_lessbg.npz')
 
 phase = loaded['phase1']
 phase_bg = loaded['phase_bg1']
@@ -206,7 +207,7 @@ if not os.path.exists("models/backgroundremovalBOLLMAN"):
     
 #model_name = "models/backgroundremoval/modelBR_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".h5"
 #model_name1 = "models/backgroundremoval/modelBR_trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".keras"
-model_name1 = "models/backgroundremovalBOLLMAN/modelBR_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +".keras"
+model_name1 = "models/backgroundremovalBOLLMAN/modelBR_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_"+ lossU +"150backgrounds1image.keras"
 
 
 #model.save(model_name)
@@ -233,7 +234,7 @@ plt.plot(loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
 plt.title("Loss")
 plt.xlabel("Dataset iterations")
-lossnamefile = "models/backgroundremovalBOLLMAN/loss/modelBR_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ lossU
+lossnamefile = "models/backgroundremovalBOLLMAN/loss/modelBR_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ "_gaaccum"+ str(gaaccumsteps) +"_loss_"+ lossU +"150backgrounds1image"
 lossfile_extension =".png"
 plt.savefig(lossnamefile + lossfile_extension )
 

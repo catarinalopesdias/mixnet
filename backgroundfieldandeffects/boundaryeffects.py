@@ -13,7 +13,7 @@ import tensorflow as tf
 import numpy as np
 from visualize_volumes import view_slices_3d, view_slices_3dNew
 from create_datasetfunctions import simulate_susceptibility_sources, generate_3d_dipole_kernel, forward_convolution
-from functionsfromsteffen import apply_random_brain_mask, calc_gauss_function_np, calc_gauss_function, forward_simulation
+from functionsfromsteffen import apply_random_brain_mask, calc_gauss_function_np, calc_gauss_function_tf, forward_simulation
 from generate_backgroundfield_steffen import add_z_gradient
 
 

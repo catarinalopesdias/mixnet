@@ -25,7 +25,7 @@ from  my_classes.DataGenerator_norm01_bgrem import DataGeneratorNormal
 
 
 
-num_train_instances = 188#500
+num_train_instances = 500
 samples_dic = []
 
 
@@ -72,7 +72,7 @@ name = "Bollmann"
 print("Model with gradient accumulation")
 gaaccumsteps = 10;
 #learningrate
-lr =0.0003
+lr =0.0004
 text_lr = str(lr).split(".")[1]
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps,
@@ -116,7 +116,7 @@ lossmon = "val_loss"
 # "cp-{epoch:04d}"+
 
 checkpoint_path = "checkpoints/bgremovalmodel/Bg_" +\
-    name + "_newadam" + str(num_filter)+ \
+    name + "_newadam" + str(num_filter)+  "cp-{epoch:04d}"\
     "_trainsamples" + str(num_train_instances) + \
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
@@ -130,16 +130,16 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                  save_weights_only = False,
                                                  #save_freq=save_period,
                                                  save_freq="epoch",
-                                                 save_best_only=True,
+                                                 save_best_only=False,
                                                  monitor = lossmon,
                                                  verbose=1)
 
 
 
 earlystop = tf.keras.callbacks.EarlyStopping(
-    monitor="loss",
+    monitor=lossmon,
     min_delta=0,
-    patience=100,
+    patience=1000,
     verbose=1,
     mode="auto",
     baseline=None,
@@ -152,12 +152,13 @@ earlystop = tf.keras.callbacks.EarlyStopping(
 
 print("fit model")
 
-history = model.fit_generator(generator=training_generatorNorm,
+history = model.fit(x=training_generatorNorm,
                     validation_data=validation_generatorNorm,
                     epochs=dataset_iterations,
                     use_multiprocessing=True,
+                    #initial_epoch=1721,
                     #batch_size=1, 
-                    callbacks = [cp_callback,earlystop],
+                    callbacks = [cp_callback],# earlystop
                     workers=6)
 
 
@@ -199,7 +200,7 @@ if not os.path.exists("models/backgroundremovalBOLLMAN/loss"):
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
-plt.title(lossmon)
+plt.title("loss")
 plt.xlabel("Dataset iterations")
 lossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
@@ -208,19 +209,19 @@ lossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 "_loss_" + lossU + "_" + \
 text_lr + "_" + "loss"+"_"+text_susc+"_datagen"
 plt.savefig(lossnamefile + lossfile_extensionpng )
-
+##################################
 plt.figure(figsize=(6, 3))
-plt.plot(cal_loss_historyGA)
+plt.plot(val_loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
 plt.title(lossmon)
 plt.xlabel("Dataset iterations")
-lossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
+vallossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
 text_lr + "_" + lossmon+"_"+text_susc+"_datagen"
-plt.savefig(lossnamefile + lossfile_extensionpng )
+plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############
 # plot loss as txt
@@ -230,3 +231,13 @@ for item in loss_historyGA:
 
 	file.write(str(item)+"\n")
 file.close()
+
+############
+
+file = open(vallossnamefile + lossfile_extensiontxt,'w')
+for item in val_loss_historyGA:
+
+	file.write(str(item)+"\n")
+file.close()
+
+

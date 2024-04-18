@@ -18,7 +18,7 @@ Created on Wed Feb  7 08:47:22 2024
 import numpy
 import tensorflow as tf
 import numpy as np
-from backgroundfieldandeffects.functionsfromsteffen import calc_gauss_function, forward_simulation
+from backgroundfieldandeffects.functionsfromsteffen import calc_gauss_function_tf, forward_simulation
 
 
 def dilation(mask, kernel, kernel_size, shape, num_dilations):
@@ -190,7 +190,7 @@ def add_boundary_artifacts( data, mask, mean, std):
         #                                            sigma=sigma,
         #                                            dim=shape)
         
-        gauss_function = calc_gauss_function(mu=mu,
+        gauss_function = calc_gauss_function_tf(mu=mu,
                                                     sigma=sigma,
                                                     dim=shape)
         

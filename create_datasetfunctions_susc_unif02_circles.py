@@ -186,8 +186,8 @@ def simulate_susceptibility_sources_1_unirec(volume):
       
       #size of cuboid - random within siye min and max
   [sizex,sizey,sizez] = np.random.randint(shape_size_min, shape_size_max,3)
-  #random_sizey = np.random.randint(shape_size_min, shape_size_max)
-  #random_sizez = np.random.randint(shape_size_min, shape_size_max)
+  random_sizey = np.random.randint(shape_size_min, shape_size_max)
+  random_sizez = np.random.randint(shape_size_min, shape_size_max)
       
       #position of cuboid (random inside the cube)
   [x_pos,y_pos, z_pos] = np.random.randint(10, simulation_dim-10,3)
@@ -195,41 +195,44 @@ def simulate_susceptibility_sources_1_unirec(volume):
   #z_pos = np.random.randint(10, simulation_dim-10)
 
       # make sure it does not get out of the cube
-  x_pos_max = min(x_pos + sizex, simulation_dim)
-  y_pos_max = min(y_pos + sizey, simulation_dim)
-  z_pos_max = min(z_pos + sizez, simulation_dim)
+  x_pos_max = min(x_pos + sizex, simulation_dim-10)
+  #np.random.randint(x_pos, simulation_dim-10)
+  y_pos_max = min(y_pos + sizey, simulation_dim-10)
+  #np.random.randint(y_pos, simulation_dim-10)#min(y_pos + sizey, simulation_dim)
+  z_pos_max = min(z_pos + sizez, simulation_dim-10)
+  #np.random.randint(z_pos, simulation_dim-10)#min(z_pos + sizez, simulation_dim)
 
     
- for i in range(3)
-  check= False
-   while check:
-       ar = np.sort(np.random.randint(10, simulation_dim-10,2))
+  #for i in range(3):
+  # check= False
+  # while check:
+     #  ar = np.sort(np.random.randint(10, simulation_dim-10,2))
        
-       diff = ar[1]- ar[0]
-       if diff < 50:
-           check=True
+   #    diff = ar[1]- ar[0]
+    #   if diff < 50:
+     #      check=True
    
-  [x_min, x_max] = ar #np.sort(np.random.randint(10, simulation_dim-10,2))
+  #[x_min, x_max] = ar #np.sort(np.random.randint(10, simulation_dim-10,2))
   
-   check= False
-   while check:
-       ar = np.sort(np.random.randint(10, simulation_dim-10,2))
+  #check= False
+  #while check:
+   #    ar = np.sort(np.random.randint(10, simulation_dim-10,2))
        
-       diff = ar[1]- ar[0]
-       if diff < 50:
-           check=True
+    #   diff = ar[1]- ar[0]
+     #  if diff < 50:
+      #     check=True
            
-  [y_min, y_max] = ar#np.sort(np.random.randint(10, simulation_dim-10,2))
+  #[y_min, y_max] = ar#np.sort(np.random.randint(10, simulation_dim-10,2))
   
-   check= False
-   while check:
-       ar = np.sort(np.random.randint(10, simulation_dim-10,2))
+  #check= False
+  #while check:
+   #    ar = np.sort(np.random.randint(10, simulation_dim-10,2))
        
-       diff = ar[1]- ar[0]
-       if diff < 50:
-           check=True
+    #   diff = ar[1]- ar[0]
+     #  if diff < 50:
+      #     check=True
   
-  [y_min, z_max] = ar#np.sort(np.random.randint(10, simulation_dim-10,2))
+  #[y_min, z_max] = ar#np.sort(np.random.randint(10, simulation_dim-10,2))
 
 
       # change the sus values in the cuboids
@@ -241,6 +244,7 @@ def simulate_susceptibility_sources_1_unirec(volume):
 dim = 128
 nr_rect = 80
 
+arr3D = np.zeros((dim, dim, dim))
 
 for i in range(nr_rect):
     simulate_susceptibility_sources_1_unirec(arr3D)
@@ -252,13 +256,13 @@ nr_circles = 80
 nr_rect = 80
 
 #############
-names = np.arange(0, nr_circles)
-ages = np.arange(0, nr_rect)
+allcircles = np.arange(0, nr_circles)
+allrects = np.arange(0, nr_rect)
 dim= 128
 arr3D = np.zeros((dim, dim, dim))
+###############################################################################
 
-
-for (nn, age) in zip(names, ages):
+for (circ, rec) in zip(allcircles, allrects):
     simulate_susceptibility_sources_1_unirec(arr3D)
     simulate_susceptibility_sources_1_unicircle(arr3D)
     

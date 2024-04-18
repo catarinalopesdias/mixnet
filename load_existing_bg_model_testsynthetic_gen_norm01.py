@@ -35,7 +35,7 @@ batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
 #text_stop = "stopping"
-lr =0.0001
+lr =0.0003
 text_lr = str(lr).split(".")[1]
 
 
@@ -46,9 +46,11 @@ text_susc="norm01"#"unif02"
 name = "Bollmann" # Phillip
 
 #Bg_Bollmann_newadam16_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0003_val_loss_norm01_datagen.ckpt
-
+#Bg_Bollmann_newadam16_trainsamples188_datasetiter5000_batchsize1_gaaccum10_loss_mse_0003_val_loss_norm01_datagen.ckpt
+#model_BR_Bollmann_newadam_16filters_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0005_val_loss_norm01_datagen
+#/home/c/checkpoints/bgremovalmodel/Bg_Bollmann_newadam16cp-1721_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0003_val_loss_norm01_datagen.ckpt
 path = "checkpoints/bgremovalmodel/Bg_" + name + "_newadam" + \
-        str(num_filter)+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+        str(num_filter)+ "cp-1721"+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
             "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
               + "_" + "val_loss"+ "_"+ text_susc +"_datagen" + ".ckpt"
 
@@ -69,14 +71,14 @@ model.compile(loss = losses, optimizer = 'adam')
 ################################################
 #   Import data
 ################################################
-newdata=False
+newdata=True
 
 
 
 path_common_init = "models/backgroundremovalBOLLMAN/prediction_images/norm01/BgRem_"+name+"_newadam"
 
 
-for epoch_i in range(1): #num_instance
+for epoch_i in range(3): #num_instance
    file =str(epoch_i)+"samples"
 
    if newdata:
@@ -105,7 +107,7 @@ for epoch_i in range(1): #num_instance
    #plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.4, vmax=0.4)   
 
 
-   path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+   path_common_final =  str(num_filter)+ "cp-1721"+ "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
                   "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
                       "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) + "_normal01"
                   
@@ -123,6 +125,11 @@ for epoch_i in range(1): #num_instance
                                                    path = pathi,
                                                    colormax=0.4,colormin=-0.4,
                                                    errormax = 0.4,errormin=-0.4 )
+   
+   pathi = pathi+"_color"
+   predicted, reference,error = visualize_all4(phasebg[:,:,:], phase[:,:,:], y_pred[0,:,:,:,0] ,
+                                                   title = title , save = True,
+                                                   path = pathi)
    
 """
 #########################
