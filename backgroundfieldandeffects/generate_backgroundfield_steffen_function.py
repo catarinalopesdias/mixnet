@@ -208,7 +208,7 @@ def add_z_gradient_SMALL(data, slope_range):
         #view_slices_3d(dist, slice_nbr=50, vmin=-20, vmax=20, title="distance x slope")
         
         # add to data
-        data = data + dist
+        data = data + dist/2
         
         #print('data shape', data.shape)
         #view_slices_3d(data, slice_nbr=50, vmin=-20, vmax=20, title="data + (distance*slope)")

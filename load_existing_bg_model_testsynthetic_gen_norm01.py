@@ -35,7 +35,7 @@ batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
 #text_stop = "stopping"
-lr =0.0003
+lr =0.0004
 text_lr = str(lr).split(".")[1]
 
 
@@ -49,8 +49,10 @@ name = "Bollmann" # Phillip
 #Bg_Bollmann_newadam16_trainsamples188_datasetiter5000_batchsize1_gaaccum10_loss_mse_0003_val_loss_norm01_datagen.ckpt
 #model_BR_Bollmann_newadam_16filters_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0005_val_loss_norm01_datagen
 #/home/c/checkpoints/bgremovalmodel/Bg_Bollmann_newadam16cp-1721_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0003_val_loss_norm01_datagen.ckpt
+#Bg_Bollmann_newadam16cp-4455_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0004_val_loss_norm01_datagen.ckpt
+
 path = "checkpoints/bgremovalmodel/Bg_" + name + "_newadam" + \
-        str(num_filter)+ "cp-1721"+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+        str(num_filter)+ "cp-4454"+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
             "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
               + "_" + "val_loss"+ "_"+ text_susc +"_datagen" + ".ckpt"
 
@@ -71,7 +73,7 @@ model.compile(loss = losses, optimizer = 'adam')
 ################################################
 #   Import data
 ################################################
-newdata=True
+newdata=False
 
 
 
@@ -107,7 +109,7 @@ for epoch_i in range(3): #num_instance
    #plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.4, vmax=0.4)   
 
 
-   path_common_final =  str(num_filter)+ "cp-1721"+ "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+   path_common_final =  str(num_filter)+ "cp-4454"+ "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
                   "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
                       "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) + "_normal01"
                   
