@@ -21,7 +21,7 @@ from newGA import GradientAccumulateModel
 from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
 #from visualize_volumes import view_slices_3dNew
 #from  my_classes.DataGenerator_susc02_bgrem import DataGeneratorUniform
-from  my_classes.DataGenerator_susc02_bgrem_lessbg import DataGeneratorUniformlessbg
+from  my_classes.DataGenerator_norm01_bgrem_evenlessbg import DataGeneratorNormal
 
 
 
@@ -44,9 +44,9 @@ partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)
 
 # Generators
 #text regarding susc
-text_susc="unif02"
-training_generatorUnif   = DataGeneratorUniformlessbg(partition['train'])
-validation_generatorUnif = DataGeneratorUniformlessbg(partition['validation'])
+text_susc="norm01"
+training_generatorNorm   = DataGeneratorNormal(partition['train'])
+validation_generatorNorm = DataGeneratorNormal(partition['validation'])
 
 
 
@@ -121,7 +121,7 @@ checkpoint_path = "checkpoints/bgremovalmodel/Bg_" +\
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_lessbg.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_elb.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -145,20 +145,20 @@ earlystop = tf.keras.callbacks.EarlyStopping(
     baseline=None,
     restore_best_weights=False,
     start_from_epoch=0,
-) 
+)
 
 
 
 
 print("fit model")
 
-history = model.fit(x=training_generatorUnif,
-                    validation_data=validation_generatorUnif,
+history = model.fit(x=training_generatorNorm,
+                    validation_data=validation_generatorNorm,
                     epochs=dataset_iterations,
                     use_multiprocessing=True,
                     #initial_epoch=1721,
                     #batch_size=1, 
-                    callbacks = [cp_callback, earlystop],
+                    callbacks = [cp_callback],# earlystop
                     workers=6)
 
 
@@ -181,7 +181,7 @@ model_name1 = "models/backgroundremovalBOLLMAN/model_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_lessbg.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbg.keras"
 
 
 model.save(model_name1)
@@ -202,12 +202,13 @@ plt.plot(loss_historyGA)
 #plt.ylim([0, loss_historyGA[-1]*2])
 plt.title("loss")
 plt.xlabel("Dataset iterations")
+
 lossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + "loss"+"_"+text_susc+"_datagen_lessbg"
+text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbg"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
@@ -220,7 +221,7 @@ vallossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_datagen_lessbg"
+text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbg"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############

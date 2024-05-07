@@ -5,7 +5,7 @@ Created on Tue Feb 13 08:56:39 2024
 This follows streffens code for adding background and artifacts
 It creates a background based on rectangles (steffen bollman)
 and then transforms to phase, and then adds background and artifacts. it saves phase, and phase+bg and artifacts
-@author: catarinalopesdias
+@author: catarinalopesdiasß
 """
 
 import h5py
@@ -20,7 +20,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 150
+num_train_instances = 1
 size = 128  # [128,128,128]
 rect_num = 200
 

@@ -21,7 +21,7 @@ from newGA import GradientAccumulateModel
 from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
 #from visualize_volumes import view_slices_3dNew
 #from  my_classes.DataGenerator_susc02_bgrem import DataGeneratorUniform
-from  my_classes.DataGenerator_susc02_bgrem_lessbg import DataGeneratorUniformlessbg
+from  my_classes.DataGenerator_susc02_bgrem_evenlessbg import DataGeneratorUniformevenlessbg
 
 
 
@@ -45,8 +45,8 @@ partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)
 # Generators
 #text regarding susc
 text_susc="unif02"
-training_generatorUnif   = DataGeneratorUniformlessbg(partition['train'])
-validation_generatorUnif = DataGeneratorUniformlessbg(partition['validation'])
+training_generatorUnif   = DataGeneratorUniformevenlessbg(partition['train'])
+validation_generatorUnif = DataGeneratorUniformevenlessbg(partition['validation'])
 
 
 
@@ -72,7 +72,7 @@ name = "Bollmann"
 print("Model with gradient accumulation")
 gaaccumsteps = 10;
 #learningrate
-lr =0.0004
+lr =0.001#0.0004
 text_lr = str(lr).split(".")[1]
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps,
@@ -108,7 +108,7 @@ else:
 
 ###############################################################################
 
-dataset_iterations = 2000
+dataset_iterations = 4000
 batch_size = 1
 num_filter = 16
 lossmon = "val_loss"
@@ -121,7 +121,7 @@ checkpoint_path = "checkpoints/bgremovalmodel/Bg_" +\
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_lessbg.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbg.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -181,7 +181,7 @@ model_name1 = "models/backgroundremovalBOLLMAN/model_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_lessbg.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbg.keras"
 
 
 model.save(model_name1)
@@ -207,7 +207,7 @@ lossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + "loss"+"_"+text_susc+"_datagen_lessbg"
+text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbg"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
@@ -220,7 +220,7 @@ vallossnamefile = "models/backgroundremovalBOLLMAN/loss/model_BR_" + name + \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_datagen_lessbg"
+text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbg"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############
