@@ -30,7 +30,7 @@ from plotting.visualize_volumes import visualize_all4, visualize_all4grey
 
 
 num_train_instances = 500
-dataset_iterations = 5000
+dataset_iterations = 2000
 batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
@@ -51,10 +51,13 @@ name = "Bollmann" # Phillip
 #/home/c/checkpoints/bgremovalmodel/Bg_Bollmann_newadam16cp-1721_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0003_val_loss_norm01_datagen.ckpt
 #Bg_Bollmann_newadam16cp-4455_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_0004_val_loss_norm01_datagen.ckpt
 
+#Bg_Bollmann_newadam16cp-2000_trainsamples500_datasetiter2000_batchsize1_gaaccum10_loss_mse_0004_val_loss_norm01_datagen_elb.ckpt
+
+current = "0"+ str(220)
 path = "checkpoints/bgremovalmodel/Bg_" + name + "_newadam" + \
-        str(num_filter)+ "cp-4454"+ "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+        str(num_filter)+ "cp-"+ current + "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
             "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
-              + "_" + "val_loss"+ "_"+ text_susc +"_datagen" + ".ckpt"
+              + "_" + "val_loss"+ "_"+ text_susc +"_datagen" + "_elb.ckpt"
 
 
 
@@ -80,6 +83,8 @@ newdata=False
 path_common_init = "models/backgroundremovalBOLLMAN/prediction_images/norm01/BgRem_"+name+"_newadam"
 
 
+folder = "normal01evenlessbglessartifacts"
+
 for epoch_i in range(3): #num_instance
    file =str(epoch_i)+"samples"
 
@@ -87,11 +92,11 @@ for epoch_i in range(3): #num_instance
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
         text_typedata = "testdata"
-        file_full = "datasynthetic/normal01/npz/testing/" + file + ".npz"
+        file_full = "datasynthetic/" +  folder + "/npz/testing/" + file + ".npz"
 
    else: #traindata
         text_typedata = "traindata" 
-        file_full = "datasynthetic/normal01/npz/" + file + ".npz"
+        file_full = "datasynthetic/" + folder + "/npz/" + file + ".npz"
 
    loaded = np.load(file_full)
    loaded =loaded['arr_0']
@@ -107,11 +112,11 @@ for epoch_i in range(3): #num_instance
    #plt.imshow(y_pred[0,64,:,:,0], cmap='gray',  vmin=-0.01, vmax=0.01)   
 
    #plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.4, vmax=0.4)   
+   bg = "elb"
 
-
-   path_common_final =  str(num_filter)+ "cp-4454"+ "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
+   path_common_final =  str(num_filter)+ "cp-"+ current + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
                   "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
-                      "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) + "_normal01"
+                      "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) + "_normal01_"+ bg
                   
                   
    print(epoch_i)

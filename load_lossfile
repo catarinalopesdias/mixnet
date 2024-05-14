@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri May 10 10:33:18 2024
+
+@author: catarinalopesdias
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+folder = "models/backgroundremovalBOLLMAN/loss/"
+
+
+file = "model_BR_Bollmann_newadam16trainsamples500_datasetiter2000_batchsize1_gaaccum10_loss_mse_0004_val_loss_norm01_datagen_evenlessbg.txt"
+
+path = folder + file 
+###############
+val_loss = np.loadtxt( path) 
+
+
+plt.plot(val_loss)
+plt.xlabel("epoch")
+plt.ylabel("loss")
+plt.title("validation loss")
+plt.show()
+###################
+################################################
+################################################
+### plot loss ####################
+
+file = "model_BR_Bollmann_newadam16trainsamples500_datasetiter2000_batchsize1_gaaccum10_loss_mse_0004_loss_norm01_datagen_evenlessbg.txt"
+
+path = folder + file 
+ ###############
+val_loss = np.loadtxt( path) 
+
+
+plt.plot(val_loss)
+plt.xlabel("epoch")
+plt.ylabel("loss")
+plt.title("loss")
+plt.show()
+ ###################
+
+
+
+
+
+
+#def moving_average(a, n=3):
+#    ret = np.cumsum(a, dtype=float)
+#    ret[n:] = ret[n:] - ret[:-n]
+#    return ret[n - 1:] / n
+    
+#av_loss= moving_average(val_loss,400)
+
+#plt.plot(av_loss)
+
+#min(av_loss)
+
+#from scipy.signal import find_peaks
+#peaks, _ = find_peaks(av_loss, height=0)
+
+#plt.plot(peaks, av_loss[peaks], "x")
+
+#plt.show()
