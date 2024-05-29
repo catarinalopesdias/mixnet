@@ -89,6 +89,96 @@ def build_CNN_BOLLMAN(input_tensor):
 
   x = input_tensor
 
+
+  # Downsampling through the model
+  skips = []
+  for down in down_stack:
+    x = down(x)
+    skips.append(x)
+
+  skips = reversed(skips[:-1])
+
+  # Upsampling and establishing the skip connections
+  for up, skip in zip(up_stack, skips):
+    x = up(x)
+    x = concat([x, skip])
+
+  x = last(x)
+
+  return tf.keras.Model(input_tensor, x)
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+#import costum layer
+from my_classes.keraslayer import dotproduct
+###################################
+
+##############################################################################
+def extralayer_build_CNN_BOLLMAN(input_tensor):
+
+  filter_base = 16
+  kernel_size = 3
+  OUTPUT_CHANNELS = 1
+
+  down_stack = [
+    downsample(filter_base, kernel_size, apply_batchnorm=False), # (bs, 32xxx 64 if filter base = 64)
+    downsample(filter_base*2, kernel_size), # (bs, 16xxx, 128)
+    downsample(filter_base*3, kernel_size), # (bs, 8xxx, 256)
+    downsample(filter_base*4, kernel_size), # (bs, 4xxx, 512)
+    downsample(filter_base*5, kernel_size), # (bs, 2xxx, 512)
+  ]
+
+  up_stack = [
+    upsample(filter_base*5, kernel_size, apply_dropout=True), # (bs, 16, 16, 1024)
+    upsample(filter_base*4, kernel_size, apply_dropout=True), # (bs, 32, 32, 512)
+    upsample(filter_base*3, kernel_size), # (bs, 64, 64, 256)
+    upsample(filter_base*2, kernel_size), # (bs, 128, 128, 128)
+  ]
+
+  #initializer = tf.random_normal_initializer(0., 0.02)
+  last = tf.keras.layers.Conv3DTranspose(OUTPUT_CHANNELS, kernel_size,
+                                         strides=2,
+                                         padding='same',
+                                         #kernel_initializer=initializer,
+                                         activation='tanh')
+
+  concat = tf.keras.layers.Concatenate()
+
+
+  x = input_tensor
+
+############################################################################
+  x = tf.keras.Sequential()
+  # https://www.tutorialspoint.com/keras/keras_customized_layer.htm
+
+  # do i need an initializer??
+  #initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev = 0.02)
+
+
+
+  #result = tf.keras.Sequential()
+  #result.add(
+  #    tf.keras.layers.Conv3D(filters, kernel_size, strides=2, padding='same',
+  #                           kernel_initializer=initializer,
+  #                             use_bias=False))
+
+  #if apply_batchnorm:
+  #  result.add(tf.keras.layers.BatchNormalization())
+
+  #result.add(tf.keras.layers.LeakyReLU())
+
+  #return result
+
+  x.add(dotproduct(32, input_shape = (16,)))  # Our MyCustomLayer is added to the model using 32 units and (16,) as input shape
+
+
+
+  ########################################################################################
+
+
+
   # Downsampling through the model
   skips = []
   for down in down_stack:

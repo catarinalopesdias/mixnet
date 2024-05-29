@@ -250,7 +250,7 @@ def view_slices_3dNew(image_3d, slice_nbr_x,slice_nbr_y,slice_nbr_z, vmin, vmax,
 
 
  
-def visualize_all4(resized_input, reference , predicted, title, save, path):
+def visualize_all4(resized_input, reference , predicted, title, save, path, colormax=1, colormin=-1, errormax=0.2, errormin=-0.2):
   
   #shape input
   input_data_shape = list(resized_input.shape)
@@ -315,20 +315,19 @@ def visualize_all4(resized_input, reference , predicted, title, save, path):
      )
    #### error
   
-  error_max = 0.1
-  error_min = -0.1
+
   
   
-  grid[0].imshow(input_slice_x, cmap='gray',aspect='equal', vmin=ref_min, vmax=ref_max)
+  grid[0].imshow(input_slice_x, cmap='gray',aspect='equal', vmin=colormin, vmax=colormax)
   grid[0].set_title("Input data X-dim")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
     
-  grid[1].imshow(input_slice_y, cmap='gray',aspect='equal', vmin=ref_min, vmax=ref_max)
+  grid[1].imshow(input_slice_y, cmap='gray',aspect='equal', vmin=colormin, vmax=colormax)
   grid[1].set_title("Input data Y-dim")
 
 
-  jj = grid[2].imshow(input_slice_z, cmap='gray',aspect='equal', vmin=ref_min, vmax=ref_max)
+  jj = grid[2].imshow(input_slice_z, cmap='gray',aspect='equal', vmin=colormin, vmax=colormax)
   grid[2].set_title("Input data Z-dim ")
   grid.cbar_axes[0].colorbar(jj)
 
@@ -344,16 +343,16 @@ def visualize_all4(resized_input, reference , predicted, title, save, path):
      )
 
 
-  grid[0].imshow(reference_slice_x, cmap='gray', vmin = ref_min, vmax = ref_max)
+  grid[0].imshow(reference_slice_x, cmap='gray', vmin = colormin, vmax = colormax)
   #grid[0].axis('off')
   grid[0].set_title("Reference data X-dim")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
    
-  grid[1].imshow(reference_slice_y, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  grid[1].imshow(reference_slice_y, cmap='gray',  vmin=colormin, vmax=colormax)
   grid[1].set_title("Reference data Y-dim")
      
-  kk = grid[2].imshow(reference_slice_z, cmap='gray', vmin=ref_min, vmax=ref_max)
+  kk = grid[2].imshow(reference_slice_z, cmap='gray', vmin=colormin, vmax=colormax)
   grid[2].set_title("Reference data Z-dim")
    
   grid.cbar_axes[0].colorbar(kk)
@@ -370,15 +369,15 @@ def visualize_all4(resized_input, reference , predicted, title, save, path):
       share_all=True
       )
 
-  grid[0].imshow(predicted_slice_x, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  grid[0].imshow(predicted_slice_x, cmap='gray',  vmin=colormin, vmax=colormax)
   grid[0].set_title("predicted data X-dim ")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
     
-  grid[1].imshow(predicted_slice_y, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  grid[1].imshow(predicted_slice_y, cmap='gray',  vmin=colormin, vmax=colormax)
   grid[1].set_title("predicted data Y-dim ")
 
-  ll = grid[2].imshow(predicted_slice_z, cmap='gray',  vmin=ref_min, vmax=ref_max)
+  ll = grid[2].imshow(predicted_slice_z, cmap='gray',  vmin=colormin, vmax=colormax)
   grid[2].set_title("predicted data Z-dim")
   grid.cbar_axes[0].colorbar(ll)
 
@@ -395,20 +394,20 @@ def visualize_all4(resized_input, reference , predicted, title, save, path):
      )
    #### error
   
-  error_max = 0.3
-  error_min = -0.3
+  #error_max = 0.3
+  #error_min = -0.3
   
   
-  grid[0].imshow(error_slice_x, cmap='seismic',aspect='equal', vmin=error_min, vmax=error_max)
+  grid[0].imshow(error_slice_x, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax)
   grid[0].set_title("Error data X-dim")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
     
-  grid[1].imshow(error_slice_y, cmap='seismic',aspect='equal', vmin=error_min, vmax=error_max)
+  grid[1].imshow(error_slice_y, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax)
   grid[1].set_title("Error data Y-dim")
 
 
-  jj = grid[2].imshow(error_slice_z, cmap='seismic',aspect='equal', vmin=error_min, vmax=error_max)
+  jj = grid[2].imshow(error_slice_z, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax)
   grid[2].set_title("Error data Z-dim ")
   grid.cbar_axes[0].colorbar(jj)
 

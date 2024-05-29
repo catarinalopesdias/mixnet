@@ -35,19 +35,19 @@ batch_size = 1
 gaaccumsteps = 10
 num_filter = 16
 #text_stop = "stopping"
-lr =0.0004
+lr =0.001 #0.0004
 text_lr = str(lr).split(".")[1]
 
 
 losses = "mse" # "mean_absolute_error" #"mse"
-text_susc="norm01"#"unif02"
+text_susc="unif02" #norm01"#
 
 
 name = "Bollmann" # Phillip
 
 #Bg_Bollmann_newadam16cp-1964_trainsamples500_datasetiter2000_batchsize1_gaaccum10_loss_mse_0004_val_loss_norm01_datagenlessbg_datagen_1gt500bg.ckpt
 
-current = "1964"#+ #str(220)
+current = "2000"#+ #str(220)
 path = "checkpoints/bgremovalmodel/Bg_" + name + "_newadam" + \
         str(num_filter)+ "cp-"+ current + "_trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
             "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
@@ -70,23 +70,26 @@ model.compile(loss = losses, optimizer = 'adam')
 ################################################
 #   Import data
 ################################################
-newdata=False
+newdata=True
 
 
 
-path_common_init = "models/backgroundremovalBOLLMAN/prediction_images/norm01_1gt500bg/BgRem_"+name+"_newadam"
+path_common_init = "models/backgroundremovalBOLLMAN/prediction_images/unif02_1gt500bg/"
 
 
-folder = "gt1bg500_normal01evenlessbgnoartifacts"
+network_type = "BgRem_"+name+"_newadam"
+
+
+folder = "gt1bg500_unif02evenlessbgnoartifacts"
 
 for epoch_i in range(3): #num_instance
-   file =str(450+epoch_i)+"samples"
+   file =str(epoch_i)+"samples"
 
    if newdata:
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
-        text_typedata = "testdata"
-        file_full = "datasynthetic/" +  folder + "/npz/testing/" + file + ".npz"
+        text_typedata = "testdata_samegt"
+        file_full = "datasynthetic/" +  folder + "/npz/testing_samegt/" + file + ".npz"
 
    else: #traindata
         text_typedata = "traindata" 
@@ -110,27 +113,29 @@ for epoch_i in range(3): #num_instance
 
    path_common_final =  str(num_filter)+ "cp-"+ current + "trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
                   "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
-                      "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) + "_normal01_"+ bg
+                      "_"  +  "valloss"+"_datagen_"+ text_typedata + "_epoch" + str(epoch_i) + "_unif02_"+ bg 
                   
                   
    print(epoch_i)
    title =   text_typedata + "_epoch " + str(epoch_i)+ " " + losses 
 
 
-   pathi =  path_common_init  + path_common_final
+   pathi =  path_common_init +"/grey/"+ network_type  + path_common_final
 
 
 
    predicted, reference,error = visualize_all4grey(phasebg[:,:,:], phase[:,:,:], y_pred[0,:,:,:,0] ,
                                                    title = title , save = True,
                                                    path = pathi,
-                                                   colormax=0.4,colormin=-0.4,
-                                                   errormax = 0.4,errormin=-0.4 )
+                                                   colormax=0.2,colormin=-0.2,
+                                                   errormax = 0.2,errormin=-0.2 )
    
-   pathi = pathi+"_color"
+   pathi = path_common_init +"/color/"+ network_type  + path_common_final+"_color"
    predicted, reference,error = visualize_all4(phasebg[:,:,:], phase[:,:,:], y_pred[0,:,:,:,0] ,
                                                    title = title , save = True,
-                                                   path = pathi)
+                                                   path = pathi,
+                                                   colormax=0.2,colormin=-0.2,
+                                                   errormax = 0.2,errormin=-0.2 )
    
 """
 #########################

@@ -12,6 +12,8 @@ import h5py
 import numpy as np
 from plotting.visualize_volumes import view_slices_3dNew
 from create_datasetfunctions_susc_unif02 import simulate_susceptibility_sources_uni, forward_convolution
+#from create_datasetfunctions_susc_norm01 import simulate_susceptibility_sources_norm, forward_convolution
+#create_datasetfunctions import simulate_susceptibility_sources,
 # ,  calc_gauss_function_np#, apply_random_brain_mask, distance_to_plane_np, distance_to_plane
 from backgroundfieldandeffects.functionsfromsteffen import apply_random_brain_mask
 import backgroundfieldandeffects.functionsfromsteffen 
@@ -20,7 +22,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 10
+num_train_instances = 1
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -73,41 +75,33 @@ Xongoing = np.ones_like(sim_gt)
 #################################################################
 #################################################################
 
-print("create 1 sim susc,  convolve, add 150 background noise")
-
-simulation1 = simulate_susceptibility_sources_uni(
-    simulation_dim=size, rectangles_total=rect_num, plot=False)
-phase1 = forward_convolution(simulation1)
-
-
- ########################################################################################################
- ########################################################################################################
- ########################################################################################################
-
-print("iterate epochs, add 150 background noises")
-
-
-
 print("iterate epochs,sim susc,  convolve, add background noise")
 
 for epoch_i in range(num_train_instances):
     print("epoch ", str(epoch_i))
 
-    # the goundtrue stays the same
+    # Create ground thruth - add rectangles
+    sim_gt[ :, :, :] = simulate_susceptibility_sources_uni( #simulate_susceptibility_sources_uni
+        simulation_dim=size, rectangles_total=rect_num, plot=False)
+    # Phase:forward convolution with the dipole kernel
+    sim_fwgt[ :, :, :] = forward_convolution(sim_gt[ :, :, :])
     
     
-    #view_slices_3dNew(sim_gt[ :, :, :], 50, 50, 50,
-     #             vmin=-1, vmax=1, title="simgt")
+    view_slices_3dNew(sim_gt[ :, :, :], 50, 50, 50,
+                  vmin=-1, vmax=1, title="simgt")
 
-    #view_slices_3dNew(sim_fwgt[ :, :, :], 50, 50, 50,
-    #              vmin=-1, vmax=1, title="simfwgt")
+    view_slices_3dNew(sim_fwgt[ :, :, :], 50, 50, 50,
+                  vmin=-1, vmax=1, title="simfwgt")
 
  ########################################################################################################
  ########################################################################################################
  ########################################################################################################
+#for epoch_i in range(num_train_instances):
+#    print("epoch ", str(epoch_i))
 
-    Xinput[ :, :, :] = phase1
-    Xongoing[ :, :, :] = phase1
+
+    Xinput[ :, :, :] = sim_fwgt[ :, :, :]
+    Xongoing[ :, :, :] = sim_fwgt[ :, :, :]
 
     if apply_masking:
 
@@ -120,11 +114,11 @@ for epoch_i in range(num_train_instances):
             sim_gt[ :, :, :], mask[ :, :, :])
         
 
-        #view_slices_3dNew(sim_fwgt_mask[ :, :, :], 50, 50, 50,
-         #         vmin=-1, vmax=1, title="sim_fwgt_mask")
+        view_slices_3dNew(sim_fwgt_mask[ :, :, :], 50, 50, 50,
+                  vmin=-1, vmax=1, title="sim_fwgt_mask")
 
-        #view_slices_3dNew(gtmask[ :, :, :], 50, 50, 50,
-         #         vmin=-1, vmax=1, title="gtmask")
+        view_slices_3dNew(gtmask[ :, :, :], 50, 50, 50,
+                  vmin=-1, vmax=1, title="gtmask")
 
 ######################
     if backgroundfield:
@@ -134,16 +128,26 @@ for epoch_i in range(num_train_instances):
             bgf[ :, :, :], gradient_slope_range)
 
         view_slices_3dNew(bgf[ :, :, :], 50, 50, 50,
-                  vmin=-10, vmax=10, title="bgf")
-
+                  vmin=-2, vmax=2, title="bgf")
+######################## HERE ##############
+############## REMOVE BIOUNDARY ARTIFACTS
         if apply_masking:
 
-            bgf_mask[ :, :, :] = add_boundary_artifacts(
-               bgf[ :, :, :], mask[ :, :, :],90,10)# boundary_artifacts_mean,
-                #boundary_artifacts_std)
+            #bgf_mask[ :, :, :] = add_boundary_artifacts(
+            #   bgf[ :, :, :], mask[ :, :, :],90,10)# boundary_artifacts_mean,
+            #    #boundary_artifacts_std)
+            
+            bgf_mask[ :, :, :] = tf.multiply(mask[ :, :, :], bgf[ :, :, :])
+            #   bgf[ :, :, :], ,90,10)# boundary_artifacts_mean,
+            #    #boundary_artifacts_std)
+            
+            
+                
+    
+                
 
-        #view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50,
-         #         vmin=-1, vmax=1, title="bgf")
+        view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50,
+                 vmin=-1, vmax=1, title="bgf + mask")
         
         # ????????????dkjfsdfsdsdklfjdsjfhhsdgfkjsdfkllfdfjfk
         sim_fwgt_mask_bg[ :, :, :] = tf.add(
@@ -151,8 +155,8 @@ for epoch_i in range(num_train_instances):
 
 
 
-        #view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50,
-         #         vmin=-1, vmax=1, title="sim_fwgt_mask_bg")
+        view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50,
+                  vmin=-1, vmax=1, title="sim_fwgt_mask_bg")
 
 ######################
     #if sensor_noise:
@@ -233,35 +237,15 @@ for epoch_i in range(num_train_instances):
         #Xongoing = tf.multiply(mask[epoch_i, :,:,:], Xongoing[epoch_i, :,:,:])
 
         #     Y = tf.multiply(tf.to_float(mask), Y)
-
-
-
     if testingdata:
-        file_name = "datasynthetic/uniform02evenlessbglessartifacts/npz/testing/" + str(epoch_i) + "samples"
+        file_name = "datasynthetic/unif02evenlessbgnoartifacts/npz/testing/" + str(epoch_i) + "samples"
     else:
-            file_name = "datasynthetic/uniform02evenlessbglessartifacts/npz/" + str(epoch_i) + "samples"
+            file_name = "datasynthetic/unif02evenlessbgnoartifacts/npz/" + str(epoch_i) + "samples"
     #     
     arr  = np.stack((gtmask,sim_fwgt_mask,Xongoing), axis=0)
             
             #np.save(file_name,arr)
     np.savez_compressed(file_name, arr)
-
-
-    if testingdata:
-        file_name = "datasynthetic/uniform02evenlessbglessartifacts/npz/testing/" + str(epoch_i) + "samples"
-    else:
-            file_name = "datasynthetic/uniform02evenlessbglessartifacts/npz/" + str(epoch_i) + "samples"
-    #     
-    arr  = np.stack((gtmask,sim_fwgt_mask,Xongoing), axis=0)
-            
-            #np.save(file_name,arr)
-    np.savez_compressed(file_name, arr)
-
-
-
-
-
-
 
 
 #view_slices_3dNew(gtmask[ :, :, :], 50, 50, 50,
@@ -282,17 +266,17 @@ view_slices_3dNew(sim_fwgt_mask[ :, :, :], 50,
 #                  vmin=-10, vmax=10, title="background field")
 view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50, vmin=-10,
                   vmax=10, title="bg field + mask (bondary artifacts)")
-view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50,
-                  50, 50, vmin=-10, vmax=10, title="fw + mask +background")
+#view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50,
+#                  50, 50, vmin=-10, vmax=10, title="fw + mask +background")
 view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50, vmin=-
-                  0.5, vmax=0.5, title="fw + mask +background+boundarz artifacs")
+                  3.5, vmax=3.5, title="fw + mask +background+boundarz artifacs")
 
 
 #view_slices_3dNew(sensornoise[ :, :, :], 50,
 #                  50, 50, vmin=-0.5, vmax=0.5, title="sn")
 
-view_slices_3dNew(sim_fwgt_mask_bg_sn[ :, :, :], 50, 50, 50,
-                  vmin=-10, vmax=10, title="fw+bg + mask (bondary artifacts)+sn")
+#view_slices_3dNew(sim_fwgt_mask_bg_sn[ :, :, :], 50, 50, 50,
+#                  vmin=-1.5, vmax=1.5, title="fw+bg + mask (bondary artifacts)+sn")
 
 
 view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
@@ -303,4 +287,4 @@ view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
 #                  vmin=-10, vmax=10, title="X ongoing-fw,masj,bg,sn,wrapped")
 
 view_slices_3dNew(Xongoing[ :, :, :], 50, 50, 50,
-                  vmin=-0.2, vmax=0.2, title="X ongoing-fw,masj,bg,sn,wrapped")
+                  vmin=-3.2, vmax=3.2, title="X ongoing-fw,masj,bg,sn,wrapped")
