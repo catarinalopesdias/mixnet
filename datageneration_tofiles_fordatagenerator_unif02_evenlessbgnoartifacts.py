@@ -22,7 +22,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 1
+num_train_instances = 500
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -43,7 +43,7 @@ sensor_noise_std = 0.03
 sensor_noise = False
 wrap_input_data = True
 
-testingdata = True
+testingdata = False
 ##############################################################################
 # create dipole kernel (cuboid size )
 ##############################################################################
@@ -149,7 +149,6 @@ for epoch_i in range(num_train_instances):
         view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50,
                  vmin=-1, vmax=1, title="bgf + mask")
         
-        # ????????????dkjfsdfsdsdklfjdsjfhhsdgfkjsdfkllfdfjfk
         sim_fwgt_mask_bg[ :, :, :] = tf.add(
             sim_fwgt_mask[ :, :, :], bgf_mask[ :, :, :])
 
@@ -187,8 +186,8 @@ for epoch_i in range(num_train_instances):
             sim_fwgt_mask_bg_sn[ :, :, :], value_range / 2.0)
 
 
-        #view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
-         #      vmin=-1, vmax=1, title="sim_fwgt_mask_bg_sn_wrapped")
+
+
 
 
 
@@ -238,9 +237,9 @@ for epoch_i in range(num_train_instances):
 
         #     Y = tf.multiply(tf.to_float(mask), Y)
     if testingdata:
-        file_name = "datasynthetic/unif02evenlessbgnoartifacts/npz/testing/" + str(epoch_i) + "samples"
+        file_name = "datasynthetic/unif02evenlessbgnoartifactsNEW/npz/testing/" + str(epoch_i) + "samples"
     else:
-            file_name = "datasynthetic/unif02evenlessbgnoartifacts/npz/" + str(epoch_i) + "samples"
+            file_name = "datasynthetic/unif02evenlessbgnoartifactsNEW/npz/" + str(epoch_i) + "samples"
     #     
     arr  = np.stack((gtmask,sim_fwgt_mask,Xongoing), axis=0)
             
@@ -257,15 +256,15 @@ for epoch_i in range(num_train_instances):
 #view_slices_3dNew(Xinput[index, :, :, :], 50, 50, 50,
 #                  vmin=-1.5, vmax=1.5, title="Xinput (fw+mask)")
 view_slices_3dNew(sim_fwgt_mask[ :, :, :], 50,
-                  50, 50, vmin=-0.5, vmax=0.5, title="fw+brain mask")
+                  50, 50, vmin=-0.2, vmax=0.2, title="fw+brain mask")
 #view_slices_3dNew(mask[index, :, :, :], 50, 50, 50,
 #                  vmin=-0.5, vmax=0.5, title="brain mask")
 
 
 #view_slices_3dNew(bgf[ :, :, :], 50, 50, 50,
 #                  vmin=-10, vmax=10, title="background field")
-view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50, vmin=-10,
-                  vmax=10, title="bg field + mask (bondary artifacts)")
+view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50, vmin=-3,
+                  vmax=3, title="bg field + mask (bondary artifacts)")
 #view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50,
 #                  50, 50, vmin=-10, vmax=10, title="fw + mask +background")
 view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50, vmin=-
@@ -280,7 +279,7 @@ view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50, vmin=-
 
 
 view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
-                  vmin=-10, vmax=10, title="bg field + masking (bondary artifacts)+wrapped")
+                  vmin=-3, vmax=3, title="bg field + masking (bondary artifacts)+wrapped")
 
 
 #view_slices_3dNew(Xongoing[ :, :, :], 50, 50, 50,
