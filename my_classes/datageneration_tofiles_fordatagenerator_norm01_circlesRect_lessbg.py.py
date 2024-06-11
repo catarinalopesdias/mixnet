@@ -1,50 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Mar 22 08:49:24 2024
-
-@author: catarinalopesdias
-"""
-from keras.layer import Lambda
-from keras import backend as K
-import tensorflow as tf
-
-def generate_3d_dipole_kernel(data_shape, voxel_size, b_vec):
-    fov = tf.array(data_shape) * tf.array(voxel_size)
-
-    ry, rx, rz = tf.meshgrid(tf.arange(-data_shape[1] // 2, data_shape[1] // 2),
-                             tf.arange(-data_shape[0] // 2, data_shape[0] // 2),
-                             tf.arange(-data_shape[2] // 2, data_shape[2] // 2))
-
-    rx, ry, rz = rx / fov[0], ry / fov[1], rz / fov[2]
-
-    sq_dist = rx ** 2 + ry ** 2 + rz ** 2
-    sq_dist[sq_dist == 0] = 1e-6
-    d2 = ((b_vec[0] * rx + b_vec[1] * ry + b_vec[2] * rz) ** 2) / sq_dist
-    kernel = (1 / 3 - d2)
-
-    return kernel
-
-
-def forward_convolution_with_dipole(chi_sample):
-    
-    scaling = tf.sqrt(chi_sample.size)
-    chi_fft = tf.fft.fftshift(tf.fft.fftn(tf.fft.fftshift(chi_sample))) / scaling
-    
-    chi_fft_t_kernel = chi_fft * generate_3d_dipole_kernel(chi_sample.shape, voxel_size=1, b_vec=[0, 0, 1])
-   
-    tissue_phase = tf.fft.fftshift(tf.fft.ifftn(tf.fft.fftshift(chi_fft_t_kernel)))
-    tissue_phase = tf.real(tissue_phase * scaling)
-
-    return tissue_phase
- 
-lambda_output= Lambda(forward_convolution_with_dipole)(input)
- 
-
-    
-"""
+ @staticmethod
     def calc_dipole_kernel(dim):
-        Calculates the dipole kernel of dimension 'dim'
+        """Calculates the dipole kernel of dimension 'dim'
         (1/3 - k_z^2/k^2)
 
         Parameters
@@ -56,7 +12,7 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
         -------
         tf tensor
             Dipole kernel of dimension dim
-        
+        """
 
         linspace = [
             tf.linspace(0.0, float(dim[i] - 1), dim[i])
@@ -77,7 +33,7 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
         return kernel
 
     def forward_simulation(self, data):
-        Calculates the forward QSM simulation, i.e. apply
+        """Calculates the forward QSM simulation, i.e. apply
         dipole kernel in the fourier domain.
 
         Parameters
@@ -95,7 +51,7 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
             Data in fourier domain
         tf tensor
             Result in fourier domain
-        
+        """
 
         shape = data.get_shape()
 
@@ -134,7 +90,7 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
         return result, f_kernel, f_data, f_result
 
     def forward_simulation_full_tf(self, data):
-        Applies the forward simulation (with full output) by running a
+        """Applies the forward simulation (with full output) by running a
         tensorflow session.
 
         Parameters
@@ -146,7 +102,7 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
         -------
         numpy array
             Result
-        
+        """
 
         graph = tf.Graph()
 
@@ -189,7 +145,7 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
         return result, f_kernel, f_data, f_result
 
     def forward_simulation_tf(self, data, graph=None, sess=None, kill=True):
-        Applies the forward simulation by running a tensorflow session.
+        """Applies the forward simulation by running a tensorflow session.
 
         Parameters
         ----------
@@ -210,7 +166,7 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
             graph
         tf session
             session
-        
+        """
 
         create_graph = False
         if graph is None:
@@ -257,5 +213,3 @@ lambda_output= Lambda(forward_convolution_with_dipole)(input)
                 graph = None
 
         return data, graph, sess
-"""
-    

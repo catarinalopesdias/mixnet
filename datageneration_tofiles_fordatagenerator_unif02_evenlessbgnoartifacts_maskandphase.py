@@ -22,7 +22,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 1
+num_train_instances = 500
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -87,11 +87,11 @@ for epoch_i in range(num_train_instances):
     sim_fwgt[ :, :, :] = forward_convolution(sim_gt[ :, :, :])
     
     
-    view_slices_3dNew(sim_gt[ :, :, :], 50, 50, 50,
-                  vmin=-1, vmax=1, title="simgt")
+    #view_slices_3dNew(sim_gt[ :, :, :], 50, 50, 50,
+    #              vmin=-1, vmax=1, title="simgt")
 
-    view_slices_3dNew(sim_fwgt[ :, :, :], 50, 50, 50,
-                  vmin=-1, vmax=1, title="simfwgt")
+    #view_slices_3dNew(sim_fwgt[ :, :, :], 50, 50, 50,
+    #              vmin=-1, vmax=1, title="simfwgt")
 
  ########################################################################################################
  ########################################################################################################
@@ -114,137 +114,25 @@ for epoch_i in range(num_train_instances):
             sim_gt[ :, :, :], mask[ :, :, :])
         
 
-        view_slices_3dNew(sim_fwgt_mask[ :, :, :], 50, 50, 50,
-                  vmin=-1, vmax=1, title="sim_fwgt_mask")
+        #view_slices_3dNew(sim_fwgt_mask[ :, :, :], 50, 50, 50,
+        #          vmin=-1, vmax=1, title="sim_fwgt_mask")
 
-        view_slices_3dNew(gtmask[ :, :, :], 50, 50, 50,
-                  vmin=-1, vmax=1, title="gtmask")
-
-######################
-    if backgroundfield:
-
-        #print("add z gradient")
-        bgf[ :, :, :] = add_z_gradient_SMALL(
-            bgf[ :, :, :], gradient_slope_range)
-
-        view_slices_3dNew(bgf[ :, :, :], 50, 50, 50,
-                  vmin=-2, vmax=2, title="bgf")
-######################## HERE ##############
-############## REMOVE BIOUNDARY ARTIFACTS
-        if apply_masking:
-
-            #bgf_mask[ :, :, :] = add_boundary_artifacts(
-            #   bgf[ :, :, :], mask[ :, :, :],90,10)# boundary_artifacts_mean,
-            #    #boundary_artifacts_std)
-            
-            bgf_mask[ :, :, :] = tf.multiply(mask[ :, :, :], bgf[ :, :, :])
-            #   bgf[ :, :, :], ,90,10)# boundary_artifacts_mean,
-            #    #boundary_artifacts_std)
-            
-            
-                
-    
-                
-
-        view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50,
-                 vmin=-1, vmax=1, title="bgf + mask")
-        
-        sim_fwgt_mask_bg[ :, :, :] = tf.add(
-            sim_fwgt_mask[ :, :, :], bgf_mask[ :, :, :])
-
-
-
-        view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50,
-                  vmin=-1, vmax=1, title="sim_fwgt_mask_bg")
+        #view_slices_3dNew(gtmask[ :, :, :], 50, 50, 50,
+        #          vmin=-1, vmax=1, title="gtmask")
 
 ######################
-    #if sensor_noise:
+    """if backgroundfield:
 
-     #   tf_noise = tf.random.normal(
-     #       shape=[128, 128, 128],  # ]Xongoing[epoch_i,:,:,:].get_shape(),
-     #       mean=sensor_noise_mean,
-     #       stddev=sensor_noise_std,
-     #       dtype=tf.float32)
-
-      #  sim_fwgt_mask_bg_sn[ :, :, :] = tf.add(
-     #       sim_fwgt_mask_bg[ :, :, :], tf_noise.numpy())
-
-      #  Xongoing[ :, :, :] = tf.add(
-       #     Xongoing[ :, :, :], tf_noise.numpy())
-
-        #sensornoise[ :, :, :] = tf_noise.numpy()
-        
-        #because  we are not using it!!!
-        sim_fwgt_mask_bg_sn = sim_fwgt_mask_bg
-        
-  ######################
-    if wrap_input_data:
-        # print('wrap_data')
-        value_range = 2.0 * np.pi
-        # shift from [-pi,pi] to [0,2*pi]
-        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = tf.add(
-            sim_fwgt_mask_bg_sn[ :, :, :], value_range / 2.0)
-
-
-
-
-
-
-
-        # # calculate wrap counts
-        # self.tensor['wrap_count'] = tf.floor(
-        #     tf.divide(X, value_range))
-
-        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = tf.math.floormod(
-            sim_fwgt_mask_bg_sn_wrapped[ :, :, :], value_range)
-        
-        
-        #view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
-         #         vmin=-1, vmax=1, title="sim_fwgt_mask_bg_sn_wrapped - floor mod")
-        
-
-
-        # shift back to [-pi,pi]
-        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = tf.subtract(
-            sim_fwgt_mask_bg_sn_wrapped[ :, :, :], value_range / 2.0)
-        
-        #view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
-           #      vmin=-1, vmax=1, title="sim_fwgt_mask_bg_sn_wrapped - between -pi-pi")
-        
-        
-        
-        
-
-
- ######################
-    if apply_masking:
-
-        #sim_gt_mask_bg_sn_wrapped = tf.multiply(tf.to_float(mask), sim_gt_mask_bg_sn_wrapped)
-
-        #sim_gt_mask_bg_sn_wrapped = tf.multiply(tf.cast(mask. tf.float32), sim_gt_mask_bg_sn_wrapped)
-        sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = np.multiply(
-            mask[ :, :, :], sim_fwgt_mask_bg_sn_wrapped[ :, :, :])
-
-        #view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
-            #      vmin=-1, vmax=1, title="sim_fwgt_mask_bg_sn_wrapped x mask")
-
-
-
-
-        Xongoing[ :, :, :] = sim_fwgt_mask_bg_sn_wrapped[ :, :, :]
-
-        #Xongoing = tf.multiply(mask[epoch_i, :,:,:], Xongoing[epoch_i, :,:,:])
-
-        #     Y = tf.multiply(tf.to_float(mask), Y)
+    """    
     if testingdata:
-        file_name = "datasynthetic/unif02evenlessbgnoartifactsNEW/npz/testing/" + str(epoch_i) + "samples"
+        file_name = "datasynthetic/uniform02mask_phase/npz/testing/" + str(epoch_i) + "samples"
     else:
-            file_name = "datasynthetic/unif02evenlessbgnoartifactsNEW/npz/" + str(epoch_i) + "samples"
+            file_name = "datasynthetic/uniform02mask_phase/npz/" + str(epoch_i) + "samples"
     #     
-    arr  = np.stack((gtmask,sim_fwgt_mask,Xongoing), axis=0)
+    arr  = np.stack((mask,sim_fwgt_mask), axis=0)
             
             #np.save(file_name,arr)
-    #np.savez_compressed(file_name, arr)
+    np.savez_compressed(file_name, arr)
 
 
 #view_slices_3dNew(gtmask[ :, :, :], 50, 50, 50,
@@ -263,12 +151,12 @@ view_slices_3dNew(sim_fwgt_mask[ :, :, :], 50,
 
 #view_slices_3dNew(bgf[ :, :, :], 50, 50, 50,
 #                  vmin=-10, vmax=10, title="background field")
-view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50, vmin=-3,
-                  vmax=3, title="bg field + mask (bondary artifacts)")
+view_slices_3dNew(mask[ :, :, :], 50, 50, 50, vmin=-1,
+                  vmax=1, title="bg field + mask (bondary artifacts)")
 #view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50,
 #                  50, 50, vmin=-10, vmax=10, title="fw + mask +background")
-view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50, vmin=-
-                  3.5, vmax=3.5, title="fw + mask +background+boundarz artifacs")
+#view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50, vmin=-
+#                  3.5, vmax=3.5, title="fw + mask +background+boundarz artifacs")
 
 
 #view_slices_3dNew(sensornoise[ :, :, :], 50,
@@ -278,12 +166,12 @@ view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50, vmin=-
 #                  vmin=-1.5, vmax=1.5, title="fw+bg + mask (bondary artifacts)+sn")
 
 
-view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
-                  vmin=-3, vmax=3, title="bg field + masking (bondary artifacts)+wrapped")
+#view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
+#                  vmin=-3, vmax=3, title="bg field + masking (bondary artifacts)+wrapped")
 
 
 #view_slices_3dNew(Xongoing[ :, :, :], 50, 50, 50,
 #                  vmin=-10, vmax=10, title="X ongoing-fw,masj,bg,sn,wrapped")
 
-view_slices_3dNew(Xongoing[ :, :, :], 50, 50, 50,
-                  vmin=-3, vmax=3, title="X ongoing-fw,masj,bg,sn,wrapped")
+#view_slices_3dNew(Xongoing[ :, :, :], 50, 50, 50,
+#                  vmin=-3.2, vmax=3.2, title="X ongoing-fw,masj,bg,sn,wrapped")

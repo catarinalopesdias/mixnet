@@ -149,7 +149,7 @@ def add_z_gradient_tf( data, slope_range):
     
     
     
-def add_z_gradient_SMALL(data, slope_range):
+def add_z_gradient_SMALL(data, slope_range, reduction=20):
     ##############################################
         #print('add z gradient')
         #view_slices_3d(data, slice_nbr=50, vmin=-0.5, vmax=0.5, title="data before bg steffen")
@@ -208,7 +208,7 @@ def add_z_gradient_SMALL(data, slope_range):
         #view_slices_3d(dist, slice_nbr=50, vmin=-20, vmax=20, title="distance x slope")
         
         # add to data
-        data = data + dist/20
+        data = data + dist/reduction
         
         #print('data shape', data.shape)
         #view_slices_3d(data, slice_nbr=50, vmin=-20, vmax=20, title="data + (distance*slope)")

@@ -40,20 +40,33 @@ for epoch_i in range(5): #num_instance
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
         text_typedata = "testdata"
-        file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file + ".npz"
+        #file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file + ".npz"
         #file_full = "datasynthetic/normal01evenlessbglessartifacts/npz/testing/" + file + ".npz"
+        #file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file + ".npz"
+        file_full = "datasynthetic/uniform02mask_phase/npz/testing/" + file + ".npz"
+
+        
 
    else: #traindata
         text_typedata = "traindata" 
-        file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file +  ".npz"
+        #file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file +  ".npz"
         #file_full = "datasynthetic//normal01evenlessbglessartifacts/npz/" + file + ".npz"
+        file_full = "datasynthetic/uniform02mask_phase/npz/" + file + ".npz"
+
 
    loaded = np.load(file_full)
    loaded =loaded['arr_0']
    ############################
+   
+   # original 
    gt = loaded[0,:]
    phase = loaded[1,:]
    phasebg = loaded[2,:]
+
+## alternative
+   mask  = loaded[0,:]
+   phase  = loaded[1,:]
+
    ############################
    #X_test = phasebg[np.newaxis, :,:,:, np.newaxis]
 

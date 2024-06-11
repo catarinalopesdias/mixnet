@@ -85,7 +85,7 @@ class DataGeneratorUniformevenlessbgnoartifacts(keras.utils.Sequence):
            #   plt.imshow(Y[i,:,:,64,0], cmap='gray',  vmin=-0.4, vmax=0.4) 
             #  plt.show()  
 
-      return X, Y#[Y,Z]
+      return X, Y #[Y,Z]
 
 
 
