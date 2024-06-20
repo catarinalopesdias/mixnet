@@ -239,10 +239,10 @@ def add_boundary_artifacts( data, mask, mean, std):
     result, *_ = forward_simulation(result)
 
     # add artifacts to data
-    result = tf.add(data, np.float64(result))
+    result = tf.add(data, tf.cast(result,tf.float32))
 
  
     # apply mask again
-    result = tf.multiply(tf.cast(mask,tf.float64), result)
+    result = tf.multiply(tf.cast(mask,tf.float32), result)
 
     return result

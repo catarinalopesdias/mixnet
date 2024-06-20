@@ -88,7 +88,7 @@ validation_generatorUnif = DataGeneratorUniformevenlessbgnoartifactsExtraLayer(p
 
 from networks.network_adaptedfrom_BOLLMAN_inputoutput import build_CNN_BOLLMANinputoutput
 
-from my_classes.keraslayer.layerbackgroundfield import CreatebackgroundFieldLayer
+from my_classes.keraslayer.layerbackgroundfield_artifacts import CreatebackgroundFieldLayer
 
 
 
@@ -166,7 +166,7 @@ checkpoint_path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_" +\
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer_artif.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -226,7 +226,7 @@ model_name1 = "models/backgroundremovalBOLLMAN_ExtraLayer/model_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayerartif.keras"
 
 
 model.save(model_name1)
@@ -252,7 +252,7 @@ lossnamefile = "models/backgroundremovalBOLLMAN_ExtraLayer/loss/model_BR_" + nam
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer"
+text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
@@ -265,7 +265,7 @@ vallossnamefile = "models/backgroundremovalBOLLMAN_ExtraLayer/loss/model_BR_" + 
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer"
+text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############

@@ -19,7 +19,7 @@ from newGA import GradientAccumulateModel
 #from visualize_volumes import view_slices_3dNew
 #from  my_classes.DataGenerator_susc02_bgrem import DataGeneratorUniform
 from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
-from  my_classes.DataGenerator_norm01_bgrem_evenlessbgnoartifacts_onlyphaseExtraLayer import DataGeneratorNormalevenlessbgnoartifactsExtraLayer
+from  my_classes.dataGenerator.DataGenerator_norm01_bgrem_evenlessbgnoartifacts_onlyphaseExtraLayer import DataGeneratorNormalevenlessbgnoartifactsExtraLayer
 
 
 

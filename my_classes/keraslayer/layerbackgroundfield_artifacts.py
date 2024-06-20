@@ -13,7 +13,8 @@ import numpy as np
 
 from tensorflow.experimental import numpy as tnp # start using tnp instead of numpy or math library#test tnp.pi, tnp.e
 from backgroundfieldandeffects.generate_backgroundfield_steffen_function import add_z_gradient_SMALL
-    
+from backgroundfieldandeffects.boundaryeffects_function import add_boundary_artifacts
+
 
 class CreatebackgroundFieldLayer(Layer):
     
@@ -47,7 +48,13 @@ class CreatebackgroundFieldLayer(Layer):
 
 
         # bgf with mask
-        bgf_mask = tf.multiply(mask, bgf)
+        #bgf_mask = tf.multiply(mask, bgf)
+        #add artifacts
+        boundary_artifacts_std = 10.0
+        boundary_artifacts_mean = 90.0
+        bgf_mask = add_boundary_artifacts(
+            bgf, mask, boundary_artifacts_mean,
+            boundary_artifacts_std)
         
 
         # add background field to the phase 

@@ -20,7 +20,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 500 
+num_train_instances = 1
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -84,6 +84,8 @@ for epoch_i in range(num_train_instances):
     # Phase:forward convolution with the dipole kernel
     sim_fwgt[ :, :, :] = forward_convolution(sim_gt[ :, :, :])
 
+    view_slices_3dNew(sim_fwgt[ :, :, :], 50, 50, 50,
+                      vmin=-0.2, vmax=0.2, title="sim_fwgt a")
  ########################################################################################################
  ########################################################################################################
  ########################################################################################################
@@ -101,13 +103,17 @@ for epoch_i in range(num_train_instances):
         gtmask[ :, :, :] = tf.multiply(
             sim_gt[ :, :, :], mask[ :, :, :])
         
-
+        view_slices_3dNew(gtmask[ :, :, :], 50, 50, 50,
+                  vmin=-0.2, vmax=0.2, title="gtmask a")
 ######################
     if backgroundfield:
 
         #print("add z gradient")
         bgf[ :, :, :] = add_z_gradient(
             bgf[ :, :, :], gradient_slope_range)
+        
+        view_slices_3dNew(bgf[ :, :, :], 50, 50, 50,
+                  vmin=-0.2, vmax=0.2, title="bgf b")
 
         if apply_masking:
 
@@ -115,9 +121,14 @@ for epoch_i in range(num_train_instances):
                 bgf[ :, :, :], mask[ :, :, :], boundary_artifacts_mean,
                 boundary_artifacts_std)
 
+        view_slices_3dNew(bgf_mask[ :, :, :], 50, 50, 50,
+                  vmin=-0.2, vmax=0.2, title="bgf mask  boundn artifacts - c")
         # ????????????dkjfsdfsdsdklfjdsjfhhsdgfkjsdfkllfdfjfk
         sim_fwgt_mask_bg[ :, :, :] = tf.add(
             sim_fwgt_mask[ :, :, :], bgf_mask[ :, :, :])
+        
+        view_slices_3dNew(sim_fwgt_mask_bg[ :, :, :], 50, 50, 50,
+                  vmin=-0.2, vmax=0.2, title="phase bgf mask  bound artifacts - d")
 
         Xongoing[ :, :, :] = tf.add(
             Xongoing[ :, :, :], bgf_mask[ :, :, :])
@@ -131,20 +142,27 @@ for epoch_i in range(num_train_instances):
             stddev=sensor_noise_std,
             dtype=tf.float32)
 
-        sim_fwgt_mask_bg_sn[ :, :, :] = tf.add(
-            sim_fwgt_mask_bg[ :, :, :], tf_noise.numpy())
+        sim_fwgt_mask_bg_sn[ :, :, :] =  sim_fwgt_mask_bg[ :, :, :]
+      
+        #sim_fwgt_mask_bg_sn[ :, :, :] = tf.add(
+         #   sim_fwgt_mask_bg[ :, :, :], tf_noise.numpy())
 
         Xongoing[ :, :, :] = tf.add(
             Xongoing[ :, :, :], tf_noise.numpy())
 
         sensornoise[ :, :, :] = tf_noise.numpy()
+        
   ######################
     if wrap_input_data:
+        
+        
         # print('wrap_data')
         value_range = 2.0 * np.pi
         # shift from [-pi,pi] to [0,2*pi]
         sim_fwgt_mask_bg_sn_wrapped[ :, :, :] = tf.add(
             sim_fwgt_mask_bg_sn[ :, :, :], value_range / 2.0)
+
+
 
         Xongoing[ :, :, :] = tf.add(
             Xongoing[ :, :, :], value_range / 2.0)
@@ -164,6 +182,9 @@ for epoch_i in range(num_train_instances):
 
         Xongoing[ :, :, :] = tf.subtract(
             Xongoing[ :, :, :], value_range / 2.0)
+        
+        view_slices_3dNew(sim_fwgt_mask_bg_sn_wrapped[ :, :, :], 50, 50, 50,
+                  vmin=-0.2, vmax=0.2, title="sim_fwgt_mask_bg_sn_wrapped - e")
 
  ######################
     if apply_masking:
@@ -188,6 +209,6 @@ for epoch_i in range(num_train_instances):
     arr  = np.stack((gtmask,Xinput,Xongoing), axis=0)
             
             #np.save(file_name,arr)
-    np.savez_compressed(file_name, arr)
+   # np.savez_compressed(file_name, arr)
 
 
