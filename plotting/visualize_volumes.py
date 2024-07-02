@@ -77,7 +77,7 @@ def visualize_all(resized_input, reference , predicted, title, save, path ):
      )
 
 
-  grid[0].imshow(reference_slice_x, cmap='gray', vmin = ref_min, vmax = ref_max)
+  grid[0].imshow(reference_slice_x, cmap='gray', vmin = -3.14, vmax = 3.14)
   #grid[0].axis('off')
   grid[0].set_title("Reference data X-dim")
   grid[0].get_xaxis().set_ticks([])
@@ -318,17 +318,17 @@ def visualize_all4(resized_input, reference , predicted, title, save, path, colo
 
   
   
-  grid[0].imshow(input_slice_x, cmap='gray',aspect='equal', vmin=colormin, vmax=colormax)
-  grid[0].set_title("Input data X-dim")
+  grid[0].imshow(input_slice_x, cmap='gray',aspect='equal', vmin=-15, vmax=15)
+  grid[0].set_title("Background Field - X")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
     
-  grid[1].imshow(input_slice_y, cmap='gray',aspect='equal', vmin=colormin, vmax=colormax)
-  grid[1].set_title("Input data Y-dim")
+  grid[1].imshow(input_slice_y, cmap='gray',aspect='equal', vmin=-15, vmax=15)
+  grid[1].set_title("Background Field - Y")
 
 
-  jj = grid[2].imshow(input_slice_z, cmap='gray',aspect='equal', vmin=colormin, vmax=colormax)
-  grid[2].set_title("Input data Z-dim ")
+  jj = grid[2].imshow(input_slice_z, cmap='gray',aspect='equal', vmin=-15, vmax=15)
+  grid[2].set_title("Input data - Z")
   grid.cbar_axes[0].colorbar(jj)
 
   ########################################################################
@@ -345,15 +345,15 @@ def visualize_all4(resized_input, reference , predicted, title, save, path, colo
 
   grid[0].imshow(reference_slice_x, cmap='gray', vmin = colormin, vmax = colormax)
   #grid[0].axis('off')
-  grid[0].set_title("Reference data X-dim")
+  grid[0].set_title("Reference - X")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
    
   grid[1].imshow(reference_slice_y, cmap='gray',  vmin=colormin, vmax=colormax)
-  grid[1].set_title("Reference data Y-dim")
+  grid[1].set_title("Reference - Y")
      
   kk = grid[2].imshow(reference_slice_z, cmap='gray', vmin=colormin, vmax=colormax)
-  grid[2].set_title("Reference data Z-dim")
+  grid[2].set_title("Reference - Z")
    
   grid.cbar_axes[0].colorbar(kk)
 
@@ -370,15 +370,15 @@ def visualize_all4(resized_input, reference , predicted, title, save, path, colo
       )
 
   grid[0].imshow(predicted_slice_x, cmap='gray',  vmin=colormin, vmax=colormax)
-  grid[0].set_title("predicted data X-dim ")
+  grid[0].set_title("Predicted - X")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
     
   grid[1].imshow(predicted_slice_y, cmap='gray',  vmin=colormin, vmax=colormax)
-  grid[1].set_title("predicted data Y-dim ")
+  grid[1].set_title("Predicted - Y")
 
   ll = grid[2].imshow(predicted_slice_z, cmap='gray',  vmin=colormin, vmax=colormax)
-  grid[2].set_title("predicted data Z-dim")
+  grid[2].set_title("Predicted - Z")
   grid.cbar_axes[0].colorbar(ll)
 
   
@@ -399,20 +399,20 @@ def visualize_all4(resized_input, reference , predicted, title, save, path, colo
   
   
   grid[0].imshow(error_slice_x, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax)
-  grid[0].set_title("Error data X-dim")
+  grid[0].set_title("Difference - X")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
     
   grid[1].imshow(error_slice_y, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax)
-  grid[1].set_title("Error data Y-dim")
+  grid[1].set_title("Difference - Y")
 
 
   jj = grid[2].imshow(error_slice_z, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax)
-  grid[2].set_title("Error data Z-dim ")
+  grid[2].set_title("Difference - Z")
   grid.cbar_axes[0].colorbar(jj)
 
   if save:    
-      filename = path +  ".png"
+      filename = path +  ".pdf"
       plt.savefig(filename)
   plt.show()
   

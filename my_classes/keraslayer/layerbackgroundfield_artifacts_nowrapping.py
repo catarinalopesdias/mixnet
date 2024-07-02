@@ -21,7 +21,7 @@ class CreatebackgroundFieldLayer(Layer):
     def __init__(self):
         super().__init__()
         self.gradient_slope_range = [3* 2 * tnp.pi, 8 * 2 * tnp.pi] #in tensorflow
-        self.size = 128 
+        #self.size = 128 
         
     #def build(self, input_shape):   
         
@@ -32,19 +32,25 @@ class CreatebackgroundFieldLayer(Layer):
         
         
         mask =  inputs[0]
+        
+        
+        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
         mask =  mask[0,:,:,:,0] # IF 4 D
+        #mask.shape()
+        bgf = tf.zeros_like(mask)
+        #bgf = tf.zeros([self.size , self.size ,self.size ], tf.float32)
 
-              
         
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
 
         #create background field
-        bgf = tf.zeros([self.size , self.size ,self.size ], tf.float32)
+        #bgf = tf.zeros_like(mask)
+        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
 
         #create bgf        
-        bgf = add_z_gradient_SMALL(
-            bgf, self.gradient_slope_range, 20) # [ :, :, :] #reduction = 20
+        #bgf = add_z_gradient_SMALL(
+        #    bgf, self.gradient_slope_range, 1) # [ :, :, :] #reduction = 20
 
 
         # bgf with mask
@@ -62,7 +68,7 @@ class CreatebackgroundFieldLayer(Layer):
             sim_fwgt_mask, bgf_mask)
 
 
-
+        """
         value_range = 2.0 * tnp.pi
         # shift from [-pi,pi] to [0,2*pi]
         
@@ -76,7 +82,7 @@ class CreatebackgroundFieldLayer(Layer):
         # shift back to [-pi,pi]
         sim_fwgt_mask_bg_wrapped = tf.subtract(
             sim_fwgt_mask_bg_wrapped, value_range / 2.0)
-        
+       
         sim_fwgt_mask_bg_wrapped = tf.multiply(
             mask, sim_fwgt_mask_bg_wrapped)
         
@@ -86,8 +92,22 @@ class CreatebackgroundFieldLayer(Layer):
 
         sim_fwgt_mask_bg_wrapped = tf.expand_dims(sim_fwgt_mask_bg_wrapped, 0)
         sim_fwgt_mask_bg_wrapped = tf.expand_dims(sim_fwgt_mask_bg_wrapped, 4)
+"""
+
+        #sim_fwgt_mask_bg_wrapped = tf.multiply(
+        #    mask, sim_fwgt_mask_bg_wrapped)
+        
+    
+        #output = sim_fwgt_mask_bg_sn_wrapped
+
+
+        sim_fwgt_mask_bg = tf.expand_dims(sim_fwgt_mask_bg, 0)
+        sim_fwgt_mask_bg = tf.expand_dims(sim_fwgt_mask_bg, 4)
+
+
        #return output_data    
-        return sim_fwgt_mask_bg_wrapped
+        #return sim_fwgt_mask_bg_wrapped
+        return sim_fwgt_mask_bg
     
     
     
