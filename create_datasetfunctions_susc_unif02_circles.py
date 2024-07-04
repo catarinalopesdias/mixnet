@@ -161,13 +161,13 @@ def simulate_susceptibility_sources_1_unicircle(volume):
 
 
 ###################################################################
-dim = 128
-arr3D = np.zeros((dim, dim, dim))
-nr_circles = 80
-for i in range(nr_circles):
-    simulate_susceptibility_sources_1_unicircle(arr3D)
+#dim = 128
+#arr3D = np.zeros((dim, dim, dim))
+#nr_circles = 80
+#for i in range(nr_circles):
+#    simulate_susceptibility_sources_1_unicircle(arr3D)
 
-view_slices_3dNew(arr3D,dim/2, dim/2,dim/2, -0.5,0.5)
+#view_slices_3dNew(arr3D,dim/2, dim/2,dim/2, -0.5,0.5)
 
 
 ###############################################
@@ -241,33 +241,33 @@ def simulate_susceptibility_sources_1_unirec(volume):
   return volume
 
 ###########################################
-dim = 128
-nr_rect = 80
+#dim = 128
+#nr_rect = 80
 
-arr3D = np.zeros((dim, dim, dim))
+#arr3D = np.zeros((dim, dim, dim))
 
-for i in range(nr_rect):
-    simulate_susceptibility_sources_1_unirec(arr3D)
+#for i in range(nr_rect):
+#    simulate_susceptibility_sources_1_unirec(arr3D)
 
-view_slices_3dNew(arr3D,dim/2, dim/2,dim/2, -0.5,0.5)
+#view_slices_3dNew(arr3D,dim/2, dim/2,dim/2, -0.5,0.5)
 #################################################
 ###################
-nr_circles = 80
-nr_rect = 80
+#nr_circles = 80
+#nr_rect = 80
 
 #############
-allcircles = np.arange(0, nr_circles)
-allrects = np.arange(0, nr_rect)
-dim= 128
-arr3D = np.zeros((dim, dim, dim))
+#allcircles = np.arange(0, nr_circles)
+#allrects = np.arange(0, nr_rect)
+#dim= 128
+#arr3D = np.zeros((dim, dim, dim))
 ###############################################################################
 
-for (circ, rec) in zip(allcircles, allrects):
-    simulate_susceptibility_sources_1_unirec(arr3D)
-    simulate_susceptibility_sources_1_unicircle(arr3D)
+#for (circ, rec) in zip(allcircles, allrects):
+#    simulate_susceptibility_sources_1_unirec(arr3D)
+#    simulate_susceptibility_sources_1_unicircle(arr3D)
     
     
-view_slices_3dNew(arr3D,dim/2, dim/2,dim/2, -0.5,0.5)
+#view_slices_3dNew(arr3D,dim/2, dim/2,dim/2, -0.5,0.5)
 
 #######################################################################################
 #########################'

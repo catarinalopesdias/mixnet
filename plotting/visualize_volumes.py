@@ -407,7 +407,7 @@ def visualize_all4(resized_input, reference , predicted, title, save, path, colo
   grid[1].set_title("Difference - Y")
 
 
-  jj = grid[2].imshow(error_slice_z, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax)
+  jj = grid[2].imshow(error_slice_z, cmap='seismic',aspect='equal', vmin=errormin, vmax=errormax,)
   grid[2].set_title("Difference - Z")
   grid.cbar_axes[0].colorbar(jj)
 
@@ -422,7 +422,7 @@ def visualize_all4(resized_input, reference , predicted, title, save, path, colo
 
 ############################################################################
 
-def visualize_all4grey(resized_input, reference , predicted, title, save, path, colormax, colormin, errormax, errormin):
+def visualize_all4grey(resized_input, reference , predicted, title, save, path, colormax, colormin, errormax, errormin, slice_nr=64 ):
   
   #shape input
   input_data_shape = list(resized_input.shape)
@@ -443,20 +443,21 @@ def visualize_all4grey(resized_input, reference , predicted, title, save, path, 
   error_shape = list(error.shape)
   print("error shape:", error_shape)
   
+
   #cut 3 slices from input 
-  input_slice_x = resized_input[input_data_shape[0]//2, :, :]
-  input_slice_y = resized_input[:, input_data_shape[1]//2, :]
-  input_slice_z = resized_input[:, :, input_data_shape[2]//2]
+  input_slice_x = resized_input[slice_nr, :, :]
+  input_slice_y = resized_input[:, slice_nr, :]
+  input_slice_z = resized_input[:, :, slice_nr]
   
   #cut 3 slices from reference 
-  reference_slice_x = reference[reference_shape[0]//2, :, :]
-  reference_slice_y = reference[:, reference_shape[1]//2, :]
-  reference_slice_z = reference[:, :, reference_shape[2]//2]
+  reference_slice_x = reference[slice_nr, :, :]
+  reference_slice_y = reference[:, slice_nr, :]
+  reference_slice_z = reference[:, :, slice_nr]
   
   #cut 3 slices from predicted
-  predicted_slice_x = predicted[predicted_shape[0]//2, :, :]
-  predicted_slice_y = predicted[:, predicted_shape[1]//2, :]
-  predicted_slice_z = predicted[:, :, predicted_shape[2]//2]
+  predicted_slice_x = predicted[slice_nr, :, :]
+  predicted_slice_y = predicted[:, slice_nr, :]
+  predicted_slice_z = predicted[:, :, slice_nr]
   
   
   # 3 slices of error
