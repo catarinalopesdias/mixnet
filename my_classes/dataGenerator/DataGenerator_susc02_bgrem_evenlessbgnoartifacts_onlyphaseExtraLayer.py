@@ -72,7 +72,7 @@ class DataGeneratorUniformevenlessbgnoartifactsExtraLayer(keras.utils.Sequence):
           #print("id",ID)
          
             
-          loaded = np.load('datasynthetic/uniform02mask_phase/npz/' + ID + '.npz')
+          loaded = np.load('datasynthetic/uniform02Rect_mask_phase/npz/' + ID + '.npz')
           #loaded = np.load('datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/' + ID + '.npz')
 
 

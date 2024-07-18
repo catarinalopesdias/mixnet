@@ -18,7 +18,7 @@ import tensorflow as tf
 #import matplotlib.pyplot as plt
 import numpy as np
 #from datahandling import read_and_decode_tf
-from plotting.visualize_volumes import visualize_all4, visualize_all4grey
+from plotting.visualize_volumes import visualize_all4, visualize_all4grey, view_slices_3dNew
 import  matplotlib.pyplot as plt
 
 #################################################################
@@ -43,7 +43,9 @@ for epoch_i in range(5): #num_instance
         #file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file + ".npz"
         #file_full = "datasynthetic/normal01evenlessbglessartifacts/npz/testing/" + file + ".npz"
         #file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file + ".npz"
-        file_full = "datasynthetic/uniform02mask_phase/npz/testing/" + file + ".npz"
+        #file_full = "datasynthetic/uniform02mask_phase/npz/testing/" + file + ".npz"
+        file_full = "datasynthetic/uniform02RectCircle_mask_phase/testing/" + file + ".npz"
+
 
         
 
@@ -51,7 +53,9 @@ for epoch_i in range(5): #num_instance
         text_typedata = "traindata" 
         #file_full = "datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/testing/" + file +  ".npz"
         #file_full = "datasynthetic//normal01evenlessbglessartifacts/npz/" + file + ".npz"
-        file_full = "datasynthetic/uniform02mask_phase/npz/" + file + ".npz"
+        #file_full = "datasynthetic/uniform02mask_phase/npz/" + file + ".npz"
+        file_full = "datasynthetic/uniform02RectCircle_mask_phase/training/" + file + ".npz"
+
 
 
    loaded = np.load(file_full)
@@ -59,9 +63,9 @@ for epoch_i in range(5): #num_instance
    ############################
    
    # original 
-   gt = loaded[0,:]
-   phase = loaded[1,:]
-   phasebg = loaded[2,:]
+   #gt = loaded[0,:]
+   #phase = loaded[1,:]
+   #phasebg = loaded[2,:]
 
 ## alternative
    mask  = loaded[0,:]
@@ -73,32 +77,32 @@ for epoch_i in range(5): #num_instance
    #y_pred = model.predict(X_test)
 
 
-   plt.imshow(gt[64,:,:], cmap='gray',  vmin=-1.4, vmax=1.4)   
-   plt.colorbar()
-   max_o = str(round(np.max(gt),2))
-   min_o = str(round(np.min(gt),2))
+   #plt.imshow(gt[64,:,:], cmap='gray',  vmin=-1.4, vmax=1.4)   
+   #plt.colorbar()
+   #max_o = str(round(np.max(gt),2))
+   #min_o = str(round(np.min(gt),2))
 
    #plt.imshow(y_pred[0,64,:,:,0], cmap='gray',  vmin=-0.01, vmax=0.01)   
-   plt.title("file " + str(epoch_i) + ': gt - max: ' + max_o + ' min ' + min_o)
-   plt.show()
+   #plt.title("file " + str(epoch_i) + ': gt - max: ' + max_o + ' min ' + min_o)
+   #plt.show()
 ##########################
-   plt.imshow(phase[64,:,:], cmap='gray',  vmin=-1.4, vmax=1.4)  
+   plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.4, vmax=0.4)  
    plt.colorbar()
    max_o = str(round(np.max(phase),2))
    min_o = str(round(np.min(phase),2))
    plt.title("file " +  str(epoch_i) + ': phase - max: ' + max_o + ' min ' + min_o)  
    plt.show()
 #####################################################
-   plt.imshow(phasebg[64,:,:], cmap='gray',  vmin=-1.4, vmax=1.4)   
-   plt.colorbar()
-   max_o = str(round(np.max(phasebg),2))
-   min_o = str(round(np.min(phasebg),2))
-   plt.title("file " +  str(epoch_i) + ': phasebg - max: '+ max_o + ' min ' + min_o)
-   plt.show()
+   #plt.imshow(phasebg[64,:,:], cmap='gray',  vmin=-1.4, vmax=1.4)   
+   #plt.colorbar()
+   #max_o = str(round(np.max(phasebg),2))
+   #min_o = str(round(np.min(phasebg),2))
+   #plt.title("file " +  str(epoch_i) + ': phasebg - max: '+ max_o + ' min ' + min_o)
+   #plt.show()
 
                   
                   
-
+view_slices_3dNew(phase, 64,64,64, -0.2, 0.3, title='ee')
 
 
 

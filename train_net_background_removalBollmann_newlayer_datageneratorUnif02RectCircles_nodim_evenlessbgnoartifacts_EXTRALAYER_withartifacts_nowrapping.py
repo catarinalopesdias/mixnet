@@ -11,7 +11,7 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 import tensorflow as tf
-from keras.layers import Input
+from keras.layers import Input, Reshape
 from keras.models import Model
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam
@@ -21,6 +21,7 @@ from newGA import GradientAccumulateModel
 #from visualize_volumes import view_slices_3dNew
 #from  my_classes.DataGenerator_susc02_bgrem import DataGeneratorUniform
 #from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
+#from  my_classes.dataGenerator.DataGenerator_susc02_bgrem_evenlessbgnoartifacts_onlyphaseExtraLayer import DataGeneratorUniformevenlessbgnoartifactsExtraLayer
 from  my_classes.dataGenerator.DataGenerator_susc02_bgrem_RectCirc_evenlessbgnoartifacts_onlyphaseExtraLayer import DataGeneratorUniformevenlessbgnoartifactsExtraLayer
 
 
@@ -93,7 +94,7 @@ from networks.network_adaptedfrom_BOLLMAN_inputoutput import build_CNN_BOLLMANin
 from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
 
 
-
+#old - original seems to work
 input_shape = (None, None, None, 1) # shape of pict, last is the channel
 input_shape = (128, 128, 128, 1) # shape of pict, last is the channel
 
@@ -101,6 +102,13 @@ input_tensor = Input(shape = input_shape, name="input")
 
 inputs = [Input(shape=input_shape), Input(shape=input_shape)]
 
+#NEW
+#INPUT = Input((128,128,128))
+
+#reshaped_input = Reshape((128, 128,128, 1))(INPUT)
+
+
+#inputs = [reshaped_input,reshaped_input]
 
 LayerWBakgroundField = CreatebackgroundFieldLayer()
 
@@ -139,7 +147,8 @@ optimizerMINE = Adam(
 
 
 
-model.compile(optimizer=optimizerMINE, loss = lossU) #mean_absolute_error
+#model.compile(optimizer=optimizerMINE, loss = lossU,run_eagerly=True)
+model.compile(optimizer=optimizerMINE, loss = lossU)
 
 model.summary()
 
@@ -157,7 +166,7 @@ else:
 
 ###############################################################################
 
-dataset_iterations = 2000
+dataset_iterations = 5000
 batch_size = 1
 num_filter = 16
 lossmon = "val_loss"
@@ -170,7 +179,7 @@ checkpoint_path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_" +\
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrapping1.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircNEW.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -188,7 +197,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
 earlystop = tf.keras.callbacks.EarlyStopping(
     monitor=lossmon,
     min_delta=0,
-    patience=500,
+    patience=1000,
     verbose=1,
     mode="auto",
     baseline=None,
@@ -230,7 +239,7 @@ model_name1 = "models/backgroundremovalBOLLMAN_ExtraLayer/model_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayerartif_nowrapping1.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayerartif_nowrappingCirc.keras"
 
 
 model.save(model_name1)
@@ -256,7 +265,7 @@ lossnamefile = "models/backgroundremovalBOLLMAN_ExtraLayer/loss/model_BR_" + nam
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrapping1"
+text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCirc"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
@@ -269,7 +278,7 @@ vallossnamefile = "models/backgroundremovalBOLLMAN_ExtraLayer/loss/model_BR_" + 
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrapping1"
+text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCirc"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############

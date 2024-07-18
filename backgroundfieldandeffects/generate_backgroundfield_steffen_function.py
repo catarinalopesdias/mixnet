@@ -23,17 +23,22 @@ from backgroundfieldandeffects.functionsfromsteffen import   distance_to_plane, 
 import tensorflow as tf
 ##############################
 ##############################################
-def add_z_gradient(data, slope_range):
+def add_z_gradient(data, slope_range,dim):
 ##############################################
     #print('add z gradient')
     #view_slices_3d(data, slice_nbr=50, vmin=-0.5, vmax=0.5, title="data before bg steffen")
     
     #print('a')
     #dim = data.shape
-    dim = list(data.shape)
-     
+    #dim = list(data.shape)
+    #print(dim) 
+    tf.print("data shape:",dim)
+
     #point middle
-    point = np.array([i / 2.0 for i in dim]).reshape((3,1))
+    #point = np.array([i / 2.0 for i in dim]).reshape((3,1))
+    point = np.array([dim[0]/ 2.0, dim[1]/ 2.0, dim[2]/ 2.0 ]).reshape((3,1))
+
+    
     #normal z dire
     normal = np.array([0.0, 0.0, -1.0]).reshape((3,1))
     
@@ -107,15 +112,25 @@ def add_z_gradient_tf( data, slope_range):
         tf tensor
             Input data with the added z gradient.
         """
-
+        #print("shape data:",tf.shape(data))
+        #print("dataget shape",data.get_shape())
+        #print("new", data.shape.as_list())
+        
         dim = data.get_shape().as_list()
-        point = tf.constant([i / 2.0 for i in dim],
-                            dtype=np.float32,
-                            shape=(3, 1))
+        #dim = tf.cast(dim, dtype=tf.float32)
+        #tf.print("data shape:",dim)
+        
+        #print("dim", dim)
+        #point = tf.constant([i / 2.0 for i in dim],
+             #              dtype=np.float32,
+          #                  shape=(3, 1))
+        
+        point = tf.constant([dim[0]/ 2.0, dim[1]/ 2.0, dim[2]/ 2.0 ], dtype=tf.float32, shape=(3, 1))
+
         normal = tf.constant([0.0, 0.0, -1.0], dtype=np.float32, shape=(3, 1))
 
         # add jitter for center
-        z_jitter = tf.random_uniform(
+        z_jitter = tf.random.uniform(
             (1, 1),
             minval=-dim[2] / 16.0,
             maxval=dim[2] / 16.0)
@@ -124,7 +139,7 @@ def add_z_gradient_tf( data, slope_range):
         point = tf.add(point, z_jitter)
 
         # add jitter for normal direction
-        x_y_jitter = tf.random_uniform(
+        x_y_jitter = tf.random.uniform(
             (2, 1),
             minval=-0.1,
             maxval=0.1)
@@ -137,7 +152,7 @@ def add_z_gradient_tf( data, slope_range):
         dist = distance_to_plane_tf(point, normal, dim, True)
 
         # define slope range
-        slope = tf.random_uniform([],
+        slope = tf.random.uniform([],
                                   minval=slope_range[0] / dim[2],
                                   maxval=slope_range[1] / dim[2])
         dist = tf.multiply(slope, dist)
@@ -157,7 +172,7 @@ def add_z_gradient_SMALL(data, slope_range, reduction=20):
         #print('a')
         #dim = data.shape
         dim = list(data.shape)
-         
+        print("data shape:",dim)
         #point middle
         point = np.array([i / 2.0 for i in dim]).reshape((3,1))
         #normal z dire

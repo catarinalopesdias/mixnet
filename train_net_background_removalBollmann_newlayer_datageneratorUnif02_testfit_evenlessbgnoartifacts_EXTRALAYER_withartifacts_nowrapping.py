@@ -157,7 +157,7 @@ else:
 
 ###############################################################################
 
-dataset_iterations = 2000
+dataset_iterations = 5000
 batch_size = 1
 num_filter = 16
 lossmon = "val_loss"

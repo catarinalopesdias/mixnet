@@ -12,7 +12,7 @@ import tensorflow as tf
 import numpy as np
 
 from tensorflow.experimental import numpy as tnp # start using tnp instead of numpy or math library#test tnp.pi, tnp.e
-from backgroundfieldandeffects.generate_backgroundfield_steffen_function import add_z_gradient_SMALL
+from backgroundfieldandeffects.generate_backgroundfield_steffen_function import add_z_gradient_SMALL, add_z_gradient_tf, add_z_gradient
 from backgroundfieldandeffects.boundaryeffects_function import add_boundary_artifacts
 
 
@@ -30,29 +30,79 @@ class CreatebackgroundFieldLayer(Layer):
 
         # make sense of inputs   
         
-        
-        mask =  inputs[0]
-        
-        
-        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
-        mask =  mask[0,:,:,:,0] # IF 4 D
-        #mask.shape()
-        bgf = tf.zeros_like(mask)
-        #bgf = tf.zeros([self.size , self.size ,self.size ], tf.float32)
+        #num_rows, num_columns = tf.shape(inputs)[1], tf.shape(inputs)[2]
 
+        #print("ssss", tf.shape(inputs[1]))
+
+        mask =  inputs[0]
+        mask =  mask[0,:,:,:,0] # IF 4 D
         
+        #phase 
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
+        
+        #print("shape MASK",mask.get_shape().as_list())
+ #       print("shape MASK",tf.shape(tf.gather(mask)))
 
+        print("shape MASK orig",tf.shape(mask))      
+        dim_mask = tf.shape(mask)
+            #print("shape MASK",tf.shape(mask))
+        #tf.print("shape MASK",mask.get_shape().as_list())
+        #tf.print("shape MASK",tf.shape(mask))
+
+        #print(len(mask.numpy()))
+
+        #print(tf.cast(mask,tf.float32))
+        #print("dfds", tf.shape(inputs)[0], tf.shape(inputs)[1])
+        #phase 
+        #sim_fwgt_mask = inputs[1]
+        #sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
+        #print("shape phase orig",sim_fwgt_mask.shape.as_list())   
+        ############################################################
+        ############################################################
+       # print("here")
+        #bla = tf.print(tf.shape(mask[0,:,0])[0])
+        #bla = eval(tf.shape(mask[0,:,0])[0]))
+        #print("bla")
+        #tf.print(bla)
+      
+        dim_mask1= tf.shape(mask[0,:,0])[0]
+        #print("tf print dim_mask")
+        #tf.print(dim_mask1)
+        #print("tf print dim_mask",tf.print(dim_mask1) )
+        #bgf = tf.zeros([dim_mask1,dim_mask1,dim_mask1], tf.float32)
+        bgf = tf.zeros([128,128,128], tf.float32)
+
+        
+        #bgf = tf.zeros_like(mask)
+        #tf.print(bgf)     
+        
+        
+        #bgf = tf.zeros_like(mask, tf.float32)
+        #bgf = tf.zeros_like(mask)
+        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
+        
+
+        #print("shape tensor bgf - self",tf.shape(bgf))
+
+        #bgf = tf.zeros_like(mask)
+        
+        #tf.print("bgf before input",bgf.shape.as_list())   
+
+###################################################################################################################################
         #create background field
         #bgf = tf.zeros_like(mask)
         #tf.zeros([self.size , self.size ,self.size ], tf.float32)
 
         #create bgf        
         #bgf = add_z_gradient_SMALL(
-        #    bgf, self.gradient_slope_range, 1) # [ :, :, :] #reduction = 20
+         #   bgf, self.gradient_slope_range, 1) # [ :, :, :] #reduction = 1
+        
 
+        bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
+        #bgf = add_z_gradient( bgf, self.gradient_slope_range, dim)
 
+        ###########################################################################################################
         # bgf with mask
         #bgf_mask = tf.multiply(mask, bgf)
         #add artifacts

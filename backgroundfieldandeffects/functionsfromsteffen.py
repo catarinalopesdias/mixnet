@@ -315,7 +315,7 @@ def distance_to_plane_tf(point, normal, dim, signed_dist=False):
     """
     ndim = len(dim)
 
-    linspace = [tf.lin_space(0.0, dim[i] - 1.0, dim[i]) for i in range(ndim)]
+    linspace = [tf.linspace(0.0, dim[i] - 1.0, dim[i]) for i in range(ndim)]
     coord = tf.meshgrid(*linspace, indexing='ij')
     coord = [coord[i] - point[i] for i in range(ndim)]
     coord = tf.stack(coord)
