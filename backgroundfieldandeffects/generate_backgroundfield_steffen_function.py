@@ -120,7 +120,7 @@ def add_z_gradient_tf( data, slope_range):
         #dim = tf.cast(dim, dtype=tf.float32)
         #tf.print("data shape:",dim)
         
-        #print("dim", dim)
+        print("dim", dim)
         #point = tf.constant([i / 2.0 for i in dim],
              #              dtype=np.float32,
           #                  shape=(3, 1))
