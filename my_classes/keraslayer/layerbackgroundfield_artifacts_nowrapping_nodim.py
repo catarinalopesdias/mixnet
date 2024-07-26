@@ -40,12 +40,13 @@ class CreatebackgroundFieldLayer(Layer):
         #phase 
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
+        #sim_fwgt_mask= tf.cas()
         
         #print("shape MASK",mask.get_shape().as_list())
  #       print("shape MASK",tf.shape(tf.gather(mask)))
 
-        print("shape MASK orig",tf.shape(mask))      
-        dim_mask = tf.shape(mask)
+        #print("shape mask orig",tf.shape(mask))      
+        #dim_mask = tf.shape(mask)
             #print("shape MASK",tf.shape(mask))
         #tf.print("shape MASK",mask.get_shape().as_list())
         #tf.print("shape MASK",tf.shape(mask))
@@ -65,8 +66,13 @@ class CreatebackgroundFieldLayer(Layer):
         #bla = eval(tf.shape(mask[0,:,0])[0]))
         #print("bla")
         #tf.print(bla)
-      
-        dim_mask1= tf.shape(mask[0,:,0])[0]
+        dimm = inputs[2]
+        print(dimm)
+        print(tf.get_static_value(dimm))
+        bla = tf.get_static_value(dimm)
+        print("ff",  bla)
+        dim_mask1= 128#inputs[2] #tf.shape(mask[0,:,0])[0]
+        print(dim_mask1)
         #print("tf print dim_mask")
         #tf.print(dim_mask1)
         #print("tf print dim_mask",tf.print(dim_mask1) )
@@ -115,6 +121,8 @@ class CreatebackgroundFieldLayer(Layer):
             boundary_artifacts_std)
         
 
+        print("bgf mask", bgf_mask)
+        print("phase with mask",sim_fwgt_mask)
         # add background field to the phase 
         sim_fwgt_mask_bg = tf.add(
             sim_fwgt_mask, bgf_mask)

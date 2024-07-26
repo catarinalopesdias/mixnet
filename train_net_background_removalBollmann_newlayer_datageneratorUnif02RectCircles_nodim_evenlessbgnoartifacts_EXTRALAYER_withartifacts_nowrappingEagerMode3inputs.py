@@ -22,7 +22,7 @@ from newGA import GradientAccumulateModel
 #from  my_classes.DataGenerator_susc02_bgrem import DataGeneratorUniform
 #from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
 #from  my_classes.dataGenerator.DataGenerator_susc02_bgrem_evenlessbgnoartifacts_onlyphaseExtraLayer import DataGeneratorUniformevenlessbgnoartifactsExtraLayer
-from  my_classes.dataGenerator.DataGenerator_susc02_bgrem_RectCirc_evenlessbgnoartifacts_onlyphaseExtraLayer import DataGeneratorUniformevenlessbgnoartifactsExtraLayer
+from  my_classes.dataGenerator.DataGenerator_susc02_bgrem_RectCirc_evenlessbgnoartifacts_onlyphaseExtraLayer3outputs import DataGeneratorUniformevenlessbgnoartifactsExtraLayer
 
 
 
@@ -102,8 +102,8 @@ input_shape = (None, None, None, 1) # shape of pict, last is the channel
 
 input_tensor = Input(shape = input_shape, name="input")
 
-#inputs = [Input(shape=input_shape), Input(shape=input_shape), Input(shape=(1,))]
-inputs = [Input(shape=input_shape), Input(shape=input_shape)]
+inputs = [Input(shape=input_shape), Input(shape=input_shape), Input(shape=(1,))]
+#inputs = [Input(shape=input_shape), Input(shape=input_shape)]
 
 #NEW
 #INPUT = Input((128,128,128))
@@ -182,7 +182,7 @@ checkpoint_path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_" +\
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircEagerNone.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircEager3outputs.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -242,7 +242,7 @@ model_name1 = "models/backgroundremovalBOLLMAN_ExtraLayer/model_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayerartif_nowrappingCircEager.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayerartif_nowrappingCircEager3outputs.keras"
 
 
 model.save(model_name1)
@@ -281,7 +281,7 @@ vallossnamefile = "models/backgroundremovalBOLLMAN_ExtraLayer/loss/model_BR_" + 
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCircEager"
+text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCircEager3outputs"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############
