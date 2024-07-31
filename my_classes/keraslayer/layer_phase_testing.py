@@ -34,8 +34,8 @@ class CreatePhaseLayer(Layer):
         mask =  inputs[0]
         mask =  mask[0,:,:,:,0] # IF 4 D
 
-               sim_fwgt[ :, :, :] = forward_convolution(sim_gt[ :, :, :])
-        def forward_convolution(chi_sample):
+        sim_fwgt[ :, :, :] = forward_convolution(sim_gt[ :, :, :])
+    def forward_convolution(chi_sample):
     
     scaling = np.sqrt(chi_sample.size)
     chi_fft = np.fft.fftshift(np.fft.fftn(np.fft.fftshift(chi_sample))) / scaling

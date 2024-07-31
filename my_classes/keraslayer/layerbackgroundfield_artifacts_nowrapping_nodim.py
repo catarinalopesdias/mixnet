@@ -21,91 +21,34 @@ class CreatebackgroundFieldLayer(Layer):
     def __init__(self):
         super().__init__()
         self.gradient_slope_range = [3* 2 * tnp.pi, 8 * 2 * tnp.pi] #in tensorflow
-        #self.size = 128 
-        
-    #def build(self, input_shape):   
+    
         
         
     def call(self, inputs):
 
         # make sense of inputs   
         
-        #num_rows, num_columns = tf.shape(inputs)[1], tf.shape(inputs)[2]
-
-        #print("ssss", tf.shape(inputs[1]))
-
+        print("=== start of bgf layer ==========")
         mask =  inputs[0]
         mask =  mask[0,:,:,:,0] # IF 4 D
         
         #phase 
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
-        #sim_fwgt_mask= tf.cas()
         
-        #print("shape MASK",mask.get_shape().as_list())
- #       print("shape MASK",tf.shape(tf.gather(mask)))
 
-        #print("shape mask orig",tf.shape(mask))      
-        #dim_mask = tf.shape(mask)
-            #print("shape MASK",tf.shape(mask))
-        #tf.print("shape MASK",mask.get_shape().as_list())
-        #tf.print("shape MASK",tf.shape(mask))
-
-        #print(len(mask.numpy()))
-
-        #print(tf.cast(mask,tf.float32))
-        #print("dfds", tf.shape(inputs)[0], tf.shape(inputs)[1])
-        #phase 
-        #sim_fwgt_mask = inputs[1]
-        #sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
-        #print("shape phase orig",sim_fwgt_mask.shape.as_list())   
         ############################################################
-        ############################################################
-       # print("here")
-        #bla = tf.print(tf.shape(mask[0,:,0])[0])
-        #bla = eval(tf.shape(mask[0,:,0])[0]))
-        #print("bla")
-        #tf.print(bla)
-        dimm = inputs[2]
-        print(dimm)
-        print(tf.get_static_value(dimm))
-        bla = tf.get_static_value(dimm)
-        print("ff",  bla)
-        dim_mask1= 128#inputs[2] #tf.shape(mask[0,:,0])[0]
-        print(dim_mask1)
-        #print("tf print dim_mask")
-        #tf.print(dim_mask1)
-        #print("tf print dim_mask",tf.print(dim_mask1) )
-        bgf = tf.zeros([dim_mask1,dim_mask1,dim_mask1], tf.float32)
-        #bgf = tf.zeros([128,128,128], tf.float32)
-
-        
-        #bgf = tf.zeros_like(mask)
-        #tf.print(bgf)     
-        
-        
-        #bgf = tf.zeros_like(mask, tf.float32)
-        #bgf = tf.zeros_like(mask)
-        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
-        
-
-        #print("shape tensor bgf - self",tf.shape(bgf))
-
-        #bgf = tf.zeros_like(mask)
-        
-        #tf.print("bgf before input",bgf.shape.as_list())   
-
-###################################################################################################################################
         #create background field
-        #bgf = tf.zeros_like(mask)
-        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
+
+        mask_shape = mask.get_shape().as_list()
+        bgf = tf.zeros(mask_shape, tf.float32)
 
         #create bgf        
-        #bgf = add_z_gradient_SMALL(
-         #   bgf, self.gradient_slope_range, 1) # [ :, :, :] #reduction = 1
+        bgf = add_z_gradient_SMALL(
+            bgf, self.gradient_slope_range, 20) # [ :, :, :] #reduction = 1
         
 
-        bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
+        #bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
         #bgf = add_z_gradient( bgf, self.gradient_slope_range, dim)
 
         ###########################################################################################################
@@ -121,8 +64,9 @@ class CreatebackgroundFieldLayer(Layer):
             boundary_artifacts_std)
         
 
-        print("bgf mask", bgf_mask)
-        print("phase with mask",sim_fwgt_mask)
+        #print("bgf mask", bgf_mask)
+        #print("phase with mask",sim_fwgt_mask)
+        
         # add background field to the phase 
         sim_fwgt_mask_bg = tf.add(
             sim_fwgt_mask, bgf_mask)
@@ -165,8 +109,9 @@ class CreatebackgroundFieldLayer(Layer):
         sim_fwgt_mask_bg = tf.expand_dims(sim_fwgt_mask_bg, 4)
 
 
-       #return output_data    
         #return sim_fwgt_mask_bg_wrapped
+        print("=== end bgf layer =================")
+
         return sim_fwgt_mask_bg
     
     

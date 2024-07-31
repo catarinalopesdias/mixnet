@@ -21,7 +21,7 @@ class CreateMaskLayer(Layer):
 
     #function from stefan heber
     
-    def apply_random_brain_mask(self, data,maxsize):
+    def apply_random_brain_mask(self, data):
         """Apply a random brain mask to the data (tensorflow graph update)
 
         Parameters
@@ -36,14 +36,9 @@ class CreateMaskLayer(Layer):
         tf tensor
             Mask of size HxWxD
         """
-        print("datainputrandommask", data)
         
-        shape = data.get_shape().as_list()
-        #print("dd",shape)
+        shape = [128,128,128]#data.get_shape().as_list()
         ndim = len(shape)
-        #print(ndim)
-        shape1 = [maxsize,maxsize,maxsize]
-        #print(shape1)
         
         # number of gaussians to be used
         num_gaussians = 20
@@ -52,9 +47,9 @@ class CreateMaskLayer(Layer):
         sigma_range = [0.15, 0.2]
 
         # init volume
-        #mask0 = tf.zeros(shape, dtype=tf.bool)
-
-        mask0 = tf.zeros([maxsize,maxsize,maxsize], dtype=tf.bool)
+        
+        print("shape mask0", shape)
+        mask0 = tf.zeros(shape, dtype=tf.bool)
         
 
         i0 = tf.constant(0)
@@ -70,20 +65,20 @@ class CreateMaskLayer(Layer):
                                   stddev=0.075)#,
                                   #seed=self.para['seed'] *
                                   #np.random.randint(1000))
-            mu = tf.multiply(mu, shape1)
+            mu = tf.multiply(mu, shape)
             # create random sigma values
             sigma = tf.stack([
-                sigma_range[0] * shape1[i] + tf.random.uniform(
+                sigma_range[0] * shape[i] + tf.random.uniform(
                     [])#, seed=self.para['seed'] * np.random.randint(1000)) 
                 *
-                (sigma_range[1] - sigma_range[0]) * shape1[i]
+                (sigma_range[1] - sigma_range[0]) * shape[i]
                 for i in range(ndim)
             ])
 
             #print(sigma)
             gauss_function = self.__calc_gauss_function(mu=mu,
                                                         sigma=sigma,
-                                                        dim=shape1)
+                                                        dim=shape)
 
 
             # update mask
@@ -101,10 +96,8 @@ class CreateMaskLayer(Layer):
 
 #        return tf.multiply(tf.to_float(mask), data), mask
         mask = tf.cast(mask, tf.float32)      
-        print("data",data )
         
         masked_data = tf.multiply(mask, data)
-        print("maskeddata", masked_data)
 
 
         return mask, masked_data
@@ -163,86 +156,23 @@ class CreateMaskLayer(Layer):
         
         
     def call(self, inputs):
-
+        print(" ===== start mask layer ======")
         data =  inputs[0]
-        data =  data[0,:,:,:,0] # IF 4 D
-        #maxsize = inputs[1]
-        maxsize=128 # HEREEEEEEEEEEEEEEEEEE ERROR
+        data =  data[0,:,:,:,0] # IF 4 D        
+        print("data sjape", data.shape)
+        mask, dataMask = self.apply_random_brain_mask( data)
         
-        mask, dataMask = self.apply_random_brain_mask( data,maxsize)
-        
-        #print(mask.shape[1])
-        
-        print("mask",mask)# make sense of inputs   
-        print("datamask",dataMask)
         
         dataMask = tf.expand_dims(dataMask, 0)
         dataMask = tf.expand_dims(dataMask, 4)
 
         mask = tf.expand_dims(mask, 0)
         mask = tf.expand_dims(mask, 4)
-        data_size = mask.shape[1]
-        print(data_size, "data size")
-        print("end =================")
-        
-        return mask, dataMask, data_size
 
+        print("=== end mask layer =================")
         
-
-     
- 
+        return mask, dataMask
 
         
 
-################################################################################
-#####################################################################
         
-"""
-
-from plotting.visualize_volumes import view_slices_3dNew
-from create_datasetfunctions_susc_unif02 import simulate_susceptibility_sources_uni
-
-size = 128  
-rect_num = 200
-
-
-#gt
-gt = simulate_susceptibility_sources_uni( #simulate_susceptibility_sources_uni
-    simulation_dim=size, rectangles_total=rect_num, plot=False)
-
-
-
-#
-# Should I expand the dimension??
-
-gt = np.expand_dims(gt, 0)
-gt = np.expand_dims(gt, 4)
-
-#convert to tensorflow
-gt = tf.convert_to_tensor(gt)
-
-
-## input for layer - phase with mask, mask
-
-view_slices_3dNew( gt[0,:,:,:,0], 50, 50, 50,
-                  vmin=-0.5, vmax=0.5, title="gt")
-
-
-inputs = [gt]
-
-LayerMask = CreateMaskLayer()
-
-masked_data, mask, data_sizee = LayerMask(inputs)
-
-
-
-
-view_slices_3dNew( masked_data[0,:,:,:,0], 50, 50, 50,
-                  vmin=-0.5, vmax=0.5, title="masked data")
-
-view_slices_3dNew( mask[0,:,:,:,0], 50, 50, 50,
-                  vmin=-0.5, vmax=0.5, title="mask")
-
-##################################################################
-####################################################################
-"""

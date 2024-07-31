@@ -18,16 +18,7 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-#from visualize_volumes import view_slices_3dNew
-#from  my_classes.DataGenerator_susc02_bgrem import DataGeneratorUniform
-#from networks.network_adaptedfrom_BOLLMAN import build_CNN_BOLLMAN
-#from  my_classes.dataGenerator.DataGenerator_susc02_bgrem_evenlessbgnoartifacts_onlyphaseExtraLayer import DataGeneratorUniformevenlessbgnoartifactsExtraLayer
 from  my_classes.dataGenerator.DataGenerator_susc02_bgrem_RectCirc_evenlessbgnoartifacts_onlyphaseExtraLayer3outputs import DataGeneratorUniformevenlessbgnoartifactsExtraLayer
-
-
-
-
-
 
 
 ######################
@@ -63,31 +54,7 @@ validation_generatorUnif = DataGeneratorUniformevenlessbgnoartifactsExtraLayer(p
 #############################################################
 #### Compile the model
 #############################################################
-#input_shape = (None, None, None, 1) # shape of pict, last is the channel
-#input_tensor = Input(shape = input_shape, name="input")
 
-#ushape1 = build_CNN(input_tensor)
-#ushape2 = build_CNN(ushape1)
-
-#print("compile model")
-
-#model = Model(input_tensor, ushape2) #get from orig deepQSM algorithm
-#model = build_CNN(input_tensor)
-#model = build_CNN_BOLLMAN(input_tensor)
-#name = "Bollmann"GradientAccumulateModel
-
-
-#################################################################
-##############################################################
-###
-
-#There are two ways you could be using preprocessing layers:
-#Option 1: Make them part of the model, like this:
-
-#inputs = keras.Input(shape=input_shape)
-#x = preprocessing_layer(inputs)
-#outputs = rest_of_the_model(x)
-#model = keras.Model(inputs, outputs)
 
 from networks.network_adaptedfrom_BOLLMAN_inputoutput import build_CNN_BOLLMANinputoutput
 # HEREEEEEEEEEEE
@@ -96,8 +63,8 @@ from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping_nodim impor
 
 
 #old - original seems to work
-input_shape = (None, None, None, 1) # shape of pict, last is the channel
-#input_shape = (128, 128, 128, 1) # shape of pict, last is the channel
+#input_shape = (None, None, None, 1) # shape of pict, last is the channel
+input_shape = (128, 128, 128, 1) # shape of pict, last is the channel
 
 
 input_tensor = Input(shape = input_shape, name="input")
@@ -217,8 +184,6 @@ history = model.fit( x=training_generatorUnif,
                     validation_data=validation_generatorUnif,
                     epochs=dataset_iterations,
                     use_multiprocessing=True,
-                    #initial_epoch=1721,
-                    #batch_size=1, 
                     callbacks = [cp_callback, earlystop],
                     workers=6)
 
@@ -229,9 +194,7 @@ val_loss_historyGA = history.history['val_loss']
 loss_historyGA = history.history['loss']
 
 
-#with open('loss_historyGA.pickle', 'wb') as f:
-#pickle.dump([loss_historyGA, dataset_iterations], f)
-###################
+
 
 #save model
 if not os.path.exists("models/backgroundremovalBOLLMAN_ExtraLayer"):

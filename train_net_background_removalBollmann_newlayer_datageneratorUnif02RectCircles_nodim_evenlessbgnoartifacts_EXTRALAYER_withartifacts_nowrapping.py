@@ -179,7 +179,7 @@ checkpoint_path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_" +\
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircNEW.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircNew.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -239,7 +239,7 @@ model_name1 = "models/backgroundremovalBOLLMAN_ExtraLayer/model_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayerartif_nowrappingCirc.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagen_evenlessbgnoartifacts_ExtraLayerartif_nowrappingCircNew.keras"
 
 
 model.save(model_name1)
@@ -265,7 +265,7 @@ lossnamefile = "models/backgroundremovalBOLLMAN_ExtraLayer/loss/model_BR_" + nam
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCirc"
+text_lr + "_" + "loss"+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCircNew"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
@@ -278,7 +278,7 @@ vallossnamefile = "models/backgroundremovalBOLLMAN_ExtraLayer/loss/model_BR_" + 
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCirc"
+text_lr + "_" + lossmon+"_"+text_susc+"_datagen_evenlessbgnoartifacts_ExtraLayer_artif_nowrappingCircNew"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############
