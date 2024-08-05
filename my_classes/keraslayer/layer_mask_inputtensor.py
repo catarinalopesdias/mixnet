@@ -155,9 +155,11 @@ class CreateMaskLayer(Layer):
     #def build(self, input_shape):   
         
         
-    def call(self, inputs):
+    def call(self, input_tensor):
         print(" ===== start mask layer ======")
-        data =  inputs[0]
+        #data =  inputs[0]
+        data = input_tensor
+        print("data shape", data.shape)
         data =  data[0,:,:,:,0] # IF 4 D        
         print("data shape", data.shape)
         mask, dataMask = self.apply_random_brain_mask( data)

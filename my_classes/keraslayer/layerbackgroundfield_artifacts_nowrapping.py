@@ -44,7 +44,7 @@ class CreatebackgroundFieldLayer(Layer):
         #print("shape MASK",mask.get_shape().as_list())
  #       print("shape MASK",tf.shape(tf.gather(mask)))
 
-        print("shape MASK orig",tf.shape(mask))      
+        print("shape Mask orig",tf.shape(mask))      
         dim_mask = tf.shape(mask)
             #print("shape MASK",tf.shape(mask))
         #tf.print("shape MASK",mask.get_shape().as_list())

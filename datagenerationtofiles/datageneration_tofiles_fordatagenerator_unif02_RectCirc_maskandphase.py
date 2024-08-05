@@ -28,13 +28,13 @@ import tensorflow as tf
 
 from create_datasetfunctions_susc_unif02_circles import simulate_susceptibility_sources_1_unirec, simulate_susceptibility_sources_1_unicircle
 
-num_train_instances = 50
-size = 128  # [128,128,128]
+num_train_instances = 2
+size = 160  # [128,128,128]
 rect_num = 120
 circles_num = 120
 # Parameters backgroundHHSS
 
-testingdata = True
+testingdata = False
 #############################################################################
 # create dipole kernel (cuboid size )
 ##############################################################################
@@ -107,9 +107,9 @@ for epoch_i in range(num_train_instances):
 
   
     if testingdata:
-       file_name = "datasynthetic/uniform02RectCircle_mask_phase/testing/" + str(epoch_i) + "samples"
+       file_name = "datasynthetic/uniform02RectCircle_mask_phase160/testing/" + str(epoch_i) + "samples"
     else:
-       file_name = "datasynthetic/uniform02RectCircle_mask_phase/training/" + str(epoch_i) + "samples"
+       file_name = "datasynthetic/uniform02RectCircle_mask_phase160/training/" + str(epoch_i) + "samples"
          
     arr  = np.stack((mask,sim_fwgt_mask), axis=0)
             

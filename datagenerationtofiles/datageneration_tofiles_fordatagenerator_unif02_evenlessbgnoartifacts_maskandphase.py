@@ -22,7 +22,7 @@ from backgroundfieldandeffects.boundaryeffects_function import add_boundary_arti
 
 import tensorflow as tf
 
-num_train_instances = 500
+num_train_instances = 5
 size = 128  # [128,128,128]
 rect_num = 200
 
@@ -43,7 +43,7 @@ sensor_noise_std = 0.03
 sensor_noise = False
 wrap_input_data = True
 
-testingdata = False
+testingdata = True
 ##############################################################################
 # create dipole kernel (cuboid size )
 ##############################################################################
@@ -104,9 +104,11 @@ for epoch_i in range(num_train_instances):
     Xongoing[ :, :, :] = sim_fwgt[ :, :, :]
 
     if apply_masking:
-
+        print("f")
         sim_fwgt_mask[ :, :, :], mask[ :, :,
                                               :] = apply_random_brain_mask(sim_fwgt[ :, :, :])
+        
+        print("s")
 
         Xinput[ :, :, :] = sim_fwgt_mask[ :, :, :]
         
@@ -125,9 +127,9 @@ for epoch_i in range(num_train_instances):
 
     """    
     if testingdata:
-        file_name = "datasynthetic/uniform02mask_phase/npz/testing/" + str(epoch_i) + "samples"
+        file_name = "datasynthetic/uniform02mask_phase/testing/" + str(epoch_i) + "samples"
     else:
-            file_name = "datasynthetic/uniform02mask_phase/npz/" + str(epoch_i) + "samples"
+            file_name = "datasynthetic/uniform02mask_phase/training/" + str(epoch_i) + "samples"
     #     
     arr  = np.stack((mask,sim_fwgt_mask), axis=0)
             

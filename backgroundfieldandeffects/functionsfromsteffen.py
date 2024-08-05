@@ -127,9 +127,10 @@ def apply_random_brain_mask(data):
 
         # init volume
         mask = np.zeros(dim, dtype=np.float32)
-
+        print("w")
         # create gaussians and sum them up
         for i in range(num_gaussians):
+            print(i)
 
             # create random positions inside dim range (clustered in the center)
             mu = np.random.normal(0.5, 0.075, len(dim)) * dim
@@ -139,7 +140,7 @@ def apply_random_brain_mask(data):
                 (sigma_range[1] - sigma_range[0]) * dim[i]
                 for i in range(len(dim))
             ])
-
+            print("ff")
             gauss_function = calc_gauss_function_np(mu=mu,
                                                            sigma=sigma,
                                                            dim=dim)
