@@ -18,7 +18,7 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-from  my_classes.dataGenerator.DataGenerator_susc02_RectCirc_phase import DataGeneratorUniform_RecCirc_phase
+from  my_classes.dataGenerator.DataGenerator_susc02_RectCirc_phaseLayer import DataGeneratorUniform_RecCirc_phase
 
 
 ######################
@@ -70,13 +70,13 @@ input_tensor = Input(shape = input_shape, name="input")
 
 #inputs = [Input(shape=input_shape) ] # Gets only phase
 
-#inputs = [Input(shape=input_shape, name="inputs_0") ] # Gets only phase
+inputs = [Input(shape=input_shape), Input(shape=input_shape)  ] # Gets only phase
 #inputs = [input_tensor] # Gets only phase
 
 
 ###################################
 #create layers
-LayerwMask = CreateMaskLayer()
+#LayerwMask = CreateMaskLayer()
 LayerWBackgroundField = CreatebackgroundFieldLayer()
 #################################################
 #################################################
@@ -84,16 +84,16 @@ LayerWBackgroundField = CreatebackgroundFieldLayer()
 
 #mask, maskedPhase = LayerwMask(inputs) #inputs is phase #######and shape
 #mask, maskedPhase = LayerwMask(input_tensor) #inputs is phase #######and shape
-x = LayerwMask(input_tensor) #inputs is phase #######and shape
-mask = x[0]
-maskedPhase = x[1]
+#x = LayerwMask(input_tensor) #inputs is phase #######and shape
+#mask = x[0]
+#maskedPhase = x[1]
 #backgroundfield
 #phasewithbackgroundfield = LayerWBackgroundField(LayerwMask(inputs))
-phasewithbackgroundfield = LayerWBackgroundField(x)
+phasewithbackgroundfield = LayerWBackgroundField(inputs)
 
 
 #phasewithbackgroundfield = LayerWBackgroundField(LayerwMask(input_tensor))
-y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_BOLLMANinputoutput(phasewithbackgroundfield)])
+
 
 ##########################################
 #outputs = build_CNN_BOLLMANinputoutput(x)
@@ -101,11 +101,13 @@ y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_BOLLMANinputoutput(pha
 
 outputs = [#mask,
            #maskedPhase,
-           phasewithbackgroundfield,y]
+           phasewithbackgroundfield,
+           build_CNN_BOLLMANinputoutput(phasewithbackgroundfield)]
 
 #model = Model(input=inputs, output=outputs)
 #model = Model(inputs, outputs)
-model = Model(input_tensor, outputs)
+#model = Model(input_tensor, outputs)
+model = Model(inputs, outputs)
 
 name = "PhaseBgf_Bgfrem_Bollmann"
 
@@ -137,74 +139,54 @@ optimizerMINE = Adam(
 
 #### loss ##################
 
-lossU = "costum"# "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
-#losses = [None, None, lossU]
+lossU = "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
+losses = [ None, lossU]
 
 
 ###############################################################################
 ### Add costum loss
-import keras.backend as K
+
+"""loss = K.mean(mse(outputs[0],outputs[2] ))
+# Add loss to model
+model.add_loss(loss)"""
 
 ###############################
-
+"""
 def my_loss_function(y_true, y_pred):
-    print("----------loss function")
-    print("y_pred shape")
-    print(y_pred.shape)
-    #print(y_pred[0])
-    maskedPhaseOutput = y_pred[:,:,:,:,0]
-    maskedPhaseOutput = tf.expand_dims(maskedPhaseOutput, 4)
-   #maskedPhaseOutput = y_pred[0]
-    print("phase data shape")
-    print(maskedPhaseOutput.shape)
-    #print("second element")
-    
-    maskedPhasePrediction = y_pred[:,:,:,:,1]
-    #print("pred shape")
-    #print(maskedPhasePrediction.shape)
-
-    maskedPhasePrediction = tf.expand_dims(maskedPhasePrediction, 4)
-    
+    print("y_pred")
+    print(y_pred)
+    print(y_pred[0])
+    print("second element")
     #print(y_pred[1])
     #masked, bgf , predphase = y_pred
 
     #plt.imshow(pred_phase[0,64,:,:,0 ], cmap='gray',  vmin=-0.4, vmax=0.4)   
     #plt.show()
-    #print("y_true")
-    #print(y_true)
-    #print(y_true.shape)
-    #print("y_true second element")
-    #print(y_true[1])
-    #print("y_true third element")
-    #print(y_true[2])
-    #print("y_true fourth element")
-    #print(y_true[3])
+    print("y_true")
+    print(y_true)
+    print(y_true.shape)
+    print("y_true second element")
+    print(y_true[1])
+    print("y_true third element")
+    print(y_true[2])
+    print("y_true fourth element")
+    print(y_true[3])
     # image reconstruction
-    image_loss = tf.keras.losses.mse(maskedPhaseOutput, maskedPhasePrediction)
-    print("loss shape")
-    print(image_loss.shape)
-    #image_loss =  tf.keras.losses.MeanSquaredError(maskedPhaseOutput, maskedPhasePrediction)
-    #bla=maskedPhaseOutput[0, 64,:,:]
-    #plt.imshow(bla.numpy(), cmap='gray',  vmin=-0.1, vmax=0.1)   
-    #plt.show()
-    #image_loss =  K.mean(K.square(maskedPhaseOutput - maskedPhasePrediction))
+    image_loss = mse(y_pred, y_true)
 
-    #print("image loss shape")
-    #print(image_loss)
-    #print(image_loss.shape)
     return  image_loss #image_loss
+"""
 ###################################################################
 
 
 #model.compile(optimizer=optimizerMINE, loss = lossU,run_eagerly=True)
 #model.compile(optimizer=optimizerMINE, loss = lossU)
-#model.compile(optimizer="Adam", loss = losses)
-#model.compile(optimizer="Adam", loss = ["mse","mse","mse" ])
+model.compile(optimizer="Adam", loss = losses)
+
+#model.compile(optimizer="Adam", loss = [None,None,my_loss_function ])
+
 #model.compile(optimizer=optimizerMINE, loss=my_loss_function)
-#model.compile(optimizer="Adam", loss=[None, my_loss_function])
-
-
-model.compile(optimizer=optimizerMINE, loss=[None, my_loss_function])
+#model.compile(optimizer="Adam", loss=my_loss_function)
 
 
 model.summary()

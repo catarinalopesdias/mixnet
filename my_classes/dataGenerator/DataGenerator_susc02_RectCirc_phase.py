@@ -43,13 +43,12 @@ class DataGeneratorUniform_RecCirc_phase(keras.utils.Sequence):
       list_IDs_temp = [self.list_IDs[k] for k in indexes]
     
       # Generate data
-      #X, Y = self.__data_generation(list_IDs_temp)
-      #[X1,X2,X3], Y = self.__data_generation(list_IDs_temp)
-      X2, Y = self.__data_generation(list_IDs_temp)
+
+      X2,Y = self.__data_generation(list_IDs_temp) #[Y,Y,Y]
 
     
       #return [X1,X2,X3], Y
-      return X2, Y
+      return X2, Y#[Y,Y,Y]
 
     
     
@@ -79,30 +78,31 @@ class DataGeneratorUniform_RecCirc_phase(keras.utils.Sequence):
           #print("id",ID)
          
             
-          loaded = np.load('datasynthetic/uniform02RectCircle-Mask-MaskedPhase-Phase/training/' + ID + '.npz')
+          #loaded = np.load('datasynthetic/uniform02RectCircle-Mask-MaskedPhase-Phase/training/' + ID + '.npz')
           #loaded = np.load('datasynthetic/gt1bg500_normal01evenlessbgnoartifacts/npz/' + ID + '.npz')
-
+          loaded = np.load('datasynthetic/uniform02RectCircle-Phase/training/' + ID + '.npz')
+          
 
           loaded =loaded['arr_0']
+          #print(loaded.shape)
 
-          loaded = np.expand_dims(loaded, 4)
+          loaded = np.expand_dims(loaded, 3)
           #print("expanded")
-
+          #print(loaded.shape)
            # Store classII
            #y[i] = self.labels[ID]
           #X1[i,:] = loaded[0,:] #mask
-          X2[i,:] = loaded[2,:] #phase
-          Y[i,:]  = loaded[2,:] #phase
+          X2[i,:] = loaded#[2,:] #phase
+          Y[i,:]  = loaded#[2,:] #phase
           #print(loaded[1,:].shape())
           #print("ff ",loaded[1,:].shape[2])
           #X3[i,:] = loaded[1,:].shape[2]
 
-          
-          #if i < 5:
-           #   plt.imshow(Y[i,:,:,64,0], cmap='gray',  vmin=-0.4, vmax=0.4) 
-            #  plt.show()  
+          #print("data generator====")
+          #sprint(loaded.shape)
 
-      return X2, Y  #X,Y Y#
+
+      return X2,Y# [Y,Y,Y]  #X,Y Y#
 
 
 

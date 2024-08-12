@@ -95,11 +95,11 @@ class CreatebackgroundFieldLayer(Layer):
         #tf.zeros([self.size , self.size ,self.size ], tf.float32)
 
         #create bgf        
-        #bgf = add_z_gradient_SMALL(
-         #   bgf, self.gradient_slope_range, 1) # [ :, :, :] #reduction = 1
+        bgf = add_z_gradient_SMALL(
+           bgf, self.gradient_slope_range, 10000) # [ :, :, :] #reduction = 1
         
 
-        bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
+        #bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
         #bgf = add_z_gradient( bgf, self.gradient_slope_range, dim)
 
         ###########################################################################################################
@@ -108,6 +108,7 @@ class CreatebackgroundFieldLayer(Layer):
         #add artifacts
         boundary_artifacts_std = 10.0
         boundary_artifacts_mean = 90.0
+        
         bgf_mask = add_boundary_artifacts(
             bgf, mask, boundary_artifacts_mean,
             boundary_artifacts_std)
@@ -116,6 +117,9 @@ class CreatebackgroundFieldLayer(Layer):
         # add background field to the phase 
         sim_fwgt_mask_bg = tf.add(
             sim_fwgt_mask, bgf_mask)
+
+
+
 
 
         """
