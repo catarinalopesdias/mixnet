@@ -44,9 +44,13 @@ path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_" + name + "_newadam" + \
             "_batchsize" + str(batch_size)+ "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses + "_" + text_lr \
               + "_" + "val_loss"+ "_"+ text_susc +"_datagen" + "_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircEager.ckpt"
 """
-path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_BollmannExtralayer_newadam16cp-0005_trainsamples500_datasetiter5000" + \
-"_batchsize1_gaaccum10_loss_mse_001_val_loss_unif02_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircNew_2output.ckpt"
-model_orig = tf.keras.models.load_model(path)
+#path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_BollmannExtralayer_newadam16cp-0005_trainsamples500_datasetiter5000" + \
+#"_batchsize1_gaaccum10_loss_mse_001_val_loss_unif02_datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrappingCircNew_2output.ckpt"
+
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0001_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_001_val_loss_unif02_RecCirc__datagenRecCirc.ckpt"
+
+
+model_orig = tf.keras.models.load_model(path, compile=False)
 model_orig.summary()
 
 

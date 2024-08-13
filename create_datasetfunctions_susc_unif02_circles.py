@@ -153,7 +153,8 @@ def simulate_susceptibility_sources_1_unicircle(volume):
                (y[np.newaxis, :         , np.newaxis]  - cyy)**2  + \
                (z[np.newaxis, np.newaxis, :          ] - czz)**2 )< rr**2            
                
-    volume[maskkk3D] = np.random.uniform(low=-0.2, high=0.2)
+    susceptibility = np.random.uniform(low=-0.2, high=0.2)    
+    volume[maskkk3D] = volume[maskkk3D] + susceptibility
     
     return volume
 
@@ -236,7 +237,7 @@ def simulate_susceptibility_sources_1_unirec(volume):
 
 
       # change the sus values in the cuboids
-  volume[x_pos:x_pos_max, y_pos:y_pos_max, z_pos:z_pos_max] = susceptibility_value
+  volume[x_pos:x_pos_max, y_pos:y_pos_max, z_pos:z_pos_max] = volume[x_pos:x_pos_max, y_pos:y_pos_max, z_pos:z_pos_max] + susceptibility_value
 
   return volume
 

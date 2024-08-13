@@ -125,6 +125,11 @@ for epoch_i in range(num_train_instances):
 
 #view_slices_3dNew(Xinput[index, :, :, :], 50, 50, 50,
 #                  vmin=-1.5, vmax=1.5, title="Xinput (fw+mask)")
+
+view_slices_3dNew(sim_gt[ :, :, :], 50,
+                50, 50, vmin=-0.2, vmax=0.2, title="fw+brain mask")
+
+
 view_slices_3dNew(sim_fwgt[ :, :, :], 50,
                 50, 50, vmin=-0.2, vmax=0.2, title="fw+brain mask")
 

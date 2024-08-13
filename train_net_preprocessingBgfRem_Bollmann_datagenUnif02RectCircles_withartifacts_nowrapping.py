@@ -160,10 +160,11 @@ def my_loss_function(y_true, y_pred):
     #print("second element")
     
     maskedPhasePrediction = y_pred[:,:,:,:,1]
-    #print("pred shape")
-    #print(maskedPhasePrediction.shape)
+  
 
     maskedPhasePrediction = tf.expand_dims(maskedPhasePrediction, 4)
+    print("pred shape")
+    print(maskedPhasePrediction.shape)
     
     #print(y_pred[1])
     #masked, bgf , predphase = y_pred

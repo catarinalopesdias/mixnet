@@ -37,26 +37,10 @@ import pickle
 # model data
 
 
-"""num_train_instances = 500
-dataset_iterations = 5000
-batch_size = 1
-gaaccumsteps = 10
-num_filter = 16
-#text_stop = "stopping"
-lr =0.001
-text_lr = str(lr).split(".")[1]
-
-
-losses = "mse" # "mean_absolute_error" #"mse"
-text_susc="unif02" 
-
-name = "BollmannExtralayer" # Phillip
-lastit="0820"
-"""
 #checkpoint path
 
 #Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0213_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt
-path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0005_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0845_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
 
 
 #model1 = tf.keras.models.load_model(path) -needs loss function
@@ -71,20 +55,6 @@ model1.summary()
 #from keras.layers import Input
 from keras.models import Model
 from keras.layers import Input
-
-#model2Synthetic = Model(inputs=model1.inputs, outputs=[model1.layers[2].output, model1.outputs[0]])
-#model2Synthetic.layers[2].size = 160
-#model2Synthetic.compile(loss = losses, optimizer = 'adam')
-
-
-########################
-# create new model
-###################################
-#from keras.layers import Input
-#from keras.models import Model
-#model2 = Model(inputs=model.inputs, outputs=[model.layers[2].output, model.outputs[0]])
-
-
 
 
 
@@ -130,111 +100,93 @@ for epoch_i in range(1): #num_instance
    #mask = y_pred[0]
    pred_phaswBgF = y_pred[0] #1 output is bgf+phase 
 
-   maskedphase  = y_pred[1][0] # 
-   pred_phase = y_pred[1][1]
+   maskedphase  = y_pred[1][0,:,:,:,0] # 
+   pred_phase = y_pred[1][0,:,:,:,1]
 
    #plt.imshow(X_test[0,64,:,:,0], cmap='gray',  vmin=-0.4, vmax=0.4)   
    #plt.imshow(y_pred[0,64,:,:,0], cmap='gray',  vmin=-0.01, vmax=0.01)   
 
    #plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.4, vmax=0.4)   
-   plt.imshow(X_test[0, 64,:,:], cmap='gray',  vmin=-0.1, vmax=0.1)   
+   plt.imshow(X_test[0, 64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)   
+   plt.title("input phase ")
+   plt.colorbar()
    plt.show()
+   
+   plt.imshow(maskedphase[64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)   
+   plt.title("masked phase")
+   plt.colorbar()
+   plt.show()
+   
    #plt.imshow(mask[0,64,:,:,0], cmap='gray',  vmin=-0.4, vmax=0.4)   
    #plt.show()
 
-   plt.imshow(pred_phaswBgF[0,64,:,:,0 ], cmap='gray',  vmin=-0.2, vmax=0.2)   
-   plt.show()
-   plt.imshow(maskedphase[0,64,:,:,0 ], cmap='gray',  vmin=-0.2, vmax=0.2)   
-   plt.show()
-   
-   plt.imshow(pred_phase[0,64,:,:,0 ], cmap='gray',  vmin=-0.1, vmax=0.1)   
+   plt.imshow(pred_phaswBgF[0,64,:,:,0 ], cmap='gray',  vmin=-4, vmax=4)  
+   plt.title("bgf and phase")
+   plt.colorbar()
+
    plt.show()
 
-
-"""
-
-
-   path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
-                  "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
-                      "_"  +  "valloss"+"_datagen_"+ text_typedata +"_" + lastit+ "_epoch" + str(epoch_i) + "_evenlessbgttt_nowrappingCirC"
-                  
-                  
-   print(epoch_i)
-   title =   text_typedata + "_epoch " + str(epoch_i)+ " " + losses
-
-
-   pathi =  path_common_init + "/grey/"+ path_common_final
-
-
-
-   predicted, reference,error = visualize_all4grey(pred_bgf[0,:,:,:,0], phase[:,:,:], pred_phase[0,:,:,:,0] ,
-                                                   title = title , save = True,
-                                                   path = pathi,
-                                                   colormax=0.2,colormin=-0.2,
-                                                   errormax = 0.2,errormin=-0.2 )
    
+   plt.imshow(pred_phase[64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)  
+   plt.title("pred phase")
+   plt.colorbar()
+   plt.show()
    
-   pathi = path_common_init +"/color/"+ text_typedata + "/"+ network_type  + path_common_final+"_color"
-   
-   predicted, reference,error = visualize_all4( pred_bgf[0,:,:,:,0], phase[:,:,:], pred_phase[0,:,:,:,0],
-                                                   title = title , save = True,
-                                                   path = pathi,
-                                                   colormax=0.2,colormin=-0.2,
-                                                   errormax = 0.1,errormin=-0.1)
-   
-   
+   error = maskedphase - pred_phase
+
+   plt.imshow(error[64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)  
+   plt.colorbar()
+   plt.title("error")
+   plt.show()
+
+   plt.imshow(error[64,:,:], cmap='RdBu',  vmin=-0.08, vmax=0.08)  
+   plt.colorbar()
+   plt.title("error")
+   plt.show()
+
+
+###############################################################################
+###############################################################################
+
+
+#############################################
+########## Create new model 
+#############################################
+
+import tensorflow as tf
+from keras.layers import Input
+from keras.models import Model
+from networks.network_adaptedfrom_BOLLMAN_inputoutput import build_CNN_BOLLMANinputoutput
+from my_classes.keraslayer.layer_mask_inputtensor import CreateMaskLayer
+from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping_nodim import CreatebackgroundFieldLayer
+from newGA import GradientAccumulateModel
+from keras.optimizers import Adam
+import numpy as np
+
+
+input_shape = (160, 160, 160, 1) # shape of pict, last is the channel
+
+input_tensor = Input(shape = input_shape, name="input")
+
+#outputs = [phasewithbackgroundfield,y]
+
+y = build_CNN_BOLLMANinputoutput(input_tensor)
+
+
+model160 = Model(input_tensor, y)
+
+model160.summary()
+
+
+checkpoint = tf.train.Checkpoint(model160)
+status = checkpoint.restore(path) 
+#status.expect_partial()
 
 
 
+#################################################
 
 
-
-
-
-"""
-
-
-
-
-
-"""model2Real = Model(inputs=model1.layers[2].output, outputs=[model1.outputs[0]])
-
-#model2Real = Model(inputs=[model1.layers[2].output], outputs=[model1.outputs[0]])
-model2Real.summary()
-#model2Real.layers.pop(0)
-#model1.summary()
-#model1.layers.pop(0)
-#model1.layers.pop(0)
-#model1.summary()
-#model2Real.layers.pop(0)
-model2Real.summary()
-
-model_config = model2Real.get_config()
-model_config["layers"][0]["config"]["batch_input_shape"] = (160, 160,160,1)
-modified_model = tf.keras.Model.from_config(model_config)
-modified_model.summary()
-input_tensor = Input(shape = (160, 160, 160, 1), name="input_real")
-#model1(input_tensor)
-#model1.summary()
-
-newOutputs = model2Real(input_tensor)
-newModel = Model(input_tensor, newOutputs)
-
-
-#model2Real = Model(inputs=[input_tensor], outputs=[model2Real.outputs[0]])
-#model2Real.summary()
-                    
-#input_tensor = Input(shape = (160, 160, 160, 1), name="input_real")
-#print(model1.layers[3].inputs)
-#model1.layers[3](input_tensor)
-#print(model1.layers[3].inputs)
-#model2Real = Model(inputs=input_tensor, outputs=[model1.outputs[0]])
-#model2Real.summary()
-
-#model2Real = Model(inputs=[model1.layers[2].output,     , outputs=[model1.outputs[0]])
-
-#################################################################
-#################################################################
 
 # load unseen data 
 ################################################
@@ -301,17 +253,11 @@ img = nib.load(filetoupload)
 mask = img.get_fdata()
 ########################################
 
-#bgf, predictedPhase = model2Synthetic.predict(mask,reference_phasetissue)
-#create crop
-#reference_phasetissue = reference_phasetissue[:,0:128,0:128,0:128,:]
-#input_phasebgwrap = input_phasebgwrap[:,0:128,0:128,0:128,:]
-#input_phasebgunwrap = input_phasebgunwrap[:,0:128,0:128,0:128,:]
-###################################################################################
 
 
 
 
-predictedPhase = model2Real.predict(input_phasebgunwrap)
+predictedPhase = model160.predict(input_phasebgunwrap)
 
 prediction_title = "nii.gz files  - qsm2016"
 pathi = path_common_init +"color/real/"+ network_type  + "niigz_nowrapping"
@@ -324,7 +270,7 @@ pathi = path_common_init +"color/real/"+ network_type  + "niigz_nowrapping"
 
 
 m_predicted, reference,error = visualize_all4(input_phasebgunwrap[0,:,:,:,0], reference_phasetissue[0,:,:,:,0], predictedPhase[0,:,:,:,0],
-                                                  title = prediction_title, save=True, 
+                                                  title = prediction_title, save=False, 
                                                   path=pathi,
                                                    colormax=0.05,colormin=-0.05,
                                                    errormax = 0.1,errormin=-0.1  )
@@ -344,108 +290,3 @@ predicted, reference,error = visualize_all4grey(input_phasebgunwrap[0,:,:,:,0], 
                                                    colormax=0.05,colormin=-0.05,
                                                    errormax = 0.13,errormin=-0.13, slice_nr=100 )
    
-
-maskCropped = mask[0:128,0:128,0:128]
-###########################################################################
-#####################################
-# apllying a black mask 
-input_phasebgunwrapCropped= input_phasebgunwrap[0,0:128,0:128,0:128,0]
-view_slices_3d(input_phasebgunwrapCropped, 100, -0.05, 0.05, title='ff')
-
-
-
-input_phasebgunwrapCroppedMask = input_phasebgunwrapCropped*maskCropped
-
-input_phasebgunwrapCroppedMask[input_phasebgunwrapCroppedMask == 0] =-100
-
-
-
-
-view_slices_3d(input_phasebgunwrapCroppedMask, 100, -0.05, 0.05, title='ff')
-   
-   
-###############################
-reference_phasetissueCropped = reference_phasetissue[0,0:128,0:128,0:128,0]
-view_slices_3d(reference_phasetissueCropped, 100, -0.05, 0.05, title='ff')
-reference_phasetissueCroppedMask = reference_phasetissueCropped*maskCropped
-reference_phasetissueCroppedMask[reference_phasetissueCroppedMask == 0] =-100
-view_slices_3d(reference_phasetissueCroppedMask, 100, -0.05, 0.05, title='ff')
-###########################
-predictedPhaseCropped = predictedPhase[0,0:128,0:128,0:128,0]
-view_slices_3d(predictedPhaseCropped, 100, -0.05, 0.05, title='ff')
-predictedPhaseCroppedMask = predictedPhaseCropped*maskCropped
-predictedPhaseCroppedMask[predictedPhaseCroppedMask == 0] =-100
-view_slices_3d(predictedPhaseCroppedMask, 100, -0.05, 0.05, title='ff')
-"""
-
-"""
-tfrecord_dir_tst = "datareal/" + folder_test
-
-# List all files in the directory
-files_in_tst_directory = os.listdir(tfrecord_dir_tst)
-
-for file in files_in_tst_directory:
-    if file.endswith(".tfrecords"):
-        full_path =os.path.join(tfrecord_dir_tst, file)
-        tfrecord_files_tst.append(full_path)
-
-tfrecord_dataset_tst = tf.data.TFRecordDataset(tfrecord_files_tst)
-
-# Apply the parsing function to each record
-parsed_dataset_tst = tfrecord_dataset_tst.map(read_and_decode_tf)
-
-##################################################################
-############ Predict and plot original data
-#################################################################
-dataset_test_np = parsed_dataset_tst.as_numpy_iterator()
-
-path_common_init = "models/backgroundremovalBOLLMAN_ExtraLayer/prediction_images/real/"
-
-network_type = "BgRem_BollmannExtralayer_newadam"
-
-counter = 0
-for data_sample_tst in dataset_test_np:
-    input_ds_tst, output_ds_tst = data_sample_tst
-    
-
-    input_file = input_ds_tst[np.newaxis, :,:,:, np.newaxis]
-    
-    predicted = model2Real.predict(input_file)
-
-    #pred_bgf = predicted[0]
-    pred_phase = predicted#[0]
-   
-    counter+=1
-    print(f"Test set {counter}")
-
-
-
-    path_common_final =  str(num_filter)+"trainsamples" + str(num_train_instances) + "_datasetiter" + str(dataset_iterations) + \
-                   "_batchsize"+ str(batch_size) + "_gaaccum" + str(gaaccumsteps) + "_loss_" + losses +"_"+text_lr +\
-                       "_"  +  "valloss"+"_datagen_"+  "_epoch" + str(counter) +"_" + lastit+ "_evenlessbg" 
-   
-    pathi = path_common_init +"/color/"+ network_type  + path_common_final+"_color"
-    
-    prediction_title ="tst-2019 " + "- epoch " + str(counter)
-    m_predicted, reference,error = visualize_all4(input_file[0,:,:,:,0], output_ds_tst[:,:,:], pred_phase[0,:,:,:,0],
-                                                  title = prediction_title, save=True, 
-                                                  path=pathi,
-                                                   colormax=0.2,colormin=-0.2,
-                                                   errormax = 0.2,errormin=-0.2
-                                                  )
-
-
-###########################################################
-###############################################
-#bla = tf.data.TFRecordDataset("datareal/tst_2019/1.tfrecords")
-
-#print("bla")
-#read_and_decode_tf(bla)
-
-#parsed = bla.map(read_and_decode_tf)
-#datanp = parsed.as_numpy_iterator()
-
-#for i in datanp:
-#    input1, output1  = i    
-###########################################
-"""
