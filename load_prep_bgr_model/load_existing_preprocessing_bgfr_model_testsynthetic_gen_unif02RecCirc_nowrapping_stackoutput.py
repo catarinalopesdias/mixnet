@@ -28,7 +28,8 @@ from keras.models import Model
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam
 import pickle
-
+from keras.models import Model
+from keras.layers import Input
 ###############################################################################
 # Load existing model
 ###############################################################################
@@ -39,8 +40,7 @@ import pickle
 
 #checkpoint path
 
-#Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0213_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt
-path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0845_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-1058_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
 
 
 #model1 = tf.keras.models.load_model(path) -needs loss function
@@ -48,13 +48,6 @@ model1= load_model(path, compile=False)
 model1.summary()
 
 #model.compile(loss = losses, optimizer = 'adam')
-
-########################
-# create new model
-###################################
-#from keras.layers import Input
-from keras.models import Model
-from keras.layers import Input
 
 
 
@@ -76,6 +69,7 @@ path_common_init = "models/preprocessing_backgroundremoval/prediction_images/uni
 network_type = "PhaseBgf_Bgfrem_Bollmann_newadam16"
 
 for epoch_i in range(1): #num_instance
+   epoch_i=3
    file =str(epoch_i)+"samples"
 
    if newdata:
@@ -103,16 +97,15 @@ for epoch_i in range(1): #num_instance
    maskedphase  = y_pred[1][0,:,:,:,0] # 
    pred_phase = y_pred[1][0,:,:,:,1]
 
-   #plt.imshow(X_test[0,64,:,:,0], cmap='gray',  vmin=-0.4, vmax=0.4)   
-   #plt.imshow(y_pred[0,64,:,:,0], cmap='gray',  vmin=-0.01, vmax=0.01)   
-
+ 
+   """
    #plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.4, vmax=0.4)   
-   plt.imshow(X_test[0, 64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)   
+   plt.imshow(X_test[0, 64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)   
    plt.title("input phase ")
    plt.colorbar()
    plt.show()
    
-   plt.imshow(maskedphase[64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)   
+   plt.imshow(maskedphase[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)   
    plt.title("masked phase")
    plt.colorbar()
    plt.show()
@@ -120,21 +113,21 @@ for epoch_i in range(1): #num_instance
    #plt.imshow(mask[0,64,:,:,0], cmap='gray',  vmin=-0.4, vmax=0.4)   
    #plt.show()
 
-   plt.imshow(pred_phaswBgF[0,64,:,:,0 ], cmap='gray',  vmin=-4, vmax=4)  
+   plt.imshow(pred_phaswBgF[0,64,:,:,0 ], cmap='gray',  vmin=-3, vmax=3)  
    plt.title("bgf and phase")
    plt.colorbar()
 
    plt.show()
-
+   """
    
-   plt.imshow(pred_phase[64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)  
+   """plt.imshow(pred_phase[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
    plt.title("pred phase")
    plt.colorbar()
    plt.show()
    
    error = maskedphase - pred_phase
 
-   plt.imshow(error[64,:,:], cmap='gray',  vmin=-0.2, vmax=0.2)  
+   plt.imshow(error[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
    plt.colorbar()
    plt.title("error")
    plt.show()
@@ -144,15 +137,39 @@ for epoch_i in range(1): #num_instance
    plt.title("error")
    plt.show()
 
+   """
+###############################################################################
+###############################################################################
 
-###############################################################################
-###############################################################################
+
+predicted, reference,error = visualize_all4grey(pred_phaswBgF[0,:,:,:,0], maskedphase, pred_phase ,
+                                                   title = "ff" , save = False,
+                                                   path = "dfsd",
+                                                   colormax=0.3,colormin=-0.3,
+                                                   errormax = 0.13,errormin=-0.13, slice_nr=64 )
+
+
+
+m_predicted, reference,error = visualize_all4(pred_phaswBgF[0,:,:,:,0], maskedphase, pred_phase ,
+                                                  title = "dddd", save=False, 
+                                                  path="dd",
+                                                   colormax=0.3,colormin=-0.3,
+                                                   errormax = 0.1,errormin=-0.1  )
+
+
+plt.imshow(pred_phaswBgF[0,:,:,64,0 ], cmap='gray',  vmin=-1, vmax=1)  
+plt.title("bgf and phase")
+plt.colorbar()
+
+plt.imshow(pred_phaswBgF[0,:,:,64,0 ]-maskedphase[:,:,64,], cmap='gray',  vmin=-0.1, vmax=0.1)  
+plt.title("bgf and phase")
+plt.colorbar()
 
 
 #############################################
 ########## Create new model 
 #############################################
-
+"""
 import tensorflow as tf
 from keras.layers import Input
 from keras.models import Model
@@ -168,7 +185,6 @@ input_shape = (160, 160, 160, 1) # shape of pict, last is the channel
 
 input_tensor = Input(shape = input_shape, name="input")
 
-#outputs = [phasewithbackgroundfield,y]
 
 y = build_CNN_BOLLMANinputoutput(input_tensor)
 
@@ -262,11 +278,7 @@ predictedPhase = model160.predict(input_phasebgunwrap)
 prediction_title = "nii.gz files  - qsm2016"
 pathi = path_common_init +"color/real/"+ network_type  + "niigz_nowrapping"
 
-#m_predicted, reference,error = visualize_all4(input_phasebgwrap[0,:,:,:,0], reference_phasetissue[0,:,:,:,0], predictedPhase[0,:,:,:,0],
-#                                                  title = prediction_title, save=True, 
-#                                                  path=pathi,
-#                                                   colormax=0.2,colormin=-0.2,
-#                                                   errormax = 0.1,errormin=-0.1  )
+
 
 
 m_predicted, reference,error = visualize_all4(input_phasebgunwrap[0,:,:,:,0], reference_phasetissue[0,:,:,:,0], predictedPhase[0,:,:,:,0],
@@ -290,3 +302,4 @@ predicted, reference,error = visualize_all4grey(input_phasebgunwrap[0,:,:,:,0], 
                                                    colormax=0.05,colormin=-0.05,
                                                    errormax = 0.13,errormin=-0.13, slice_nr=100 )
    
+"""

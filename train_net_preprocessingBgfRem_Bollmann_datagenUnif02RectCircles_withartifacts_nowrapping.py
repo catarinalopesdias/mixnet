@@ -117,7 +117,7 @@ name = "PhaseBgf_Bgfrem_Bollmann"
 print("Model with gradient accumulation")
 gaaccumsteps = 10
 #learningrate
-lr =0.001 #0.0004
+lr =0.0005#0.001 #0.0004
 text_lr = str(lr).split(".")[1]
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps,
@@ -225,7 +225,7 @@ else:
 
 ###############################################################################
 
-dataset_iterations = 5000
+dataset_iterations = 3000
 batch_size = 1
 num_filter = 16
 lossmon = "val_loss"
@@ -256,7 +256,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
 earlystop = tf.keras.callbacks.EarlyStopping(
     monitor=lossmon,
     min_delta=0,
-    patience=1000,
+    patience=10000,
     verbose=1,
     mode="auto",
     baseline=None,

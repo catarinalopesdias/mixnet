@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Aug 16 09:56:23 2024
+
+@author: catarinalopesdias
+"""
+
+from plotting.visualize_volumes import view_slices_3dNew,  view_slices_3d
+import numpy as np
+import tensorflow as tf
+from numpy import linalg as LA    
+from backgroundfieldandeffects.functionsfromsteffen import   distance_to_plane, distance_to_plane_tf
+from tensorflow.experimental import numpy as tnp 
+
+
+def add_z_gradient_SMALL(data, slope_range, reduction=20):
+    ##############################################
+        #print('add z gradient')
+        view_slices_3d(data, slice_nbr=50, vmin=-0.5, vmax=0.5, title="data before bg steffen")
+        
+        #print('a')
+        #dim = data.shape
+        dim = list(data.shape)
+        #print("data shape:",dim)
+        #point middle
+        point = np.array([i / 2.0 for i in dim]).reshape((3,1))
+        print("point", point)
+        #normal z dire
+        normal = np.array([0.0, 0.0, -1.0]).reshape((3,1))
+        print("normal", normal)
+        ######################################
+        
+        z_jitter = np.random.uniform(low=-dim[2] / 16.0, high=dim[2] / 16.0, size=(1,1) )#size=[1,1]
+        tmp = np.zeros((2, 1))
+        z_jitter =np.append(tmp, z_jitter, axis=0)
+        
+        #add z jitter to middle point
+        point = point + z_jitter
+        print("new point", point)
+        #print('point with z jitter', point)
+        
+        #print('xy jitter')
+        #create xy jitter
+        x_y_jitter = np.random.uniform(
+                      low=-0.1, high=0.1, size=(2,1))
+        tmp = np.zeros((1, 1))
+        
+        x_y_jitter = np.append(x_y_jitter, tmp,axis=0)
+        
+        #add xy jitter to normal
+        normal = normal + x_y_jitter
+        #print('normal with z jitter', normal)
+        
+        #normalize normal 
+        normal = normal / LA.norm(normal)
+        #print('normal with z jitter normalized', normal)
+        print("new normal", normal)
+        
+        #dist = 3; 
+        dist = distance_to_plane(point, normal, dim, True)
+        """Calculates a distance volume to the plane given by a point and a normal."""
+
+        #dist = distance_to_plane_np(point, normal, dim, True)
+
+        
+        print('distance to plane - point - normal - shape', dist.shape)
+        
+        #common.distance_to_plane(point, normal, dim, True)
+        #view_slices_3d(dist, slice_nbr=50, vmin=-100, vmax=100, title="distance")
+        
+        
+        # define slope range
+        slope = np.random.uniform(low=slope_range[0] / dim[2],
+                                  high=slope_range[1] / dim[2])
+        
+        print("slope", slope)
+        
+        dist = dist * slope
+        
+        #view_slices_3d(dist, slice_nbr=50, vmin=-20, vmax=20, title="distance x slope")
+        
+        # add to data
+        data = data + dist/reduction
+        
+        #print('data shape', data.shape)
+        #view_slices_3d(data, slice_nbr=50, vmin=-20, vmax=20, title="data + (distance*slope)")
+        
+        return data
+
+
+bgf = tf.zeros([128,128,128], tf.float32)
+slope_range = [3* 2 * tnp.pi, 8 * 2 * tnp.pi]
+bgf_new = add_z_gradient_SMALL(bgf, slope_range, 1)
+view_slices_3d(bgf_new, slice_nbr=126, vmin=-20, vmax=20, title="data before bg steffen")
+###############################################
+
+
+import numpy as np
+import plotly.graph_objects as go
+
+# Generate nicely looking random 3D-field
+l = 128
+X, Y, Z = np.mgrid[:l, :l, :l]
+vol = bgf_new.numpy()
+
+from scipy import ndimage
+
+
+fig = go.Figure(data=go.Volume(
+    x=X.flatten(), y=Y.flatten(), z=Z.flatten(),
+    value=vol.flatten(),
+    isomin=2,
+    isomax=7,
+    opacity=0.1,
+    surface_count=100,
+    ))
+fig.update_layout(scene_xaxis_showticklabels=False,
+                  scene_yaxis_showticklabels=False,
+                  scene_zaxis_showticklabels=False)
+fig.show()
+
+

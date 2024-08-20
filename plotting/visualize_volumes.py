@@ -318,16 +318,16 @@ def visualize_all4(resized_input, reference , predicted, title, save, path, colo
 
   
   
-  grid[0].imshow(input_slice_x, cmap='gray',aspect='equal', vmin=-15, vmax=15)
+  grid[0].imshow(input_slice_x, cmap='gray',aspect='equal', vmin=-5, vmax=5)
   grid[0].set_title("Background Field - X")
   grid[0].get_xaxis().set_ticks([])
   grid[0].get_yaxis().set_ticks([])
     
-  grid[1].imshow(input_slice_y, cmap='gray',aspect='equal', vmin=-15, vmax=15)
+  grid[1].imshow(input_slice_y, cmap='gray',aspect='equal', vmin=-5, vmax=5)
   grid[1].set_title("Background Field - Y")
 
 
-  jj = grid[2].imshow(input_slice_z, cmap='gray',aspect='equal', vmin=-15, vmax=15)
+  jj = grid[2].imshow(input_slice_z, cmap='gray',aspect='equal', vmin=-5, vmax=5)
   grid[2].set_title("Input data - Z")
   grid.cbar_axes[0].colorbar(jj)
 

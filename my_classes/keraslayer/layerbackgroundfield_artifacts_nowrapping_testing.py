@@ -40,7 +40,8 @@ class CreatebackgroundFieldLayer(Layer):
         #phase 
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
-        
+        print("max_phase")
+        print(tf.math.reduce_max(sim_fwgt_mask))
         #print("shape MASK",mask.get_shape().as_list())
  #       print("shape MASK",tf.shape(tf.gather(mask)))
 
@@ -96,33 +97,52 @@ class CreatebackgroundFieldLayer(Layer):
 
         #create bgf        
         bgf = add_z_gradient_SMALL(
-           bgf, self.gradient_slope_range, 6) # [ :, :, :] #reduction = 1
+           bgf, self.gradient_slope_range, 4) # [ :, :, :] #reduction = 1
         
 
         #bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
         #bgf = add_z_gradient( bgf, self.gradient_slope_range, dim)
+        
+        print("bgf max")
+        print(tf.math.reduce_max(bgf))
 
+        onlybgfmask = tf.multiply(bgf, mask)
+
+        print("bgfmask  max")
+        print(tf.math.reduce_max(onlybgfmask))
+
+        #view_slices_3dNew(onlybgfmask[ :, :, :], 50, 50, 50,
+        #                  vmin=-5, vmax=5, title=" bgfmask")
+        
+        
+        sim_fwgt_mask_bg = tf.add( sim_fwgt_mask, onlybgfmask)
+        
+        print("bgf phase max -- no boundary artifacts")
+        print(tf.math.reduce_max(sim_fwgt_mask_bg))
         ###########################################################################################################
         # bgf with mask
-        bgf_mask = tf.multiply(mask, bgf)
-        
-        #################################################
+        #bgf_mask = tf.multiply(mask, bgf)
         #add artifacts
-
-        #boundary_artifacts_std = 10.0
-        #boundary_artifacts_mean = 90.0
+        """boundary_artifacts_std = 10.0
+        boundary_artifacts_mean = 90.0
         
-        #bgf_mask = add_boundary_artifacts(
-        #    bgf, mask, boundary_artifacts_mean,
-         #   boundary_artifacts_std)
-         
-        #########################################
-        print("no boundary artifacts")
+        bgf_mask = add_boundary_artifacts(
+            bgf, mask, boundary_artifacts_mean,
+            boundary_artifacts_std)
+        
+        print("max boundary artifacs")
+        print(tf.math.reduce_max(bgf_mask))
+
+        
         # add background field to the phase 
         sim_fwgt_mask_bg = tf.add(
             sim_fwgt_mask, bgf_mask)
 
-        ##########################
+        print("final max")
+        #print(sim_fwgt_mask_bg.max())
+        print(tf.math.reduce_max(sim_fwgt_mask_bg))
+        """
+
 
 
 
@@ -176,6 +196,87 @@ class CreatebackgroundFieldLayer(Layer):
 ######################################################################################
 ######################################################################################
 
+#####################################################################################
+####################################################################################
+###################################################################################
+######################################################################################
+######################################################################################
+
+
+from plotting.visualize_volumes import view_slices_3dNew
+
+
+from create_datasetfunctions_susc_unif02 import simulate_susceptibility_sources_uni, forward_convolution
+from backgroundfieldandeffects.functionsfromsteffen import apply_random_brain_mask
+size = 128  
+rect_num = 200
+
+
+#gt
+sim_gt = simulate_susceptibility_sources_uni( #simulate_susceptibility_sources_uni
+    simulation_dim=size, rectangles_total=rect_num, plot=False)
+
+#phase
+sim_fwgt = forward_convolution(sim_gt[ :, :, :])
+
+### apply masks
+# phase with mask
+print("apply mask")
+sim_fwgt_mask, mask = apply_random_brain_mask(sim_fwgt[ :, :, :])
+#gt with mask
+gtmask = tf.multiply(sim_gt[ :, :, :], mask[ :, :, :])
+
+
+#
+# Should I expand the dimension??
+
+gtmask = np.expand_dims(gtmask, 0)
+sim_fwgt_mask = np.expand_dims(sim_fwgt_mask, 0) 
+mask = np.expand_dims(mask, 0)
+
+
+gtmask = np.expand_dims(gtmask, 4)
+sim_fwgt_mask = np.expand_dims(sim_fwgt_mask, 4) 
+mask = np.expand_dims(mask, 4)
+
+
+
+#convert to tensorflow
+sim_fwgt_mask = tf.convert_to_tensor(sim_fwgt_mask)
+   # value, dtype=Non
+mask = tf.convert_to_tensor(mask,dtype=tf.float32 )
+mask = tf.cast(mask, tf.float32)
+
+
+#### view  add 0 in last dimenstion if dim 4 
+view_slices_3dNew(gtmask[ 0,:, :, :,0], 50, 50, 50,
+                  vmin=-0.5, vmax=0.5, title="gtmask")
+
+view_slices_3dNew(sim_fwgt_mask[ 0,:, :, :,0], 50, 50, 50,
+                  vmin=-0.5, vmax=0.5, title="phase with mask")
+
+view_slices_3dNew(mask[0, :, :, :,0], 50, 50, 50,
+                  vmin=-0.5, vmax=0.5, title=" mask")
+
+
+## input for layer - phase with mask, mask
+
+
+
+
+inputs = [ mask, sim_fwgt_mask]
+
+print("bgf field starts")
+LayerWBakgroundField = CreatebackgroundFieldLayer()
+
+output = LayerWBakgroundField(inputs)
+
+view_slices_3dNew( output[0,:,:,:,0], 50, 50, 50,
+                  vmin=-2, vmax=2, title="phase with background field and mask")
+
+
+##################################################################
+####################################################################
 
 
 
