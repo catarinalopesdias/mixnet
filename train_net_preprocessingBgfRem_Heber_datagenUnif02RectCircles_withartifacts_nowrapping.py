@@ -56,14 +56,17 @@ validation_generatorUnif = DataGeneratorUniform_RecCirc_phase(partition['validat
 #############################################################
 
 # HEREEEEEEEEEEE
-from networks.network_adaptedfrom_BOLLMAN_inputoutput import build_CNN_BOLLMANinputoutput
+#from networks.network_adaptedfrom_BOLLMAN_inputoutput import build_CNN_BOLLMANinputoutput
+from networks.network_phillip_inputoutput import build_CNN_phillip_inputoutput
+
+
 #preprocessinglayers
 from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
 from my_classes.keraslayer.layer_mask_inputtensor import CreateMaskLayer
 
 
 #old - original seems to work
-input_shape = (None, None, None, 1) # shape of pict, last is the channel
+#input_shape = (None, None, None, 1) # shape of pict, last is the channel
 input_shape = (128, 128, 128, 1) # shape of pict, last is the channel
 input_tensor = Input(shape = input_shape, name="input")
 
@@ -75,23 +78,28 @@ LayerWBackgroundField = CreatebackgroundFieldLayer()
 #################################################
 #################################################
 # mask
+
 x = LayerwMask(input_tensor) #inputs is phase #######and shape
 mask = x[0]
 maskedPhase = x[1]
 #backgroundfield
+
 phasewithbackgroundfield = LayerWBackgroundField(x)
 
 
-y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_BOLLMANinputoutput(phasewithbackgroundfield)])
+
+y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_phillip_inputoutput(phasewithbackgroundfield)])
 
 ##########################################
 
-outputs = [phasewithbackgroundfield,y]
+outputs = [#mask,
+           #maskedPhase,
+           phasewithbackgroundfield,y]
 
 
 model = Model(input_tensor, outputs)
 
-name = "PhaseBgf_Bgfrem_Bollmann"
+name = "PhaseBgf_Bgfrem_Phillip"
 
 
 
@@ -101,7 +109,7 @@ name = "PhaseBgf_Bgfrem_Bollmann"
 print("Model with gradient accumulation")
 gaaccumsteps = 10
 #learningrate
-lr =0.0025#0.001 #0.0004
+lr =0.001#0.001 #0.0004
 text_lr = str(lr).split(".")[1]
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps,
@@ -121,11 +129,14 @@ optimizerMINE = Adam(
 
 #### loss ##################
 
+lossU = "costum"# "mse" #"mean_absolute_error"#"mse"# "mean_absolute_error" #"mse"    #mse
+#losses = [None, None, lossU]
+
+
 ###############################################################################
 ### Add costum loss
 import keras.backend as K
 
-lossU = "costum"# "mse" #
 ###############################
 
 def my_loss_function(y_true, y_pred):
@@ -147,37 +158,14 @@ def my_loss_function(y_true, y_pred):
     print("pred shape")
     print(maskedPhasePrediction.shape)
     
-    #print(y_pred[1])
-    #masked, bgf , predphase = y_pred
 
-    #plt.imshow(pred_phase[0,64,:,:,0 ], cmap='gray',  vmin=-0.4, vmax=0.4)   
-    #plt.show()
-    #print("y_true")
-    #print(y_true)
-    #print(y_true.shape)
-    #print("y_true second element")
-    #print(y_true[1])
-    #print("y_true third element")
-    #print(y_true[2])
-    #print("y_true fourth element")
-    #print(y_true[3])
     # image reconstruction
     image_loss = tf.keras.losses.mse(maskedPhaseOutput, maskedPhasePrediction)
     print("loss shape")
     print(image_loss.shape)
-    #image_loss =  tf.keras.losses.MeanSquaredError(maskedPhaseOutput, maskedPhasePrediction)
-    #bla=maskedPhaseOutput[0, 64,:,:]
-    #plt.imshow(bla.numpy(), cmap='gray',  vmin=-0.1, vmax=0.1)   
-    #plt.show()
-    #image_loss =  K.mean(K.square(maskedPhaseOutput - maskedPhasePrediction))
 
-    #print("image loss shape")
-    #print(image_loss)
-    #print(image_loss.shape)
     return  image_loss #image_loss
 ###################################################################
-
-
 
 model.compile(optimizer=optimizerMINE, loss=[None, my_loss_function])
 
@@ -234,8 +222,7 @@ earlystop = tf.keras.callbacks.EarlyStopping(
     verbose=1,
     mode="auto",
     baseline=None,
-    restore_best_weights=False,
-    start_from_epoch=0,
+    restore_best_weights=False
 ) 
 
 
@@ -246,6 +233,7 @@ print("fit model")
 history = model.fit( x=training_generatorUnif,
                     validation_data=validation_generatorUnif,
                     epochs=dataset_iterations,
+                    initial_epoch=172,
                     use_multiprocessing=True,
                     callbacks = [cp_callback, earlystop],
                     workers=6)

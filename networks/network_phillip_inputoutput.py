@@ -97,6 +97,8 @@ def build_CNN_phillip_inputoutput(input_tensor):
 
     # Add the input tensor to the output tensor (residual connection)
     X_conc1 = Add()([X_save, X])
+    
+    
     encoding_down_3 = Conv3D(filters=64,
                             kernel_size=[3, 3, 3],
                             activation=LeakyReLU(alpha=0.2),
@@ -126,6 +128,8 @@ def build_CNN_phillip_inputoutput(input_tensor):
 #####################################################################################################
     #Third Layer --> up NOte: if not workin, you have to slice
     decoder_up_1 = UpSampling3D(size=(2,2,2))(X)
+    
+    
     decoder_1 = Conv3DTranspose(filters=64,
                         kernel_size=[3,3,3],
                         activation=LeakyReLU(alpha=0.2),

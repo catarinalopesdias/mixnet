@@ -28,6 +28,7 @@ class CreatebackgroundFieldLayer(Layer):
         
     def call(self, inputs):
 
+        print("=== start bgf layer ==============")
         # make sense of inputs   
         
         #num_rows, num_columns = tf.shape(inputs)[1], tf.shape(inputs)[2]
@@ -41,58 +42,23 @@ class CreatebackgroundFieldLayer(Layer):
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
         
-        #print("shape MASK",mask.get_shape().as_list())
- #       print("shape MASK",tf.shape(tf.gather(mask)))
 
-        print("shape Mask orig",tf.shape(mask))      
+        #print("shape Mask orig",tf.shape(mask))      
         dim_mask = tf.shape(mask)
-            #print("shape MASK",tf.shape(mask))
-        #tf.print("shape MASK",mask.get_shape().as_list())
-        #tf.print("shape MASK",tf.shape(mask))
 
-        #print(len(mask.numpy()))
-
-        #print(tf.cast(mask,tf.float32))
-        #print("dfds", tf.shape(inputs)[0], tf.shape(inputs)[1])
-        #phase 
-        #sim_fwgt_mask = inputs[1]
-        #sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
-        #print("shape phase orig",sim_fwgt_mask.shape.as_list())   
+ 
         ############################################################
         ############################################################
-       # print("here")
-        #bla = tf.print(tf.shape(mask[0,:,0])[0])
-        #bla = eval(tf.shape(mask[0,:,0])[0]))
-        #print("bla")
-        #tf.print(bla)
       
         dim_mask1= tf.shape(mask[0,:,0])[0]
-        #print("tf print dim_mask")
-        #tf.print(dim_mask1)
-        #print("tf print dim_mask",tf.print(dim_mask1) )
-        #bgf = tf.zeros([dim_mask1,dim_mask1,dim_mask1], tf.float32)
+       
         bgf = tf.zeros([128,128,128], tf.float32)
 
         
-        #bgf = tf.zeros_like(mask)
-        #tf.print(bgf)     
-        
-        
-        #bgf = tf.zeros_like(mask, tf.float32)
-        #bgf = tf.zeros_like(mask)
-        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
-        
 
-        #print("shape tensor bgf - self",tf.shape(bgf))
-
-        #bgf = tf.zeros_like(mask)
-        
-        #tf.print("bgf before input",bgf.shape.as_list())   
 
 ###################################################################################################################################
-        #create background field
-        #bgf = tf.zeros_like(mask)
-        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
+
 
         #create bgf        
         bgf = add_z_gradient_SMALL(
@@ -165,6 +131,8 @@ class CreatebackgroundFieldLayer(Layer):
 
        #return output_data    
         #return sim_fwgt_mask_bg_wrapped
+        
+        print("=== end bgf layer ==============") 
         return sim_fwgt_mask_bg
     
     

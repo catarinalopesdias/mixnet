@@ -10,13 +10,87 @@ from plotting.visualize_volumes import view_slices_3dNew,  view_slices_3d
 import numpy as np
 import tensorflow as tf
 from numpy import linalg as LA    
-from backgroundfieldandeffects.functionsfromsteffen import   distance_to_plane, distance_to_plane_tf
+#from backgroundfieldandeffects.functionsfromsteffen import   distance_to_plane, distance_to_plane_tf
 from tensorflow.experimental import numpy as tnp 
+
+
+def distance_to_plane(point, normal, dim, signed_dist=False):
+    
+    """Calculates a distance volume to the plane given by a point and a normal.
+
+    Parameters
+    ----------
+    point: numpy array
+        Point on the plane (3d point)
+    normal: numpy array
+        Normal vector of the plane (3d vector)
+    dim: numpy array
+        dimension of the volume (x,y,z)
+    signed_dist : bool
+        Indicates if we should use a signed or unsiged distance
+
+    Returns
+    -------
+    numpy array
+        Array of size dim with distances to the plane
+    """
+    
+    
+    
+    print('distance to plane')
+    print("----------------")
+    print('point on plane', point)
+    print('normal', normal)
+    print('dim', dim)
+    
+    print("----------------")
+    
+    ndim = len(dim)
+    linspace = [np.linspace(0, dim[i] - 1, dim[i]) for i in range(ndim)] 
+    
+    coord = np.meshgrid(*linspace, indexing='ij')
+
+    print('linspace length', len(linspace))
+    print('linspace element 1 size', linspace[1].shape)
+    print('coord length', len(coord))
+    print('coord [1] shape', coord[1].shape)
+    
+
+    coord = np.stack(coord, axis=3)
+    
+    print('coord shape after stacking shape', coord.shape)
+    
+    # calculate distance
+    # calculates the dot product between (3,w,h,d) and (3,1)
+    pot = point.reshape(3,)
+    print("point on the plane", pot)
+    coord_minus_point = np.subtract(coord, pot)
+    print("shape of coord- point")
+    print(coord_minus_point.shape)
+    if signed_dist:
+        dist = np.dot(coord_minus_point, normal)
+    else:
+        dist = np.abs( np.dot(coord_minus_point, normal))
+    
+    print("dist shape")
+    print(dist.shape)
+    dist = np.squeeze(dist)
+        
+    dist = np.divide(dist, np.linalg.norm(normal))
+
+    print("max dist")
+    print(dist.max())
+    print("min dist")
+    print(dist.min())
+    return dist
+
+
+
 
 
 def add_z_gradient_SMALL(data, slope_range, reduction=20):
     ##############################################
-        #print('add z gradient')
+        print('---- add z gradient')
         view_slices_3d(data, slice_nbr=50, vmin=-0.5, vmax=0.5, title="data before bg steffen")
         
         #print('a')
@@ -25,10 +99,10 @@ def add_z_gradient_SMALL(data, slope_range, reduction=20):
         #print("data shape:",dim)
         #point middle
         point = np.array([i / 2.0 for i in dim]).reshape((3,1))
-        print("point", point)
+        print("point in middle", point)
         #normal z dire
         normal = np.array([0.0, 0.0, -1.0]).reshape((3,1))
-        print("normal", normal)
+        print("vector normal", normal)
         ######################################
         
         z_jitter = np.random.uniform(low=-dim[2] / 16.0, high=dim[2] / 16.0, size=(1,1) )#size=[1,1]
@@ -37,10 +111,8 @@ def add_z_gradient_SMALL(data, slope_range, reduction=20):
         
         #add z jitter to middle point
         point = point + z_jitter
-        print("new point", point)
-        #print('point with z jitter', point)
+        print("new point: z jitter", point)
         
-        #print('xy jitter')
         #create xy jitter
         x_y_jitter = np.random.uniform(
                       low=-0.1, high=0.1, size=(2,1))
@@ -50,23 +122,24 @@ def add_z_gradient_SMALL(data, slope_range, reduction=20):
         
         #add xy jitter to normal
         normal = normal + x_y_jitter
-        #print('normal with z jitter', normal)
+        print('normal with xy jitter', normal)
         
         #normalize normal 
         normal = normal / LA.norm(normal)
         #print('normal with z jitter normalized', normal)
-        print("new normal", normal)
+        print("new normal, xy jitter normalized", normal)
         
-        #dist = 3; 
+
         dist = distance_to_plane(point, normal, dim, True)
         """Calculates a distance volume to the plane given by a point and a normal."""
-
-        #dist = distance_to_plane_np(point, normal, dim, True)
 
         
         print('distance to plane - point - normal - shape', dist.shape)
         
-        #common.distance_to_plane(point, normal, dim, True)
+        print("dist max", dist.max())
+        print("dist min", dist.min())
+
+  
         #view_slices_3d(dist, slice_nbr=50, vmin=-100, vmax=100, title="distance")
         
         
@@ -75,49 +148,45 @@ def add_z_gradient_SMALL(data, slope_range, reduction=20):
                                   high=slope_range[1] / dim[2])
         
         print("slope", slope)
-        
+        print("apply slope")
         dist = dist * slope
-        
+        print("dist max", dist.max())
+        print("dist min", dist.min())
+
+        print("apply reduction")
+        dist = dist/ reduction
+
+        print("dist max", dist.max())
+        print("dist min", dist.min())
+                
         #view_slices_3d(dist, slice_nbr=50, vmin=-20, vmax=20, title="distance x slope")
         
         # add to data
-        data = data + dist/reduction
+        print("add data to dist")
+        data = data + dist
+        
+        print("data max", dist.max())
+        print("data min", dist.min())
         
         #print('data shape', data.shape)
         #view_slices_3d(data, slice_nbr=50, vmin=-20, vmax=20, title="data + (distance*slope)")
         
         return data
-
+############################################################################################################
+############################################################################################################
+############################################################################################################
 
 bgf = tf.zeros([128,128,128], tf.float32)
+##########
 slope_range = [3* 2 * tnp.pi, 8 * 2 * tnp.pi]
+print("slope range")
+print(slope_range)
+####
+view_slices_3d(bgf, slice_nbr=126, vmin=-20, vmax=20, title="data before bg steffen")
+#####
 bgf_new = add_z_gradient_SMALL(bgf, slope_range, 1)
-view_slices_3d(bgf_new, slice_nbr=126, vmin=-20, vmax=20, title="data before bg steffen")
+view_slices_3d(bgf_new, slice_nbr=64, vmin=-20, vmax=20, title="data after bg steffen")
 ###############################################
 
-
-import numpy as np
-import plotly.graph_objects as go
-
-# Generate nicely looking random 3D-field
-l = 128
-X, Y, Z = np.mgrid[:l, :l, :l]
-vol = bgf_new.numpy()
-
-from scipy import ndimage
-
-
-fig = go.Figure(data=go.Volume(
-    x=X.flatten(), y=Y.flatten(), z=Z.flatten(),
-    value=vol.flatten(),
-    isomin=2,
-    isomax=7,
-    opacity=0.1,
-    surface_count=100,
-    ))
-fig.update_layout(scene_xaxis_showticklabels=False,
-                  scene_yaxis_showticklabels=False,
-                  scene_zaxis_showticklabels=False)
-fig.show()
 
 

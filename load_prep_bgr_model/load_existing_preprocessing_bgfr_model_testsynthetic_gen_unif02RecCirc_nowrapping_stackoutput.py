@@ -43,14 +43,8 @@ from keras.layers import Input
 path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-1058_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
 
 
-#model1 = tf.keras.models.load_model(path) -needs loss function
 model1= load_model(path, compile=False)
 model1.summary()
-
-#model.compile(loss = losses, optimizer = 'adam')
-
-
-
 
 #################################################################
 #################################################################
@@ -83,15 +77,13 @@ for epoch_i in range(1): #num_instance
         file_full = "datasynthetic/uniform02RectCircle-Phase/training/" + file + ".npz"
    loaded = np.load(file_full)
    loaded =loaded['arr_0']
-   #mask = loaded[0,:]
-       #loaded[1,:] masked phase
-   phase = loaded#[2,:] #phase 
-   #phasebg = loaded[2,:]
+
+   phase = loaded
    X_test =  phase[np.newaxis, :,:,:, np.newaxis]
 
    y_pred = model1.predict(X_test)
    
-   #mask = y_pred[0]
+
    pred_phaswBgF = y_pred[0] #1 output is bgf+phase 
 
    maskedphase  = y_pred[1][0,:,:,:,0] # 
