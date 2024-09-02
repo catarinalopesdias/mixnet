@@ -55,7 +55,7 @@ validation_generatorUnif = DataGeneratorUniform_RecCirc_phase(partition['validat
 #### Compile the model
 #############################################################
 
-# HEREEEEEEEEEEE
+
 from networks.network_adaptedfrom_BOLLMAN_inputoutput import build_CNN_BOLLMANinputoutput
 #preprocessinglayers
 from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
@@ -93,7 +93,7 @@ model = Model(input_tensor, outputs)
 
 name = "PhaseBgf_Bgfrem_Bollmann"
 
-
+model.summary()
 
 ###############################################
 ###############################################
@@ -101,7 +101,7 @@ name = "PhaseBgf_Bgfrem_Bollmann"
 print("Model with gradient accumulation")
 gaaccumsteps = 10
 #learningrate
-lr =0.0025#0.001 #0.0004
+lr =0.0001#0.001 #0.0004
 text_lr = str(lr).split(".")[1]
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps,
@@ -147,33 +147,11 @@ def my_loss_function(y_true, y_pred):
     print("pred shape")
     print(maskedPhasePrediction.shape)
     
-    #print(y_pred[1])
-    #masked, bgf , predphase = y_pred
-
-    #plt.imshow(pred_phase[0,64,:,:,0 ], cmap='gray',  vmin=-0.4, vmax=0.4)   
-    #plt.show()
-    #print("y_true")
-    #print(y_true)
-    #print(y_true.shape)
-    #print("y_true second element")
-    #print(y_true[1])
-    #print("y_true third element")
-    #print(y_true[2])
-    #print("y_true fourth element")
-    #print(y_true[3])
     # image reconstruction
     image_loss = tf.keras.losses.mse(maskedPhaseOutput, maskedPhasePrediction)
     print("loss shape")
     print(image_loss.shape)
-    #image_loss =  tf.keras.losses.MeanSquaredError(maskedPhaseOutput, maskedPhasePrediction)
-    #bla=maskedPhaseOutput[0, 64,:,:]
-    #plt.imshow(bla.numpy(), cmap='gray',  vmin=-0.1, vmax=0.1)   
-    #plt.show()
-    #image_loss =  K.mean(K.square(maskedPhaseOutput - maskedPhasePrediction))
 
-    #print("image loss shape")
-    #print(image_loss)
-    #print(image_loss.shape)
     return  image_loss #image_loss
 ###################################################################
 
@@ -219,7 +197,6 @@ checkpoint_dir = os.path.dirname(checkpoint_path)
 # Create checkpoint callback
 cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                  save_weights_only = False,
-                                                 #save_freq=save_period,
                                                  save_freq="epoch",
                                                  save_best_only=False,
                                                  monitor = lossmon,
@@ -297,7 +274,6 @@ plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
 plt.plot(val_loss_historyGA)
-#plt.ylim([0, loss_historyGA[-1]*2])
 plt.title(lossmon)
 plt.xlabel("Dataset iterations")
 vallossnamefile = "models/preprocessing_backgroundremoval/loss/model_Prep_BR_" + name + \

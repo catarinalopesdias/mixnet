@@ -39,8 +39,7 @@ from keras.layers import Input
 
 
 #checkpoint path
-
-path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-1058_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_costum_001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-3000_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0025_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
 
 
 model1= load_model(path, compile=False)
