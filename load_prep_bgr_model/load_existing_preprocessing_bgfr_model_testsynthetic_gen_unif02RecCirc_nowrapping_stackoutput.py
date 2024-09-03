@@ -39,7 +39,9 @@ from keras.layers import Input
 
 
 #checkpoint path
-path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-3000_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0025_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
+#path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-3000_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0025_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
+#path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-0065_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-0020_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLossOnlyBoundArtif.ckpt"
 
 
 model1= load_model(path, compile=False)
@@ -52,17 +54,17 @@ model1.summary()
 ################################################
 #   Import data
 ################################################
-newdata=False
+newdata=True
 import  matplotlib.pyplot as plt
 
 
 
 path_common_init = "models/preprocessing_backgroundremoval/prediction_images/unif"
 
-network_type = "PhaseBgf_Bgfrem_Bollmann_newadam16"
+network_type = "PhaseBgf_Bgfrem_cat_newadam16"
 
 for epoch_i in range(1): #num_instance
-   epoch_i=3
+   #epoch_i=3
    file =str(epoch_i)+"samples"
 
    if newdata:
@@ -78,62 +80,30 @@ for epoch_i in range(1): #num_instance
    loaded =loaded['arr_0']
 
    phase = loaded
+   
+   plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
+   plt.colorbar()
+   
    X_test =  phase[np.newaxis, :,:,:, np.newaxis]
 
    y_pred = model1.predict(X_test)
    
 
-   pred_phaswBgF = y_pred[0] #1 output is bgf+phase 
+   pred_phaswBgF = y_pred[0][0,:,:,:,0] #1 output is bgf+phase 
+
+   #plt.imshow(pred_phaswBgF[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
+   
+   #plt.colorbar()
 
    maskedphase  = y_pred[1][0,:,:,:,0] # 
    pred_phase = y_pred[1][0,:,:,:,1]
 
- 
-   """
-   #plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.4, vmax=0.4)   
-   plt.imshow(X_test[0, 64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)   
-   plt.title("input phase ")
-   plt.colorbar()
-   plt.show()
-   
-   plt.imshow(maskedphase[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)   
-   plt.title("masked phase")
-   plt.colorbar()
-   plt.show()
-   
-   #plt.imshow(mask[0,64,:,:,0], cmap='gray',  vmin=-0.4, vmax=0.4)   
-   #plt.show()
 
-   plt.imshow(pred_phaswBgF[0,64,:,:,0 ], cmap='gray',  vmin=-3, vmax=3)  
-   plt.title("bgf and phase")
-   plt.colorbar()
-
-   plt.show()
-   """
-   
-   """plt.imshow(pred_phase[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
-   plt.title("pred phase")
-   plt.colorbar()
-   plt.show()
-   
-   error = maskedphase - pred_phase
-
-   plt.imshow(error[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
-   plt.colorbar()
-   plt.title("error")
-   plt.show()
-
-   plt.imshow(error[64,:,:], cmap='RdBu',  vmin=-0.08, vmax=0.08)  
-   plt.colorbar()
-   plt.title("error")
-   plt.show()
-
-   """
 ###############################################################################
 ###############################################################################
 
 
-predicted, reference,error = visualize_all4grey(pred_phaswBgF[0,:,:,:,0], maskedphase, pred_phase ,
+   predicted, reference,error = visualize_all4grey(pred_phaswBgF, maskedphase, pred_phase ,
                                                    title = "ff" , save = False,
                                                    path = "dfsd",
                                                    colormax=0.3,colormin=-0.3,
@@ -141,20 +111,20 @@ predicted, reference,error = visualize_all4grey(pred_phaswBgF[0,:,:,:,0], masked
 
 
 
-m_predicted, reference,error = visualize_all4(pred_phaswBgF[0,:,:,:,0], maskedphase, pred_phase ,
+   m_predicted, reference,error = visualize_all4(pred_phaswBgF, maskedphase, pred_phase ,
                                                   title = "dddd", save=False, 
                                                   path="dd",
                                                    colormax=0.3,colormin=-0.3,
                                                    errormax = 0.1,errormin=-0.1  )
 
 
-plt.imshow(pred_phaswBgF[0,:,:,64,0 ], cmap='gray',  vmin=-1, vmax=1)  
-plt.title("bgf and phase")
-plt.colorbar()
+#plt.imshow(pred_phaswBgF[0,:,:,64,0 ], cmap='gray',  vmin=-1, vmax=1)  
+#plt.title("bgf and phase")
+#plt.colorbar()
 
-plt.imshow(pred_phaswBgF[0,:,:,64,0 ]-maskedphase[:,:,64,], cmap='gray',  vmin=-0.1, vmax=0.1)  
-plt.title("bgf and phase")
-plt.colorbar()
+#plt.imshow(pred_phaswBgF[0,:,:,64,0 ]-maskedphase[:,:,64,], cmap='gray',  vmin=-1, vmax=1)  
+#plt.title("bgf and phase")
+#plt.colorbar()
 
 
 #############################################

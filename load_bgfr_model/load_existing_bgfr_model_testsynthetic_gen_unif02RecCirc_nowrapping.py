@@ -57,12 +57,20 @@ lastit="0820"
 
 
 #Bg_BollmannExtralayer_newadam16cp-0052_trainsamples500_datasetiter2000_batchsize1_gaaccum10_loss_mse_01_val_loss_unif02_datagen_evenlessbgnoartifacts_ExtraLayer.ckpt
-path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0001_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_001_val_loss_unif02_RecCirc__datagenRecCirc.ckpt"
+#path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0001_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_001_val_loss_unif02_RecCirc__datagenRecCirc.ckpt"
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-3000_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
+
+
      #                                            Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-0001_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_001_val_loss_unif02_RecCirc__datagenRecCirc.ckpt
 #'path = "checkpoints/bgremovalmodel_ExtraLayer/Bg_BollmannExtralayer_newadam16cp-0001_trainsamples500_datasetiter5000_batchsize1_gaaccum10_loss_mse_001_val_loss_unif02_RectCirc__datagen_evenlessbgnoartifacts_ExtraLayer_artif_1_nowrapping_2output.ckpt"
 
 
-model1 = tf.keras.models.load_model(path)
+
+
+
+#model1 = tf.keras.models.load_model(path)
+model1 = tf.keras.models.load_model(path, compile = False)
+
 model1.summary()
 
 #model.compile(loss = losses, optimizer = 'adam')
