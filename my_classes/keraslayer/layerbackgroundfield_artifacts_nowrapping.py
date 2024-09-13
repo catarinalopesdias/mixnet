@@ -55,11 +55,11 @@ class CreatebackgroundFieldLayer(Layer):
 
 
 ###################################################################################################################################
-
-
+        print("add z gradient - reduction = 10")
+        
         #create bgf        
-        #bgf = add_z_gradient_SMALL(
-        #   bgf, self.gradient_slope_range, 6) # [ :, :, :] #reduction = 1
+        bgf = add_z_gradient_SMALL(
+           bgf, self.gradient_slope_range, 10) # [ :, :, :] #reduction = 1
         
 
         #bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
@@ -67,7 +67,7 @@ class CreatebackgroundFieldLayer(Layer):
 
         ###########################################################################################################
         # bgf with mask
-        #bgf_mask = tf.multiply(mask, bgf)
+        bgf_mask = tf.multiply(mask, bgf)
         
         #################################################
         #add artifacts
@@ -75,12 +75,13 @@ class CreatebackgroundFieldLayer(Layer):
         boundary_artifacts_std = 10.0
         boundary_artifacts_mean = 90.0
         
-        bgf_mask = add_boundary_artifacts(
-            bgf, mask, boundary_artifacts_mean,
-            boundary_artifacts_std)
+        #bgf_mask = add_boundary_artifacts(
+        #    bgf, mask, boundary_artifacts_mean,
+        #    boundary_artifacts_std)
          
         #########################################
-        print("only boundary artifacts")
+        print("no boundary artifacts")
+        #print("only boundary artifacts")
         # add background field to the phase 
         sim_fwgt_mask_bg = tf.add(
             sim_fwgt_mask, bgf_mask)

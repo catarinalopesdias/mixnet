@@ -41,8 +41,9 @@ from keras.layers import Input
 #checkpoint path
 #path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_Bollmann_newadam16cp-3000_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0025_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
 #path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-0065_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLoss.ckpt"
-path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-0020_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLossOnlyBoundArtif.ckpt"
-
+#path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-0020_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLossOnlyBoundArtif.ckpt"
+#path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-0020_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLossOnlyBoundArtif.ckpt"
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-2965_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLossOnlyBoundArtif.ckpt"
 
 model1= load_model(path, compile=False)
 model1.summary()
@@ -63,7 +64,7 @@ path_common_init = "models/preprocessing_backgroundremoval/prediction_images/uni
 
 network_type = "PhaseBgf_Bgfrem_cat_newadam16"
 
-for epoch_i in range(1): #num_instance
+for epoch_i in range(5): #num_instance
    #epoch_i=3
    file =str(epoch_i)+"samples"
 
@@ -81,8 +82,8 @@ for epoch_i in range(1): #num_instance
 
    phase = loaded
    
-   plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
-   plt.colorbar()
+   #plt.imshow(phase[64,:,:], cmap='gray',  vmin=-0.3, vmax=0.3)  
+   #plt.colorbar()
    
    X_test =  phase[np.newaxis, :,:,:, np.newaxis]
 
@@ -102,19 +103,19 @@ for epoch_i in range(1): #num_instance
 ###############################################################################
 ###############################################################################
 
-
+   tt = "epoch " + str(epoch_i)
    predicted, reference,error = visualize_all4grey(pred_phaswBgF, maskedphase, pred_phase ,
-                                                   title = "ff" , save = False,
+                                                   title = tt, save = False,
                                                    path = "dfsd",
-                                                   colormax=0.3,colormin=-0.3,
+                                                   colormax=0.25,colormin=-0.25,
                                                    errormax = 0.13,errormin=-0.13, slice_nr=64 )
 
 
 
    m_predicted, reference,error = visualize_all4(pred_phaswBgF, maskedphase, pred_phase ,
-                                                  title = "dddd", save=False, 
+                                                  title = tt, save=False, 
                                                   path="dd",
-                                                   colormax=0.3,colormin=-0.3,
+                                                   colormax=0.25,colormin=-0.25,
                                                    errormax = 0.1,errormin=-0.1  )
 
 

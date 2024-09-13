@@ -107,11 +107,13 @@ for epoch_i in range(num_train_instances):
 
   
     if testingdata:
-       file_name = "datasynthetic/uniform02RectCircle-Phase/testing/" + str(epoch_i) + "samples"
+       file_name = "datasynthetic/uniform02RectCircle-gt-Phase/testing/" + str(epoch_i) + "samples"
     else:
-       file_name = "datasynthetic/uniform02RectCircle-Phase/training/" + str(epoch_i) + "samples"
+       file_name = "datasynthetic/uniform02RectCircle-gt-Phase/training/" + str(epoch_i) + "samples"
          
-    arr  = sim_fwgt#mask# np.stack((mask,sim_fwgt_mask), axis=0)
+    #arr  = sim_fwgt#mask# np.stack((mask,sim_fwgt_mask), axis=0)
+    arr  = np.stack((sim_gt,sim_fwgt), axis=0)
+
             
     #np.save(file_name,arr)
     np.savez_compressed(file_name, arr)
@@ -133,5 +135,11 @@ view_slices_3dNew(sim_gt[ :, :, :], 50,
 view_slices_3dNew(sim_fwgt[ :, :, :], 50,
                 50, 50, vmin=-0.2, vmax=0.2, title="fw+brain mask")
 
-view_slices_3dNew(arr[ :, :, :], 50,
+#view_slices_3dNew(arr[ :, :, :], 50,
+#               50, 50, vmin=-0.2, vmax=0.2, title="fw+brain mask")
+
+view_slices_3dNew(arr[ 0,:, :, :], 50,
+                50, 50, vmin=-0.2, vmax=0.2, title="fw+brain mask")
+
+view_slices_3dNew(arr[ 1,:, :, :], 50,
                 50, 50, vmin=-0.2, vmax=0.2, title="fw+brain mask")
