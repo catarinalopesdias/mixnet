@@ -29,39 +29,28 @@ class CreatebackgroundFieldLayer(Layer):
     def call(self, inputs):
 
         print("=== start bgf layer ==============")
+        
         # make sense of inputs   
-    
+
 
         mask =  inputs[0]
         mask =  mask[0,:,:,:,0] # IF 4 D
-        
-        #phase 
+
+        #phase
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
-        
 
-        #print("shape Mask orig",tf.shape(mask))      
-        dim_mask = tf.shape(mask)
-
- 
-        ############################################################
-        ############################################################
-      
-        dim_mask1= tf.shape(mask[0,:,0])[0]
-       
+        #create background field
         bgf = tf.zeros([128,128,128], tf.float32)
-
-        
 
 
 ###################################################################################################################################
-        print("add z gradient - reduction = 10")
+        print("add z gradient - reduction = 5")
         
         #create bgf        
         bgf = add_z_gradient_SMALL(
-           bgf, self.gradient_slope_range, 10) # [ :, :, :] #reduction = 1
+           bgf, self.gradient_slope_range, 5) # [ :, :, :] #reduction = 10
         
-
         #bgf = add_z_gradient_tf( bgf, self.gradient_slope_range)
         #bgf = add_z_gradient( bgf, self.gradient_slope_range, dim)
 
@@ -71,31 +60,29 @@ class CreatebackgroundFieldLayer(Layer):
         
         #################################################
         #add artifacts
+        #########################################
+        print("no boundary artifacts")
+        #print("only boundary artifacts")
 
-        boundary_artifacts_std = 10.0
-        boundary_artifacts_mean = 90.0
+        #boundary_artifacts_std = 10.0
+        #boundary_artifacts_mean = 90.0
         
         #bgf_mask = add_boundary_artifacts(
         #    bgf, mask, boundary_artifacts_mean,
         #    boundary_artifacts_std)
-         
-        #########################################
-        print("no boundary artifacts")
-        #print("only boundary artifacts")
+        
+
         # add background field to the phase 
         sim_fwgt_mask_bg = tf.add(
             sim_fwgt_mask, bgf_mask)
-
+        
         ##########################
 
-
-
+        print(" no wrapping")
         """
         value_range = 2.0 * tnp.pi
         # shift from [-pi,pi] to [0,2*pi]
         
-        #sim_fwgt_mask_bg_sn = sim_fwgt_mask_bg
-
         #add 2pi/2
         sim_fwgt_mask_bg_wrapped = tf.add( sim_fwgt_mask_bg[ :, :, :], value_range / 2.0)
 
@@ -104,46 +91,24 @@ class CreatebackgroundFieldLayer(Layer):
         # shift back to [-pi,pi]
         sim_fwgt_mask_bg_wrapped = tf.subtract(
             sim_fwgt_mask_bg_wrapped, value_range / 2.0)
-       
+        
         sim_fwgt_mask_bg_wrapped = tf.multiply(
             mask, sim_fwgt_mask_bg_wrapped)
         
-    
-        #output = sim_fwgt_mask_bg_sn_wrapped
-
 
         sim_fwgt_mask_bg_wrapped = tf.expand_dims(sim_fwgt_mask_bg_wrapped, 0)
         sim_fwgt_mask_bg_wrapped = tf.expand_dims(sim_fwgt_mask_bg_wrapped, 4)
-"""
-
-        #sim_fwgt_mask_bg_wrapped = tf.multiply(
-        #    mask, sim_fwgt_mask_bg_wrapped)
-        
-    
-        #output = sim_fwgt_mask_bg_sn_wrapped
-
-
+        """
         sim_fwgt_mask_bg = tf.expand_dims(sim_fwgt_mask_bg, 0)
         sim_fwgt_mask_bg = tf.expand_dims(sim_fwgt_mask_bg, 4)
 
 
        #return output_data    
-        #return sim_fwgt_mask_bg_wrapped
-        
-        print("=== end bgf layer ==============") 
+        print("=== end bgf layer ==============")
+
         return sim_fwgt_mask_bg
     
     
     
 
 #####################################################################################
-####################################################################################
-###################################################################################
-######################################################################################
-######################################################################################
-
-
-
-
-##################################################################
-####################################################################

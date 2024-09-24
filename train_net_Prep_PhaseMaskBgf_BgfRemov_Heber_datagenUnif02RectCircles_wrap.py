@@ -18,7 +18,8 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-from  my_classes.dataGenerator.DataGenerator_susc02_RectCirc_phase import DataGeneratorUniform_RecCirc_phase
+from  my_classes.dataGenerator.unif02.DataGenerator_susc02_RectCirc_gt import DataGeneratorUniform_RecCirc_gt
+from  my_classes.dataGenerator.unif02.DataGenerator_susc02_RectCirc_gt import DataGeneratorUniform_RecCirc_gt
 
 
 ######################
@@ -45,8 +46,8 @@ partition = {'train': samples_dic[0: int(partition_factor * num_train_instances)
 # Generators
 #text regarding susc
 text_susc="unif02_RecCirc_"
-training_generatorUnif   = DataGeneratorUniform_RecCirc_phase(partition['train'])
-validation_generatorUnif = DataGeneratorUniform_RecCirc_phase(partition['validation'])
+training_generatorUnif   = DataGeneratorUniform_RecCirc_gt(partition['train'])
+validation_generatorUnif = DataGeneratorUniform_RecCirc_gt(partition['validation'])
 
 ########################################################################################################
 ########################################################################################################
@@ -57,20 +58,21 @@ validation_generatorUnif = DataGeneratorUniform_RecCirc_phase(partition['validat
 
 
 #from networks.network_catarina_new import build_CNN_catarina_inputoutput
-from networks.network_Heber_new4convs3levels import build_CNN_catarina_inputoutput
-#from networks.network_Heber_new4convs4levels import build_CNN_Heber_inputoutput4convs4levels
-nettype = "4convs4levels"
-#from networks.network_catarina_new import build_CNN_BOLLMANinputoutput
+#from networks.network_catarina_new4convs3levels import build_CNN_catarina_inputoutput
+from networks.network_Heber_new4convs4levels import build_CNN_Heber_inputoutput
+#from networks.network_Heber_new4convs3levels import build_CNN_Heber_inputoutput
+
+nettype = "4convs4levels_BgfRemov"
 
 #preprocessinglayers
-from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
-#from my_classes.keraslayer.layerbackgroundfield_artifacts_wrapping import CreatebackgroundFieldLayer
-
-from my_classes.keraslayer.layer_mask_inputtensor import CreateMaskLayer
+#from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
+from my_classes.keraslayer.layerbackgroundfield_artifacts_wrapping import CreatebackgroundFieldLayer
+from my_classes.keraslayer.layer_phase import CreatePhaseLayer
+#from my_classes.keraslayer.layer_mask_inputtensor import CreateMaskLayer
+from my_classes.keraslayer.layer_mask import CreateMaskLayer
 
 
 #old - original seems to work
-input_shape = (None, None, None, 1) # shape of pict, last is the channel
 input_shape = (128, 128, 128, 1) # shape of pict, last is the channel
 input_tensor = Input(shape = input_shape, name="input")
 
@@ -79,27 +81,35 @@ input_tensor = Input(shape = input_shape, name="input")
 #create layers
 LayerwMask = CreateMaskLayer()
 LayerWBackgroundField = CreatebackgroundFieldLayer()
+LayerWPhase = CreatePhaseLayer()
 #################################################
 #################################################
+# phase #inputs is gt #######
+
+x_phase = LayerWPhase(input_tensor) 
 # mask
-x = LayerwMask(input_tensor) #inputs is phase #######and shape
-mask = x[0]
-maskedPhase = x[1]
+x_mask = LayerwMask(x_phase) 
+#x_mask = LayerwMask(input_tensor) 
+
+mask = x_mask[0]
+maskedPhase = x_mask[1]
 #backgroundfield
-phasewithbackgroundfield = LayerWBackgroundField(x)
+phasewithbackgroundfield = LayerWBackgroundField(x_mask)
+#bgfremoval_phase= build_CNN_Heber_inputoutput4convs4levels(phasewithbackgroundfield)
+#dipinv_gt= build_CNN_Heber_inputoutput4convs3levels(bgfremoval_phase)
 
-
-#y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_BOLLMANinputoutput(phasewithbackgroundfield)])
-y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_catarina_inputoutput(phasewithbackgroundfield)])
-#y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_Heber_inputoutput4convs4levels(phasewithbackgroundfield)])
+y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_Heber_inputoutput(phasewithbackgroundfield)])
 ##########################################
 
-outputs = [phasewithbackgroundfield,y]
+outputs = [phasewithbackgroundfield,
+           y]
+
+#outputs = [phasewithbackgroundfield,y,dipinv_gt]
 
 
 model = Model(input_tensor, outputs)
 
-name = "PhaseBgf_BgfRem_cat"+nettype
+name = "PhaseBgf_BgfRem"+nettype
 
 
 model.summary() 
@@ -109,7 +119,7 @@ model.summary()
 print("Model with gradient accumulation")
 gaaccumsteps = 10
 #learningrate
-lr =0.0001#0.001 #0.0004
+lr =0.0001
 text_lr = str(lr).split(".")[1]
 
 model = GradientAccumulateModel(accum_steps=gaaccumsteps,
@@ -139,39 +149,40 @@ lossU = "costum"# "mse" #
 def my_loss_function(y_true, y_pred):
     print("----------loss function")
     
-    print("y_pred shape")
+    #print("y_pred shape")
     
-    print(y_pred.shape)
-    print(K.int_shape(y_pred))
+    #print(y_pred.shape)
+    #print(K.int_shape(y_pred))
 
     #print(y_pred[0])
     maskedPhaseTrue = y_pred[:,:,:,:,0]
     maskedPhaseTrue= tf.expand_dims(maskedPhaseTrue, 4)
 
-    print("true phase data shape")
-    print(maskedPhaseTrue.shape)
+    #print("true phase data shape")
+    #print(maskedPhaseTrue.shape)
     #print("second element")
     
     # y pred
     maskedPhasePrediction = y_pred[:,:,:,:,1]
     maskedPhasePrediction = tf.expand_dims(maskedPhasePrediction, 4)
-    print("masked prediction shape")
-    print(maskedPhasePrediction.shape)
+    #print("masked prediction shape")
+    #print(maskedPhasePrediction.shape)
     
     # image reconstruction
     #image_loss = tf.keras.losses.MSE(maskedPhaseTrue, maskedPhasePrediction)
     mse_loss = tf.keras.losses.MeanSquaredError()
     image_loss = mse_loss(maskedPhaseTrue, maskedPhasePrediction)
-    print("loss shape")
-    print(image_loss)
-    print(image_loss.shape)
+    #print("loss shape")
+    #print(image_loss)
+    #print(image_loss.shape)
 
     return  image_loss #image_loss
 ###################################################################
 
 
-
 model.compile(optimizer=optimizerMINE, loss=[None, my_loss_function])
+
+#model.compile(optimizer=optimizerMINE, loss=[None, my_loss_function,"mse"])
 
 
 model.summary()
@@ -204,7 +215,7 @@ checkpoint_path = "checkpoints/preprocessing_bgremovalmodel/Bg_" +\
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_datagenRecCircNewLossOnlyBoundArtifOnlyBgfWrapping.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -258,7 +269,7 @@ model_name1 = "models/preprocessing_backgroundremoval/model_Prep_BR_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_datagenRecCircNewLossOnlyBgfWrapping.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap.keras"
 
 
 model.save(model_name1)
@@ -284,7 +295,7 @@ lossnamefile = "models/preprocessing_backgroundremoval/loss/model_Prep_BR_" + na
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + "loss"+"_"+text_susc+"_datagenRecCircNewLossOnlyBgfWrapping"
+text_lr + "_" + "loss"+"_"+text_susc+"_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
@@ -296,7 +307,7 @@ vallossnamefile = "models/preprocessing_backgroundremoval/loss/model_Prep_BR_" +
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_datagenRecCircNewLossOnlyBgfWrapping"
+text_lr + "_" + lossmon+"_"+text_susc+"_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############

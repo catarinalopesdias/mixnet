@@ -118,10 +118,10 @@ class CreatePhaseLayer(Layer):
             Result in fourier domain
         """
 
-        shape = data.get_shape()
+        shape = [128,128,128]#data.get_shape()
 
         # TODO: padding size should actually be larger
-        padding_size = int(shape.as_list()[0] / 8)
+        padding_size = int(128/8)#int(shape.as_list()[0] / 8)
 
         data = tf.pad(
             data, [[padding_size, padding_size], [padding_size, padding_size],
@@ -129,7 +129,8 @@ class CreatePhaseLayer(Layer):
 
         ##############################
 
-        f_kernel = self.calc_dipole_kernel(data.get_shape().as_list())
+        #f_kernel = self.calc_dipole_kernel(data.get_shape().as_list())
+        f_kernel = self.calc_dipole_kernel([160,160,160])
 
 
 
@@ -156,13 +157,11 @@ class CreatePhaseLayer(Layer):
 
         return result, f_kernel, f_data, f_result
         
-    def call(self, inputs):
-        
-        # make sense of inputs   
-        
-      
-        data =  inputs[0]
-        data =  data[0,:,:,:,0] # IF 4 D
+    def call(self, input_tensor):# inputs
+        print("----start phase---")
+        data = input_tensor
+        print("data shape", data.shape)
+        data =  data[0,:,:,:,0] # IF 4 D  
 
         sim_fwgt,ffw,ffw,ffd = self.forward_simulation(data)
 
@@ -173,13 +172,12 @@ class CreatePhaseLayer(Layer):
  
 
 #####################################################################################
-
-import numpy as np
+"""import numpy as np
 from plotting.visualize_volumes import view_slices_3dNew
 from create_datasetfunctions_susc_unif02 import simulate_susceptibility_sources_uni
 from plotting.visualize_volumes import view_slices_3dNew
 import tensorflow as tf
-"""size = 128  
+size = 128  
 rect_num = 200
 
 
@@ -212,6 +210,5 @@ view_slices_3dNew( gt[0,:,:,:,0], 50, 50, 50,
 view_slices_3dNew( output[0,:,:,:,0], 50, 50, 50,
                   vmin=-0.5, vmax=0.5, title="phase with background field and mask")
 
-
-
 """
+

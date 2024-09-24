@@ -21,57 +21,65 @@ class CreatebackgroundFieldLayer(Layer):
     def __init__(self):
         super().__init__()
         self.gradient_slope_range = [3* 2 * tnp.pi, 8 * 2 * tnp.pi] #in tensorflow
-        #self.size = 160 
+        #self.size = 128 
         
     #def build(self, input_shape):   
         
         
     def call(self, inputs):
 
+        print("=== start bgf layer ==============")
+        
         # make sense of inputs   
-        
-        
+
+
         mask =  inputs[0]
-        
-        
-        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
         mask =  mask[0,:,:,:,0] # IF 4 D
-        #mask.shape()
-        bgf = tf.zeros_like(mask)
-        
+
+        #phase
         sim_fwgt_mask = inputs[1]
         sim_fwgt_mask = sim_fwgt_mask[0,:,:,:,0] #IF 4D
 
         #create background field
-        #bgf = tf.zeros_like(mask)
-        #tf.zeros([self.size , self.size ,self.size ], tf.float32)
+        bgf = tf.zeros([128,128,128], tf.float32)
 
+
+###################################################################################################################################
+        print("add z gradient - reduction = 5")
+        
         #create bgf        
-        #bgf = add_z_gradient_SMALL(
-        #    bgf, self.gradient_slope_range, 1) # [ :, :, :] #reduction = 20
+        bgf = add_z_gradient_SMALL(
+           bgf, self.gradient_slope_range, 5) # [ :, :, :] #reduction = 10
+        
 
-
+        ###########################################################################################################
         # bgf with mask
-        #bgf_mask = tf.multiply(mask, bgf)
+        bgf_mask = tf.multiply(mask, bgf)
+        
+        #################################################
         #add artifacts
-        boundary_artifacts_std = 10.0
-        boundary_artifacts_mean = 90.0
-        bgf_mask = add_boundary_artifacts(
-            bgf, mask, boundary_artifacts_mean,
-            boundary_artifacts_std)
+        #########################################
+        print("no boundary artifacts")
+        #print("only boundary artifacts")
+
+        #boundary_artifacts_std = 10.0
+        #boundary_artifacts_mean = 90.0
+        
+        #bgf_mask = add_boundary_artifacts(
+        #    bgf, mask, boundary_artifacts_mean,
+        #    boundary_artifacts_std)
         
 
         # add background field to the phase 
         sim_fwgt_mask_bg = tf.add(
             sim_fwgt_mask, bgf_mask)
+        
+        ##########################
 
-
-
+        print("wrapping")
         value_range = 2.0 * tnp.pi
         # shift from [-pi,pi] to [0,2*pi]
         
-        #sim_fwgt_mask_bg_sn = sim_fwgt_mask_bg
-
         #add 2pi/2
         sim_fwgt_mask_bg_wrapped = tf.add( sim_fwgt_mask_bg[ :, :, :], value_range / 2.0)
 
@@ -84,26 +92,17 @@ class CreatebackgroundFieldLayer(Layer):
         sim_fwgt_mask_bg_wrapped = tf.multiply(
             mask, sim_fwgt_mask_bg_wrapped)
         
-    
-        #output = sim_fwgt_mask_bg_sn_wrapped
-
 
         sim_fwgt_mask_bg_wrapped = tf.expand_dims(sim_fwgt_mask_bg_wrapped, 0)
         sim_fwgt_mask_bg_wrapped = tf.expand_dims(sim_fwgt_mask_bg_wrapped, 4)
+
+
        #return output_data    
+        print("=== end bgf layer ==============")
+
         return sim_fwgt_mask_bg_wrapped
     
     
     
 
 #####################################################################################
-####################################################################################
-###################################################################################
-######################################################################################
-######################################################################################
-
-
-
-
-##################################################################
-####################################################################

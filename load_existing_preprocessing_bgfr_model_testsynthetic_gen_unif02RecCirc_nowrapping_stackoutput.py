@@ -46,7 +46,9 @@ from keras.layers import Input
 #path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat_newadam16cp-2965_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLossOnlyBoundArtif.ckpt"
 
 #path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_Bgfrem_cat4convs3levels_newadam16cp-2625_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__datagenRecCircNewLossOnlyBoundArtifOnlyBoundArtif.ckpt"
-path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_BgfRem4convs4levels_BgfRemov_newadam16cp-0005_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap.ckpt"
+path = "checkpoints/preprocessing_bgremovalmodel/Bg_PhaseBgf_BgfRem4convs3levels_BgfRemov_newadam16cp-0003_trainsamples500_datasetiter3000_batchsize1_gaaccum10_loss_costum_0001_val_loss_unif02_RecCirc__phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap.ckpt"
+
+
 model1= load_model(path, compile=False)
 model1.summary()
 
@@ -64,7 +66,7 @@ import  matplotlib.pyplot as plt
 
 path_common_init = "models/preprocessing_backgroundremoval/prediction_images/unif"
 
-network_type = "PhaseBgf_Bgfrem_cat_newadam16"
+network_type = "PhaseMaskBgf_Bgfrem_cat_newadam16"
 
 for epoch_i in range(5): #num_instance
    #epoch_i=3
@@ -74,34 +76,43 @@ for epoch_i in range(5): #num_instance
         file =str(epoch_i)+"samples"
         #loaded = np.load(fullfile)
         text_typedata = "testdata"
-        file_full = "datasynthetic/uniform02RectCircle-Phase/testing/" + file + ".npz"
+        #file_full = "datasynthetic/uniform02RectCircle-Phase/testing/" + file + ".npz"
+        file_full = "datasynthetic/uniform02RectCircle-gt/testing/" + file + ".npz"
+
 
    else: #traindata
         text_typedata = "traindata" 
-        file_full = "datasynthetic/uniform02RectCircle-Phase/training/" + file + ".npz"
+        #file_full = "datasynthetic/uniform02RectCircle-gt/training/" + file + ".npz"
+        file_full = "datasynthetic/uniform02RectCircle-gt/training/" + file + ".npz"
+
    loaded = np.load(file_full)
    loaded =loaded['arr_0']
 
-   phase = loaded
+   gt = loaded
    
    
-   X_test =  phase[np.newaxis, :,:,:, np.newaxis]
+   X_test =  gt[np.newaxis, :,:,:, np.newaxis]
 
    y_pred = model1.predict(X_test)
    
 
-   pred_phaswBgF = y_pred[0][0,:,:,:,0] #1 output is bgf+phase 
+   phaswBgF = y_pred[0][0,:,:,:,0] #1 output is bgf+phase 
 
 
    maskedphase  = y_pred[1][0,:,:,:,0] # 
    pred_phase = y_pred[1][0,:,:,:,1]
+
+   print("max phase with bgf", phaswBgF.max() )
+   print("min phase with bgf", phaswBgF.min() )
+   
+   
 
 
 ###############################################################################
 ###############################################################################
 
    tt = "epoch " + str(epoch_i)
-   predicted, reference,error = visualize_all4grey(pred_phaswBgF, maskedphase, pred_phase ,
+   predicted, reference,error = visualize_all4grey(phaswBgF, maskedphase, pred_phase ,
                                                    title = tt, save = False,
                                                    path = "dfsd",
                                                    colormax=0.25,colormin=-0.25,
@@ -109,7 +120,7 @@ for epoch_i in range(5): #num_instance
 
 
 
-   m_predicted, reference,error = visualize_all4(pred_phaswBgF, maskedphase, pred_phase ,
+   m_predicted, reference,error = visualize_all4(phaswBgF, maskedphase, pred_phase ,
                                                   title = tt, save=False, 
                                                   path="dd",
                                                    colormax=0.25,colormin=-0.25,

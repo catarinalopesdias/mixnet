@@ -18,8 +18,7 @@ from keras.optimizers import Adam
 import pickle
 
 from newGA import GradientAccumulateModel
-from  my_classes.dataGenerator.DataGenerator_susc02_RectCirc_phase import DataGeneratorUniform_RecCirc_phase
-
+from  my_classes.dataGenerator.unif02.DataGenerator_susc02_RectCirc_phase import DataGeneratorUniform_RecCirc_phase
 
 ######################
 # create training set 
@@ -57,10 +56,10 @@ validation_generatorUnif = DataGeneratorUniform_RecCirc_phase(partition['validat
 
 
 #from networks.network_catarina_new import build_CNN_catarina_inputoutput
-from networks.network_Heber_new4convs3levels import build_CNN_catarina_inputoutput
 #from networks.network_Heber_new4convs4levels import build_CNN_Heber_inputoutput4convs4levels
-nettype = "4convs4levels"
-#from networks.network_catarina_new import build_CNN_BOLLMANinputoutput
+from networks.network_Heber_new4convs3levels import build_CNN_catarina_inputoutput
+
+nettype = "4convs3levels"
 
 #preprocessinglayers
 from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
@@ -87,11 +86,12 @@ mask = x[0]
 maskedPhase = x[1]
 #backgroundfield
 phasewithbackgroundfield = LayerWBackgroundField(x)
-
+#bgfremoval_phase= build_CNN_Heber_inputoutput4convs4levels(phasewithbackgroundfield)
+#dipinv_gt= build_CNN_Heber_inputoutput4convs3levels(bgfremoval_phase)
 
 #y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_BOLLMANinputoutput(phasewithbackgroundfield)])
 y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_catarina_inputoutput(phasewithbackgroundfield)])
-#y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_Heber_inputoutput4convs4levels(phasewithbackgroundfield)])
+#y = tf.keras.layers.Concatenate()([maskedPhase, bgfremoval_phase])
 ##########################################
 
 outputs = [phasewithbackgroundfield,y]
@@ -99,7 +99,7 @@ outputs = [phasewithbackgroundfield,y]
 
 model = Model(input_tensor, outputs)
 
-name = "PhaseBgf_BgfRem_cat"+nettype
+name = "PhaseBgf_BgfRem"+nettype
 
 
 model.summary() 
