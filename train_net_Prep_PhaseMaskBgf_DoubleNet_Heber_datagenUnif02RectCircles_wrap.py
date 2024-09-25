@@ -62,7 +62,7 @@ validation_generatorUnif = DataGeneratorUniform_RecCirc_gt(partition['validation
 from networks.network_Heber_new4convs4levels import build_CNN_Heber_inputoutput
 #from networks.network_Heber_new4convs3levels import build_CNN_Heber_inputoutput
 
-nettype = "4convs4levels_BgfRemov"
+nettype = "4convs4levels_DoubleNet"
 
 #preprocessinglayers
 #from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
@@ -95,21 +95,23 @@ mask = x_mask[0]
 maskedPhase = x_mask[1]
 #backgroundfield
 phasewithbackgroundfield = LayerWBackgroundField(x_mask)
-#bgfremoval_phase= build_CNN_Heber_inputoutput4convs4levels(phasewithbackgroundfield)
-#dipinv_gt= build_CNN_Heber_inputoutput4convs3levels(bgfremoval_phase)
+bgfremoval_phase= build_CNN_Heber_inputoutput(phasewithbackgroundfield)
+dipinv_gt= build_CNN_Heber_inputoutput(bgfremoval_phase)
 
-y = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_Heber_inputoutput(phasewithbackgroundfield)])
+phaselevel = tf.keras.layers.Concatenate()([maskedPhase, build_CNN_Heber_inputoutput(phasewithbackgroundfield)])
 ##########################################
 
 outputs = [phasewithbackgroundfield,
-           y]
+           phaselevel,
+           dipinv_gt
+           ]
 
 #outputs = [phasewithbackgroundfield,y,dipinv_gt]
 
 
 model = Model(input_tensor, outputs)
 
-name = "PhaseBgf_BgfRem"+nettype
+name = "PhaseMaskBgf_DoubleNet"+nettype
 
 
 model.summary() 
@@ -180,7 +182,7 @@ def my_loss_function(y_true, y_pred):
 ###################################################################
 
 
-model.compile(optimizer=optimizerMINE, loss=[None, my_loss_function])
+model.compile(optimizer=optimizerMINE, loss=[None, my_loss_function, "mse"])
 
 #model.compile(optimizer=optimizerMINE, loss=[None, my_loss_function,"mse"])
 
@@ -209,13 +211,13 @@ lossmon = "val_loss"
 ###############
 # "cp-{epoch:04d}"+
 
-checkpoint_path = "checkpoints/preprocessing_bgremovalmodel/Bg_" +\
+checkpoint_path = "checkpoints/preprocessing_doublenet/DN_" +\
     name + "_newadam" + str(num_filter)+  "cp-{epoch:04d}"\
     "_trainsamples" + str(num_train_instances) + \
     "_datasetiter" + str(dataset_iterations) + "_batchsize" + str(batch_size)+ \
     "_gaaccum" + str(gaaccumsteps) + \
     "_loss_" + lossU + "_" + \
-    text_lr +"_"+ lossmon+"_" + text_susc + "_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap.ckpt"
+    text_lr +"_"+ lossmon+"_" + text_susc + "_phasemaskbgf_doublenet_heber_datagenunif02rectcircles_wrap.ckpt"
 
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
@@ -261,15 +263,15 @@ loss_historyGA = history.history['loss']
 
 
 #save model
-if not os.path.exists("models/preprocessing_backgroundremoval"):
-    os.makedirs("models/preprocessing_Backgroundremoval")
+if not os.path.exists("models/doublenet"):
+    os.makedirs("models/doublenet")
 
     
-model_name1 = "models/preprocessing_backgroundremoval/model_Prep_BR_" + name + \
+model_name1 = "models/doublenet/model_Prep_doublenet_" + name + \
 "_newadam_" + str(num_filter)+"filters_trainsamples" + str(num_train_instances) + \
 "_datasetiter"+ str(dataset_iterations) + "_batchsize" + str(batch_size) + "_gaaccum" + str(gaaccumsteps) + \
 "_loss_" + lossU + \
-"_" + text_lr + "_" + lossmon + "_" + text_susc + "_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap.keras"
+"_" + text_lr + "_" + lossmon + "_" + text_susc + "_phasemaskbgf_doublenet_heber_datagenunif02rectcircles_wrap.keras"
 
 
 model.save(model_name1)
@@ -282,32 +284,32 @@ model.save(model_name1)
 lossfile_extensionpng =".png"
 lossfile_extensiontxt =".txt"
 
-if not os.path.exists("models/preprocessing_backgroundremoval/loss"):
-    os.makedirs("models/preprocessing_backgroundremoval/loss")
+if not os.path.exists("models/doublenet/loss"):
+    os.makedirs("models/doublenet/loss")
 
 plt.figure(figsize=(6, 3))
 plt.plot(loss_historyGA)
 plt.ylim([0, loss_historyGA[-1]*5])
 plt.title("loss")
 plt.xlabel("Dataset iterations")
-lossnamefile = "models/preprocessing_backgroundremoval/loss/model_Prep_BR_" + name + \
+lossnamefile = "models/doublenet/loss/model_Prep_doublenet_" + name + \
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + "loss"+"_"+text_susc+"_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap"
+text_lr + "_" + "loss"+"_"+text_susc+"_phasemaskbgf_doublenet_heber_datagenunif02rectcircles_wrap"
 plt.savefig(lossnamefile + lossfile_extensionpng )
 ##################################
 plt.figure(figsize=(6, 3))
 plt.plot(val_loss_historyGA)
 plt.title(lossmon)
 plt.xlabel("Dataset iterations")
-vallossnamefile = "models/preprocessing_backgroundremoval/loss/model_Prep_BR_" + name + \
+vallossnamefile = "models/preprocessing_doublenet/loss/model_Prep_doublenet_" + name + \
 "_newadam" + str(num_filter)+"trainsamples" + str(num_train_instances) \
 + "_datasetiter"+ str(dataset_iterations) + "_batchsize"+ str(batch_size)+ \
 "_gaaccum"+ str(gaaccumsteps) + \
 "_loss_" + lossU + "_" + \
-text_lr + "_" + lossmon+"_"+text_susc+"_phasemaskbgf_bgfremovalheber_datagenunif02rectcircles_wrap"
+text_lr + "_" + lossmon+"_"+text_susc+"_phasemaskbgf_doublenet_heber_datagenunif02rectcircles_wrap"
 plt.savefig(vallossnamefile + lossfile_extensionpng )
 
 ###############
