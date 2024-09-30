@@ -66,7 +66,9 @@ nettype = "4convs4levels_BgfRemov"
 
 #preprocessinglayers
 #from my_classes.keraslayer.layerbackgroundfield_artifacts_nowrapping import CreatebackgroundFieldLayer
-from my_classes.keraslayer.layerbackgroundfield_artifacts_wrapping import CreatebackgroundFieldLayer
+#from my_classes.keraslayer.layerbackgroundfield_artifacts_wrapping import CreatebackgroundFieldLayer
+from my_classes.keraslayer.layerbackgroundfield_artifacts_final import CreatebackgroundFieldLayer
+
 from my_classes.keraslayer.layer_phase import CreatePhaseLayer
 #from my_classes.keraslayer.layer_mask_inputtensor import CreateMaskLayer
 from my_classes.keraslayer.layer_mask import CreateMaskLayer
@@ -82,6 +84,8 @@ input_tensor = Input(shape = input_shape, name="input")
 LayerwMask = CreateMaskLayer()
 LayerWBackgroundField = CreatebackgroundFieldLayer()
 LayerWPhase = CreatePhaseLayer()
+
+bgf_features = "zgradient_no_boundartif_yes_wrap_yes_"
 #################################################
 #################################################
 # phase #inputs is gt #######
@@ -109,7 +113,7 @@ outputs = [phasewithbackgroundfield,
 
 model = Model(input_tensor, outputs)
 
-name = "PhaseBgf_BgfRem"+nettype
+name = "PhaseBgf_BgfRem" + nettype + bgf_features
 
 
 model.summary() 
@@ -237,7 +241,7 @@ earlystop = tf.keras.callbacks.EarlyStopping(
     mode="auto",
     baseline=None,
     restore_best_weights=False,
-    start_from_epoch=500,
+    start_from_epoch=100,
 ) 
 
 
@@ -249,7 +253,7 @@ history = model.fit( x=training_generatorUnif,
                     validation_data=validation_generatorUnif,
                     epochs=dataset_iterations,
                     use_multiprocessing=True,
-                    #initial_epoch=2635,
+                    initial_epoch=905,
                     callbacks = [cp_callback, earlystop],
                     workers=6)
 
